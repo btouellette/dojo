@@ -6,9 +6,7 @@ import java.awt.*;
 import java.io.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.*;
 import java.util.HashMap;
 
 public class Main
@@ -61,7 +59,7 @@ public class Main
 	private static PlayArea createPlayArea(int width, int height)
 	{
 		//Create the main play area
-        PlayArea playArea = new PlayArea();
+        PlayArea playArea = new PlayArea(width, height);
         playArea.setOpaque(true);
         playArea.setBackground(Color.WHITE);
         playArea.setPreferredSize(new Dimension(width, height));
@@ -135,7 +133,5 @@ public class Main
                 createAndShowGUI();
             }
         });
-
-        System.out.println(database.get("CoB053").getName());
     }
 }
