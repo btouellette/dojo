@@ -15,30 +15,30 @@ import javax.swing.text.*;
 
 public class TextActionListener implements ActionListener{
 
-	private JTextPane output;
+	private JTextPane chatBox;
 	private final static String newline = "\n";
 	
     public TextActionListener(JTextPane chatBox)
     {
     	//Recieves the textfield to which the ActionListener outputs
-    	output = chatBox;
+    	this.chatBox = chatBox;
     	addStyles();
-    	output.setText("Welcome to L5R Online!");
+    	chatBox.setText("Welcome to L5R Online!");
     }
     
     public void addStyles()
     {
-    	StyledDocument doc = output.getStyledDocument();
+    	StyledDocument doc = chatBox.getStyledDocument();
     	
-    	Style style = output.addStyle("Default", null);
+    	Style style = chatBox.addStyle("Default", null);
     
-	    style = output.addStyle("Action", null);
+	    style = chatBox.addStyle("Action", null);
 	    StyleConstants.setForeground(style, new Color(99, 204, 33));
 	    
-	    style = output.addStyle("YourName", null);
+	    style = chatBox.addStyle("YourName", null);
 	    StyleConstants.setForeground(style, Color.BLUE);
 	    
-	    style = output.addStyle("OppName", null);
+	    style = chatBox.addStyle("OppName", null);
 	    StyleConstants.setForeground(style, Color.RED);
     }
     
@@ -51,9 +51,10 @@ public class TextActionListener implements ActionListener{
     {
     	//Just updates the chat area locally for now, needs to be updated to send a network command
     	try	{
-    		StyledDocument doc = output.getStyledDocument();
+    		StyledDocument doc = chatBox.getStyledDocument();
     		//Default will be replaced with the appropriate style
     		doc.insertString(doc.getLength(), newline + text, doc.getStyle("Default"));
+    		
     	} catch(BadLocationException e)	{
     		System.err.println("The following error ocured: " + e);
     	}
