@@ -37,6 +37,8 @@ public class Main
 
 		//Lay out the Game menu
 		JMenu game = new JMenu("Game");
+		//Prevent the menu from being occluded
+		game.setMinimumSize(game.getPreferredSize());
 		JMenuItem connect = new JMenuItem("Connect");
 		JMenuItem startGame = new JMenuItem("Start Game");
 		JMenuItem deck = new JMenuItem("Deckbuilder");
@@ -55,6 +57,8 @@ public class Main
 
 		//Lay out the Action menu
 		JMenu action = new JMenu("Action");
+		//Prevent the menu from being occluded
+		action.setMinimumSize(action.getPreferredSize());
 		JMenuItem flipCoin = new JMenuItem("Flip Coin");
 		JMenuItem randomCard = new JMenuItem("Drop Random Fate Card");
 		JMenuItem revealHand = new JMenuItem("Reveal Hand");
@@ -73,13 +77,32 @@ public class Main
 		menuBar.add(about);
 
 		//Create the top bar
+		//Create the card size slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
-		sizeSlider.setMaximumSize(new Dimension(width/10 , 25));
+		sizeSlider.setPreferredSize(new Dimension(width/10 , 25));
+		//Make it so the menu background color shows through behind the slider
+		sizeSlider.setOpaque(false);
+		//Create the token generator (naming box and button)
+		JComboBox tokenName = new JComboBox();
+		tokenName.setEditable(false);
+		tokenName.setPreferredSize(new Dimension(width/10, 20));
+		//Prevent the popup from appearing on the first click
+		tokenName.setEnabled(false);
+		tokenName.setForeground(Color.LIGHT_GRAY);
+		tokenName.addItem(" Create token");
+		tokenName.addMouseListener(new TokenActionListener());
+		JButton unbowButton = new JButton("Unbow All");
 
 		//Add some horizontal glue to push the action boxes to the right side
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(new JLabel("Card Size"));
 		menuBar.add(sizeSlider);
+		menuBar.add(Box.createHorizontalStrut(10));
+		menuBar.add(tokenName);
+		//menuBar.add(Box.createHorizontalStrut(3));
+		//menuBar.add(tokenButton);
+		menuBar.add(Box.createHorizontalStrut(10));
+		menuBar.add(unbowButton);
 
 		//Create the play area
 		PlayArea playArea = createPlayArea(width, height);
