@@ -1,10 +1,6 @@
-/**
- * @(#)TextActionListener.java
- *
- *
- * @author
- * @version 1.00 2007/10/5
- */
+// TextActionListener.java
+// Written by Brian Ouellette
+// Part of Dojo
 
 package l5r;
 
@@ -13,8 +9,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class TextActionListener implements ActionListener{
-
+class TextActionListener implements ActionListener
+{
 	private JTextPane chatBox;
 	private final static String newline = "\n";
 

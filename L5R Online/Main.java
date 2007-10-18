@@ -1,3 +1,7 @@
+// Main.java
+// Written by Brian Ouellette
+// Part of Dojo
+
 package l5r;
 
 import javax.swing.*;
@@ -28,6 +32,20 @@ public class Main
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = (int)(screenSize.getWidth()*.75);
         int height = (int)(screenSize.getHeight()*.5);
+
+		//Create the play area
+		PlayArea playArea = createPlayArea(width, height);
+
+		//Create the info area (card box, chat box, game info box)
+		JPanel infoArea = createInfoArea(width, height);
+
+		//Create a split panel so that the relative size of the areas can be user controlled
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, playArea, infoArea);
+		//Set it so that the play area gets all the extra space by default (from resizing the main window)
+		splitPane.setResizeWeight(1);
+		//Don't use the ugly default Java divider
+		splitPane.setUI(new BasicSplitPaneUI());
+		splitPane.setDividerSize(5);
 
 		//Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
@@ -79,6 +97,7 @@ public class Main
 		//Create the top bar
 		//Create the card size slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
+		sizeSlider.addChangeListener(new SliderListener(playArea));
 		sizeSlider.setPreferredSize(new Dimension(width/10 , 25));
 		//Make it so the menu background color shows through behind the slider
 		sizeSlider.setOpaque(false);
@@ -103,20 +122,6 @@ public class Main
 		//menuBar.add(tokenButton);
 		menuBar.add(Box.createHorizontalStrut(10));
 		menuBar.add(unbowButton);
-
-		//Create the play area
-		PlayArea playArea = createPlayArea(width, height);
-
-        //Create the info area (card box, chat box, game info box)
-        JPanel infoArea = createInfoArea(width, height);
-
-		//Create a split panel so that the relative size of the areas can be user controlled
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, playArea, infoArea);
-		//Set it so that the play area gets all the extra space by default (from resizing the main window)
-		splitPane.setResizeWeight(1);
-		//Don't use the ugly default Java divider
-		splitPane.setUI(new BasicSplitPaneUI());
-		splitPane.setDividerSize(5);
 
         //Set the menu bar and add the label to the content pane
         frame.setJMenuBar(menuBar);
