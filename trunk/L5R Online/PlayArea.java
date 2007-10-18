@@ -7,23 +7,41 @@
  */
 
 package l5r;
+// PlayArea.java
+// Written by Brian Ouellette
+// Part of Dojo
+
+//package l5r;
 
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PlayArea extends JPanel implements MouseListener
+class PlayArea extends JPanel implements MouseListener
 {
 	Dimension dimension;
-	int cardWidth, cardHeight;
+	int cardWidth, cardHeight, baseCardHeight;
 
     public PlayArea(int width, int height)
     {
-		dimension = this.getSize();
+		//dimension = this.getSize();
 
 		cardHeight = (int)(height/5);
 		cardWidth = (int)(cardHeight*(2.5/3.5));
+
+		baseCardHeight = cardHeight;
     }
+
+    public void setCardSize(int cardHeight)
+    {
+		this.cardHeight = cardHeight;
+		this.cardWidth = cardWidth = (int)(cardHeight*(2.5/3.5));
+	}
+
+	public int getBaseCardSize()
+	{
+		return baseCardHeight;
+	}
 
 	//Override the default JPanel paint method
     public void paintComponent(Graphics g)

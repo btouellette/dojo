@@ -1,10 +1,6 @@
-/**
- * @(#)TokenActionListener.java
- *
- *
- * @author
- * @version 1.00 2007/10/5
- */
+// TokenActionListener.java
+// Written by Brian Ouellette
+// Part of Dojo
 
 package l5r;
 
@@ -15,8 +11,8 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.swing.plaf.basic.*;
 
-public class TokenActionListener implements ActionListener, MouseListener{
-
+class TokenActionListener implements ActionListener, MouseListener
+{
     public TokenActionListener()
     {
     }

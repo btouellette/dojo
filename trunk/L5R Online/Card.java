@@ -1,16 +1,12 @@
-/**
- * @(#)Card.java
- *
- *
- * @author
- * @version 1.00 2007/10/5
- */
+// Card.java
+// Written by Brian Ouellette
+// Part of Dojo
 
 package l5r;
 
 import java.util.ArrayList;
 
-public class Card
+class Card
 {
 	//Info
 	String id, type;

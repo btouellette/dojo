@@ -1,3 +1,7 @@
+// Importer.java
+// Written by Brian Ouellette
+// Part of Dojo
+
 package l5r;
 
 import javax.swing.*;
@@ -11,7 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import java.util.HashMap;
 
-public class Importer extends DefaultHandler
+class Importer extends DefaultHandler
 {
 	private Writer  out;
 	private String version, eName;
