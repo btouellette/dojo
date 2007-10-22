@@ -17,10 +17,33 @@ class TokenActionListener implements ActionListener, MouseListener
     {
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-		System.out.println("Action");
-    }
+	// This method is called whenever the user or program changes the selected item.
+	// Note: The new item may be the same as the previous item.
+	public void actionPerformed(ActionEvent e)
+	{
+		boolean dupeTest = true;
+		JComboBox comboBox = (JComboBox)e.getSource();
+
+		// Get the text entered
+		Object text = comboBox.getSelectedItem();
+
+		if ("comboBoxEdited".equals(e.getActionCommand()))
+		{
+			// String has been entered and the user wants to make a token
+			TextActionListener.send(Main.userName + " makes a token.", "Action");
+			for(int i = 0; i < comboBox.getItemCount(); i++)
+			{
+				if(text.equals(comboBox.getItemAt(i)))
+				{
+					dupeTest = false;
+				}
+			}
+			if(dupeTest)
+			{
+				comboBox.insertItemAt(text, 0);
+			}
+		}
+	}
 
     public void mouseClicked(MouseEvent e)
 	{
@@ -30,6 +53,9 @@ class TokenActionListener implements ActionListener, MouseListener
 		{
 			comboBox.setEnabled(true);
 			comboBox.setEditable(true);
+			//Bias the text five pixels from the edge of the combo box
+			JTextField textField = ((JTextField)comboBox.getEditor().getEditorComponent());
+			textField.setBorder(BorderFactory.createCompoundBorder(textField.getBorder(), BorderFactory.createEmptyBorder(0,3,0,0)));
 			comboBox.removeAllItems();
 			comboBox.requestFocusInWindow();
 		}
