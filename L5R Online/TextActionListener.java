@@ -14,10 +14,10 @@ class TextActionListener implements ActionListener
 	private JTextPane chatBox;
 	private final static String newline = "\n";
 
-    public TextActionListener(JTextPane chatBox)
+    public TextActionListener()
     {
     	//Recieves the textfield to which the ActionListener outputs
-    	this.chatBox = chatBox;
+    	this.chatBox = Main.chatBox;
     	addStyles();
     	chatBox.setText("Welcome to L5R Online!");
     }
@@ -29,31 +29,33 @@ class TextActionListener implements ActionListener
     	Style style = chatBox.addStyle("Default", null);
 
 	    style = chatBox.addStyle("Action", null);
-	    StyleConstants.setForeground(style, new Color(99, 204, 33));
+	    //Green
+	    StyleConstants.setForeground(style, new Color(51, 153, 51));
 
-	    style = chatBox.addStyle("YourName", null);
-	    StyleConstants.setForeground(style, Color.BLUE);
+	    style = chatBox.addStyle("You", null);
+	    //Blue
+	    StyleConstants.setForeground(style, new Color(51, 51, 204));
 
-	    style = chatBox.addStyle("OppName", null);
-	    StyleConstants.setForeground(style, Color.RED);
+	    style = chatBox.addStyle("Opp", null);
+	    //Red
+	    StyleConstants.setForeground(style, new Color(204, 51, 51));
     }
 
     public void actionPerformed(ActionEvent e)
     {
 		JTextField textBox = (JTextField)e.getSource();
 		//Send the inputted text to the display
-    	send(textBox.getText());
+		send(Main.userName + ": " + textBox.getText(), "You");
     	//Clear the text box
     	textBox.setText("");
     }
 
-    public void send(String text)
+    public static void send(String text, String style)
     {
     	//Just updates the chat area locally for now, needs to be updated to send a network command
     	try	{
-    		StyledDocument doc = chatBox.getStyledDocument();
-    		//Default will be replaced with the appropriate style
-    		doc.insertString(doc.getLength(), newline + text, doc.getStyle("Default"));
+    		StyledDocument doc = Main.chatBox.getStyledDocument();
+			doc.insertString(doc.getLength(), newline + text, doc.getStyle(style));
 
     	} catch(BadLocationException e)	{
     		System.err.println("The following error ocured: " + e);

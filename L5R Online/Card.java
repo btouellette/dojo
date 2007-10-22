@@ -5,6 +5,7 @@
 package l5r;
 
 import java.util.ArrayList;
+import java.awt.Dimension;
 
 class Card
 {
@@ -16,6 +17,9 @@ class Card
 	String edition, text, cost, focus;
 	String clan, province_strength, gold_production, starting_honor;
 	String force, chi, personal_honor, honor_req;
+
+	ArrayList<Card> attachments;
+	int x, y;
 
     public Card(String id)
     {
@@ -189,5 +193,26 @@ class Card
 	public String getHonorReq()
 	{
 		return honor_req;
+	}
+
+	public void setLocation(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+
+	public Dimension getLocation()
+	{
+		return new Dimension(x, y);
+	}
+
+	public void attach(Card attachingCard)
+	{
+		attachments.add(attachingCard);
+	}
+
+	public void unattach(Card unattachingCard)
+	{
+		attachments.remove(attachments.indexOf(unattachingCard));
 	}
 }
