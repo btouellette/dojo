@@ -20,6 +20,7 @@ class Main
 	public static String userName, gender;
 	public static JTextPane chatBox;
 	public static CardInfoBox cardBox;
+	public static boolean highRes;
 
     /**
      * Create the GUI and show it.  For thread safety,
@@ -49,7 +50,7 @@ class Main
 		PlayArea playArea = createPlayArea(width, height);
 
 		//Create the info area (card box, chat box, game info box)
-		JPanel infoArea = createInfoArea(width, height);
+		JSplitPane infoArea = createInfoArea(width, height);
 
 		//Create a split panel so that the relative size of the areas can be user controlled
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, playArea, infoArea);
@@ -190,13 +191,13 @@ class Main
         return playArea;
 	}
 
-	private static JPanel createInfoArea(int width, int height)
+	private static JSplitPane createInfoArea(int width, int height)
 	{
 		//Create the chat/info area
         JPanel infoArea = new JPanel();
         infoArea.setOpaque(true);
         infoArea.setBackground(Color.LIGHT_GRAY);
-        infoArea.setPreferredSize(new Dimension(width, 175));
+        infoArea.setPreferredSize(new Dimension(3*width/4, 175));
         //Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
@@ -209,13 +210,25 @@ class Main
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		chatSend.addActionListener(new TextActionListener());
 
-		//Create the card info box
-		cardBox = new CardInfoBox();
-
 		infoArea.add(scrollPane, BorderLayout.CENTER);
 		infoArea.add(chatSend, BorderLayout.SOUTH);
 
-		return infoArea;
+
+		//Create the card info box
+		cardBox = new CardInfoBox();
+		//JScrollPane scrollPaneCard = new JScrollPane(cardBox);
+		//scrollPaneCard.setPreferredSize(new Dimension(width/4, 175));
+		cardBox.setPreferredSize(new Dimension(width/4, 175));
+		JScrollPane cardBoxScrollPane = new JScrollPane(cardBox);
+
+		JSplitPane outerInfoArea = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
+
+		outerInfoArea.setUI(new BasicSplitPaneUI());
+		outerInfoArea.setDividerSize(5);
+
+		cardBox.setCard(database.get("WoE091"));
+
+		return outerInfoArea;
 	}
 
 	private static void importDatabase()
