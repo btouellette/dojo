@@ -47,12 +47,16 @@ class Card
 
     public void setImageLocation(String imageLocation)
     {
-		this.imageLocation.add(imageLocation);
+		//Always add it at the beginning of the list
+		//MRP will be the last card and we want that to be the default return
+		this.imageLocation.add(0, imageLocation);
 	}
 
     public void setImageEdition(String imageEdition)
     {
-		this.imageEdition.add(imageEdition);
+		//Always add it at the beginning of the list
+		//MRP will be the last card and we want that to be the default return
+		this.imageEdition.add(0, imageEdition);
 	}
 
 	public void setEdition(String edition)
@@ -133,6 +137,30 @@ class Card
 	public String getName()
 	{
 		return name;
+	}
+
+	public String getImageLocation(int count)
+	{
+		if(count < imageLocation.size())
+		{
+			return imageLocation.get(count);
+		}
+		else
+		{
+			return "";
+		}
+	}
+
+	public String getImageEdition(int count)
+	{
+		if(count < imageEdition.size())
+		{
+			return imageEdition.get(count);
+		}
+		else
+		{
+			return "";
+		}
 	}
 
 	public String getEdition()
