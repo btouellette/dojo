@@ -5,9 +5,10 @@
 package l5r;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
-class GameInfoBox extends JPanel implements MouseListener
+class GameInfoBox extends JPanel implements ActionListener
 {
 	int yourHonor, oppHonor;
 	int yourCardNum, oppCardNum;
@@ -17,20 +18,39 @@ class GameInfoBox extends JPanel implements MouseListener
 
     public GameInfoBox()
     {
+		setBackground(Color.WHITE);
+		setLayout(new GridLayout(1,2));
+
+		JButton upHonor = new JButton("\u21E7");
+		JButton downHonor = new JButton("\u21E9");
+
+		upHonor.setBorderPainted(false);
+		upHonor.setBackground(Color.WHITE);
+
+		downHonor.setBorderPainted(false);
+		downHonor.setBackground(Color.WHITE);
+
+		upHonor.setActionCommand("up");
+		downHonor.setActionCommand("down");
+
+		JPanel yourInfo = new JPanel();
+		JPanel oppInfo = new JPanel();
+
+		yourInfo.setOpaque(false);
+		oppInfo.setOpaque(false);
+
+		yourInfo.setLayout(new GridLayout(1, 2));
+		oppInfo.setLayout(new GridLayout(1, 1));
+
+		yourInfo.add(upHonor);
+		yourInfo.add(downHonor);
+
+		add(yourInfo);
+		add(oppInfo);
     }
-    public void mouseClicked(MouseEvent e)
-    {
-    }
- 	public void mouseEntered(MouseEvent e)
- 	{
-    }
- 	public void mouseExited(MouseEvent e)
- 	{
-    }
- 	public void mousePressed(MouseEvent e)
- 	{
-    }
- 	public void mouseReleased(MouseEvent e)
- 	{
-    }
+
+	public void actionPerformed(ActionEvent e)
+	{
+	}
+
 }

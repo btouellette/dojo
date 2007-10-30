@@ -21,6 +21,7 @@ class Main
 	public static JTextPane chatBox;
 	public static CardInfoBox cardBox;
 	public static boolean highRes;
+	public static PlayArea playArea;
 
     /**
      * Create the GUI and show it.  For thread safety,
@@ -47,7 +48,7 @@ class Main
         gender = "Male";
 
 		//Create the play area
-		PlayArea playArea = createPlayArea(width, height);
+		playArea = createPlayArea(width, height);
 
 		//Create the info area (card box, chat box, game info box)
 		JSplitPane infoArea = createInfoArea(width, height);
@@ -135,17 +136,19 @@ class Main
 
 		//Create the top bar
 		//Create the card size slider
+		// TODO: More intelligent max/min for the slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
-		sizeSlider.addChangeListener(new SliderListener(playArea));
+		sizeSlider.addChangeListener(new SliderListener());
 		sizeSlider.setPreferredSize(new Dimension(100, 25));
 		sizeSlider.setMaximumSize(sizeSlider.getPreferredSize());
 		//Make it so the menu background color shows through behind the slider
 		sizeSlider.setOpaque(false);
+
 		//Create the token generator (naming box and button)
 		JComboBox tokenName = new JComboBox();
-		tokenName.setEditable(false);
 		tokenName.setPreferredSize(new Dimension(175, 23));
 		tokenName.setMaximumSize(tokenName.getPreferredSize());
+		//Indent the text by 3 pixels
 		((BasicComboBoxRenderer)tokenName.getRenderer()).setBorder(new EmptyBorder(0,3,0,0));
 		//Prevent the popup from appearing on the first click
 		tokenName.setEnabled(false);
@@ -154,9 +157,12 @@ class Main
 		TokenActionListener tokenListener = new TokenActionListener();
 		tokenName.addMouseListener(tokenListener);
 		tokenName.addActionListener(tokenListener);
+
+		//Create the buttons
 		JButton unbowButton = new JButton("Unbow All");
 		//No reason for the button to hold focus
 		unbowButton.setFocusable(false);
+
 		JButton turnButton = new JButton("End Turn");
 		//No reason for the button to hold focus
 		turnButton.setFocusable(false);
@@ -183,12 +189,14 @@ class Main
 	private static PlayArea createPlayArea(int width, int height)
 	{
 		//Create the main play area
-        PlayArea playArea = new PlayArea(width, height);
-        playArea.setOpaque(true);
-        playArea.setBackground(Color.WHITE);
-        playArea.setPreferredSize(new Dimension(width, height));
+        PlayArea playAreaPanel = new PlayArea(width, height);
+        playAreaPanel.setOpaque(true);
+        // TODO: Allow for custom backgrounds
+        playAreaPanel.setBackground(Color.WHITE);
+        // TODO: Save the last used size and load it here
+        playAreaPanel.setPreferredSize(new Dimension(width, height));
 
-        return playArea;
+        return playAreaPanel;
 	}
 
 	private static JSplitPane createInfoArea(int width, int height)
@@ -197,7 +205,8 @@ class Main
         JPanel infoArea = new JPanel();
         infoArea.setOpaque(true);
         infoArea.setBackground(Color.LIGHT_GRAY);
-        infoArea.setPreferredSize(new Dimension(3*width/4, 175));
+        // TODO: Remember the previous size of all these windows
+        infoArea.setPreferredSize(new Dimension(2*width/4, 175));
         //Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
@@ -213,22 +222,29 @@ class Main
 		infoArea.add(scrollPane, BorderLayout.CENTER);
 		infoArea.add(chatSend, BorderLayout.SOUTH);
 
-
 		//Create the card info box
 		cardBox = new CardInfoBox();
-		//JScrollPane scrollPaneCard = new JScrollPane(cardBox);
-		//scrollPaneCard.setPreferredSize(new Dimension(width/4, 175));
 		cardBox.setPreferredSize(new Dimension(width/4, 175));
 		JScrollPane cardBoxScrollPane = new JScrollPane(cardBox);
 
-		JSplitPane outerInfoArea = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
+		GameInfoBox gameInfo = new GameInfoBox();
+		gameInfo.setPreferredSize(new Dimension(width/4, 175));
 
-		outerInfoArea.setUI(new BasicSplitPaneUI());
-		outerInfoArea.setDividerSize(5);
+		//Set up JSplitPanes to allow for dynamic resizing
+		// TODO: Allow corner dragging to resize multiple SplitPanes. Would have to use a different component. Possible?
+		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
+		JSplitPane outerInfoArea2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, outerInfoArea1, gameInfo);
+
+		outerInfoArea1.setUI(new BasicSplitPaneUI());
+		outerInfoArea1.setDividerSize(5);
+
+		outerInfoArea2.setUI(new BasicSplitPaneUI());
+		outerInfoArea2.setDividerSize(5);
+
 
 		cardBox.setCard(database.get("WoE091"));
 
-		return outerInfoArea;
+		return outerInfoArea2;
 	}
 
 	private static void importDatabase()
@@ -242,7 +258,8 @@ class Main
         {
 		 	// Parse the input
 		    SAXParser saxParser = factory.newSAXParser();
-		    saxParser.parse( new File("cards-complete.xml"), handler );
+		    System.out.print("Loading card database: ");
+		    saxParser.parse( new File("cards.xml"), handler );
 
 		} catch (SAXParseException spe) {
 		   // Error generated by the parser
@@ -251,12 +268,20 @@ class Main
 			  + ", uri " + spe.getSystemId());
 		   System.out.println("   " + spe.getMessage() );
 
+		} catch (IOException io) {
+			// File is not there or unreadable
+			System.err.println(io);
+			// TODO: Fetch the cards database from Kamisasori and unzip it
+			// http://www.kamisasori.net/files/cards-complete.zip
+			System.exit(1);
+
 		} catch (Throwable t) {
 
 			t.printStackTrace();
     	}
 
     	database = handler.getDatabase();
+    	System.out.println("success");
 	}
 
     public static void main(String[] args)
