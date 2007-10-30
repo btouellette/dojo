@@ -9,17 +9,14 @@ import javax.swing.event.*;
 
 class SliderListener implements ChangeListener
 {
-	PlayArea playArea;
-
-	public SliderListener(PlayArea playArea)
+	public SliderListener()
 	{
-		this.playArea = playArea;
 	}
 
 	public void stateChanged(ChangeEvent e)
 	{
 		int sliderValue = ((JSlider)e.getSource()).getValue();
-		playArea.setCardSize(sliderValue*playArea.getBaseCardSize()/50);
-		playArea.repaint();
+		Main.playArea.setCardSize(sliderValue*Main.playArea.getBaseCardSize()/50);
+		Main.playArea.repaint();
 	}
 }
