@@ -19,8 +19,8 @@ class Importer extends DefaultHandler
 {
 	private Writer  out;
 	private String version, eName;
-	private HashMap<String, Card> database;
-	private Card currentCard;
+	private HashMap<String, StoredCard> database;
+	private StoredCard currentCard;
 
 	public Importer()
 	{
@@ -31,14 +31,14 @@ class Importer extends DefaultHandler
 
             //Create a new HashMap with an initial capacity of 1500
             //This value might need to be tweaked
-            database = new HashMap<String, Card>(500);
+            database = new HashMap<String, StoredCard>(500);
 
         } catch (Throwable t) {
             t.printStackTrace();
         }
 	}
 
-	public HashMap<String, Card> getDatabase()
+	public HashMap<String, StoredCard> getDatabase()
 	{
 		return database;
 	}
@@ -121,7 +121,7 @@ class Importer extends DefaultHandler
 					{
 						database.put(currentCard.getID(), currentCard);
 					}
-					currentCard = new Card(localValue);
+					currentCard = new StoredCard(localValue);
 				}
 				else if(localName.equals("type"))
 				{

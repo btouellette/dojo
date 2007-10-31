@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 class Main
 {
-	public static HashMap<String, Card> database;
+	public static HashMap<String, StoredCard> database;
 	public static String userName, gender;
 	public static JTextPane chatBox;
 	public static CardInfoBox cardBox;
@@ -233,14 +233,17 @@ class Main
 		//Set up JSplitPanes to allow for dynamic resizing
 		// TODO: Allow corner dragging to resize multiple SplitPanes. Would have to use a different component. Possible?
 		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
+		//Set it so that the chatbox gets all the extra space by default (from resizing the main window)
+		outerInfoArea1.setResizeWeight(0);
 		JSplitPane outerInfoArea2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, outerInfoArea1, gameInfo);
+		//Set it so that the chatbox gets all the extra space by default (from resizing the main window)
+		outerInfoArea2.setResizeWeight(1);
 
 		outerInfoArea1.setUI(new BasicSplitPaneUI());
 		outerInfoArea1.setDividerSize(5);
 
 		outerInfoArea2.setUI(new BasicSplitPaneUI());
 		outerInfoArea2.setDividerSize(5);
-
 
 		cardBox.setCard(database.get("WoE091"));
 
