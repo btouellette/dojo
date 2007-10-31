@@ -18,5 +18,7 @@ class SliderListener implements ChangeListener
 		int sliderValue = ((JSlider)e.getSource()).getValue();
 		Main.playArea.setCardSize(sliderValue*Main.playArea.getBaseCardSize()/50);
 		Main.playArea.repaint();
+
+		System.out.println(sliderValue*Main.playArea.getBaseCardSize()/50);
 	}
 }

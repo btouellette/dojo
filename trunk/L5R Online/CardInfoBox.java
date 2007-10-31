@@ -13,7 +13,7 @@ import java.io.*;
 
 class CardInfoBox extends JEditorPane
 {
-	Card card;
+	StoredCard card;
 
     public CardInfoBox()
     {
@@ -21,13 +21,13 @@ class CardInfoBox extends JEditorPane
 		setContentType("text/html");
     }
 
-    public CardInfoBox(Card card)
+    public CardInfoBox(StoredCard card)
     {
 		this();
 		setCard(card);
 	}
 
-    public void setCard(Card card)
+    public void setCard(StoredCard card)
     {
 		String cardHTML1, cardHTML2, cardHTML3, cardHTML4, cardImageLoc = "";
 		boolean imageExists = false, moreImages = true;
@@ -123,7 +123,6 @@ class CardInfoBox extends JEditorPane
 
 		//Set the card window to show the html table for the card
 		setText(cardHTML1 + cardHTML2 + cardHTML3 + cardHTML4);
-		System.out.println(getText());
 		//Scroll the window back up to the top
 		setCaretPosition(0);
 	}

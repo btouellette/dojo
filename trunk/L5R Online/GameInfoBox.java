@@ -25,9 +25,11 @@ class GameInfoBox extends JPanel implements ActionListener
 		JButton downHonor = new JButton("\u21E9");
 
 		upHonor.setBorderPainted(false);
+		upHonor.setFocusable(false);
 		upHonor.setBackground(Color.WHITE);
 
 		downHonor.setBorderPainted(false);
+		downHonor.setFocusable(false);
 		downHonor.setBackground(Color.WHITE);
 
 		upHonor.setActionCommand("up");
