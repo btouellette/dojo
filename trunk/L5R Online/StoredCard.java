@@ -5,6 +5,7 @@
 package l5r;
 
 import java.util.ArrayList;
+import java.io.File;
 
 class StoredCard
 {
@@ -130,16 +131,26 @@ class StoredCard
 		return name;
 	}
 
-	public String getImageLocation(int count)
+	public String getImageLocation()
 	{
-		if(count < imageLocation.size())
+		String cardImageLoc = null;
+		boolean imageExists = false;
+		int count = 0;
+
+		//Find the first valid image location
+		while(!imageExists && count < imageLocation.size())
 		{
-			return imageLocation.get(count);
+			cardImageLoc = imageLocation.get(count);
+			imageExists = (new File(cardImageLoc)).exists();
+			count++;
 		}
-		else
+
+		if(imageExists)
 		{
-			return "";
+			return cardImageLoc;
 		}
+
+		return null;
 	}
 
 	public String getImageEdition(int count)
