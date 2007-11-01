@@ -29,30 +29,16 @@ class CardInfoBox extends JEditorPane
 
     public void setCard(StoredCard card)
     {
-		String cardHTML1, cardHTML2, cardHTML3, cardHTML4, cardImageLoc = "";
-		boolean imageExists = false, moreImages = true;
+		String cardHTML1, cardHTML2, cardHTML3, cardHTML4, cardImageLoc;
 		int count = 0;
 
 
 		/* Commented out until it's determined whether images should be present in the info box
-		//Find the first valid image location
-		while(!imageExists && moreImages)
-		{
-			cardImageLoc = card.getImageLocation(count);
-			if(cardImageLoc.equals(""))
-			{
-				moreImages = false;
-			}
-			else
-			{
-				imageExists = (new File(cardImageLoc)).exists();
-			}
-			count++;
-		}
+		cardImageLoc = card.getImageLocation();
 
 		//Hack to get a non-relative file location as JEditorPane doesn't support relative pathnames in IMG tags
 		//If used then <img src=\"" + cardImageLoc + "\"> is added to the HTML
-		if(imageExists)
+		if(cardImageLoc != null)
 		{
 			File temp = new File(cardImageLoc);
 			cardImageLoc = "file:" + temp.getAbsolutePath();

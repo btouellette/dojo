@@ -12,11 +12,14 @@ class PlayableCard
 	//Info needed
 	String id;
 	ArrayList<Card> attachments;
-	int x, y;
+	int[] location;
 
     public PlayableCard(String id)
     {
 		this.id = id;
+		location = new int[2];
+		location[0] = 0;
+		location[1] = 0;
     }
 
 	public String getID()
@@ -26,13 +29,13 @@ class PlayableCard
 
 	public void setLocation(int x, int y)
 	{
-		this.x = x;
-		this.y = y;
+		location[0] = x;
+		location[1] = y;
 	}
 
-	public Dimension getLocation()
+	public int[] getLocation()
 	{
-		return new Dimension(x, y);
+		return location;
 	}
 
 	public void attach(Card attachingCard)
