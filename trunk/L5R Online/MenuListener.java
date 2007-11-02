@@ -1,6 +1,7 @@
 // MenuListener.java
 // Written by Brian Ouellette
 // Part of Dojo
+// Listener for all the menus at the top of the panel.
 
 package l5r;
 
