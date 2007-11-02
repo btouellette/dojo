@@ -1,6 +1,7 @@
 // TextActionListener.java
 // Written by Brian Ouellette
 // Part of Dojo
+// This is the ActionListener that controls the chat panel. It formats the text and sends out commands.
 
 package l5r;
 

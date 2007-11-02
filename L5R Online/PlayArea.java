@@ -1,6 +1,7 @@
 // PlayArea.java
 // Written by Brian Ouellette
 // Part of Dojo
+// This is the beefy part of the program. It controls the display for the game.
 
 package l5r;
 
@@ -15,7 +16,8 @@ import java.io.*;
 class PlayArea extends JPanel implements MouseListener
 {
 	Dimension dimension;
-	int cardWidth, cardHeight, baseCardHeight;
+	int cardWidth, cardHeight;
+	static int baseCardHeight;
 	ArrayList<PlayableCard> displayedCards;
 
     public PlayArea(int width, int height)
@@ -27,8 +29,6 @@ class PlayArea extends JPanel implements MouseListener
 
 		//Create a new ArrayList to hold the cards to display and
 		displayedCards = new ArrayList<PlayableCard>(40);
-
-		addCard(new PlayableCard(Main.database.get("TTT088").getID()));
     }
 
     public void setCardSize(int cardHeight)
@@ -37,10 +37,10 @@ class PlayArea extends JPanel implements MouseListener
 		this.cardWidth = cardWidth = (int)(cardHeight*(2.5/3.5));
 	}
 
-	public int getBaseCardSize()
+	/*public int getBaseCardSize()
 	{
 		return baseCardHeight;
-	}
+	}*/
 
 	public void addCard(PlayableCard card)
 	{
@@ -120,6 +120,28 @@ class PlayArea extends JPanel implements MouseListener
 
 		int[] location = card.getLocation();
 
+		//Recursively show all the attachments on the current card
+		//Will also show all the attachments on attached cards in correct order.
+
+		/* Example of intended use
+		 * 1 has 2 and 4 attached to it
+		 * 2 has 3 attached to it
+		 * 4 has 5 attached to it
+		 *
+		 * This starts at the last attachment of the current card
+		 * which will be 4 as 1 is the only card stored in displayedCards
+		 * (attachments are displayed by default)
+		 * First the attachments of 4 are displayed. Then 4 itself is displayed.
+		 * Then the next to last attachment on 1 is called. It's attachments are
+		 * displayed so 3 gets put out. Then 2 and finally 1. So 1 will be "on top"
+		 * with 2-3-4-5 in that order stacked "underneath" it.
+		 */
+		ArrayList<PlayableCard> attachments = card.getAttachments();
+		for(int i = attachments.size()-1; i >= 0; i--)
+		{
+			displayCard(attachments.get(i), g);
+		}
+
 		String imageLocation = databaseCard.getImageLocation();
 		if(imageLocation == null)
 		{
@@ -136,13 +158,11 @@ class PlayArea extends JPanel implements MouseListener
 				if(cardImage.getHeight() >= cardHeight)
 				{
 					//if downsizing image
-
 					//Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
 					//then they can be swapped.
 					//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
 					Image cardImage2 = cardImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
 					g.drawImage(cardImage2, null, null);
-					System.out.println("downsizing");
 				}
 				else
 				{
@@ -151,10 +171,7 @@ class PlayArea extends JPanel implements MouseListener
 					//supposedly better quality, slower
 					//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 					g.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
-					System.out.println("upsizing");
 				}
-
-				//cardImage = gc.createCompatibleImage(cardHeight, cardWidth, Transparency.OPAQUE), RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
 			} catch(IOException io) {
 				System.err.println(io);

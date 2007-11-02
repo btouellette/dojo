@@ -1,6 +1,7 @@
 // PopupListener.java
 // Written by Brian Ouellette
 // Part of Dojo
+// This is the listener for pop-up menus across the application.
 
 package l5r;
 

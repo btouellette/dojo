@@ -1,6 +1,7 @@
 // StoredCard.java
 // Written by Brian Ouellette
 // Part of Dojo
+// Format in which cards are stored in the database after being read in from XML.
 
 package l5r;
 

@@ -1,6 +1,7 @@
 // GameInfoBox.java
 // Written by Brian Ouellette
 // Part of Dojo
+// Box for displaying information on the game state.
 
 package l5r;
 
@@ -54,5 +55,4 @@ class GameInfoBox extends JPanel implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 	}
-
 }

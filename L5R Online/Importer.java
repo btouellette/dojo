@@ -1,6 +1,7 @@
 // Importer.java
 // Written by Brian Ouellette
 // Part of Dojo
+// Imports the database from the XML and stores it in a HashMap.
 
 package l5r;
 

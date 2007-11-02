@@ -1,6 +1,8 @@
 // TokenActionListener.java
 // Written by Brian Ouellette
 // Part of Dojo
+// This is the Action and Mouse Listener for the JComboBox that creates tokens
+// It takes input, stores previous token names, and generates tokens.
 
 package l5r;
 
