@@ -23,6 +23,7 @@ class Main
 	public static CardInfoBox cardBox;
 	public static boolean highRes;
 	public static PlayArea playArea;
+	public static Deckbuilder deck;
 
     /**
      * Create the GUI and show it.  For thread safety,
@@ -65,6 +66,9 @@ class Main
         //Set the menu bar and add the label to the content pane
         frame.setJMenuBar(createMenuBar(width, playArea));
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
+
+		deck = new Deckbuilder();
+        deck.showGUI(frame.getWidth(),frame.getHeight());
 
         //Display the window
         frame.pack();
