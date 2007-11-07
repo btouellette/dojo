@@ -8,17 +8,23 @@ package l5r;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
 import java.util.*;
 import java.io.*;
 
-class PlayArea extends JPanel implements MouseListener
+class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 {
 	Dimension dimension;
-	int cardWidth, cardHeight;
+	static int cardWidth, cardHeight;
+	//Reference height (height that the card is initially)
 	static int baseCardHeight;
-	ArrayList<PlayableCard> displayedCards;
+	static ArrayList<PlayableCard> displayedCards;
+	boolean cardClicked;
+	//The percent of a card that attachments show
+	static double attachmentHeight = .2;
+	PlayableCard clickedCard;
 
     public PlayArea(int width, int height)
     {
@@ -29,6 +35,11 @@ class PlayArea extends JPanel implements MouseListener
 
 		//Create a new ArrayList to hold the cards to display and
 		displayedCards = new ArrayList<PlayableCard>(40);
+
+		addCard(new PlayableCard("WoE091"));
+
+		addMouseListener(this);
+		addMouseMotionListener(this);
     }
 
     public void setCardSize(int cardHeight)
@@ -36,11 +47,6 @@ class PlayArea extends JPanel implements MouseListener
 		this.cardHeight = cardHeight;
 		this.cardWidth = cardWidth = (int)(cardHeight*(2.5/3.5));
 	}
-
-	/*public int getBaseCardSize()
-	{
-		return baseCardHeight;
-	}*/
 
 	public void addCard(PlayableCard card)
 	{
@@ -110,13 +116,13 @@ class PlayArea extends JPanel implements MouseListener
 		while (iterator.hasNext())
 		{
 			PlayableCard element = iterator.next();
+			System.out.println(element.getLocation());
 			displayCard(element, (Graphics2D)g);
     	}
     }
 
 	public void displayCard(PlayableCard card, Graphics2D g)
 	{
-		StoredCard databaseCard = Main.database.get(card.getID());
 
 		int[] location = card.getLocation();
 
@@ -142,41 +148,59 @@ class PlayArea extends JPanel implements MouseListener
 			displayCard(attachments.get(i), g);
 		}
 
-		String imageLocation = databaseCard.getImageLocation();
-		if(imageLocation == null)
+		BufferedImage displayImage = card.getImage();
+		if(displayImage == null)
 		{
-			//Display a placeholder card
-		}
-		else
-		{
-			try
+			StoredCard databaseCard = Main.database.get(card.getID());
+			String imageLocation = databaseCard.getImageLocation();
+			if(imageLocation == null)
 			{
-				//TODO: Check to see if there are performance increases that can be done here
-				//Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
-				BufferedImage cardImage = ImageIO.read(new File(imageLocation));
-
-				if(cardImage.getHeight() >= cardHeight)
+				//Display a placeholder card
+			}
+			else
+			{
+				try
 				{
-					//if downsizing image
-					//Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
-					//then they can be swapped.
-					//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-					Image cardImage2 = cardImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
-					g.drawImage(cardImage2, null, null);
-				}
-				else
-				{
-					//if enlarging image
-					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-					//supposedly better quality, slower
-					//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-					g.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
-				}
+					//TODO: Check to see if there are performance increases that can be done here
+					//Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
 
-			} catch(IOException io) {
-				System.err.println(io);
+					//We read in and resize the image once, after that it is stored in PlayableCard
+					BufferedImage tempImage = ImageIO.read(new File(imageLocation));
+					BufferedImage cardImage = new BufferedImage(cardWidth, cardHeight, tempImage.getType());
+					Graphics2D g2 = cardImage.createGraphics();
+
+					if(cardImage.getHeight() >= cardHeight)
+					{
+						//if downsizing image
+						//Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
+						//then they can be swapped.
+						//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+						Image cardImage2 = tempImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
+						//AffineTransform transform = new AffineTransform();
+						//transform.setToTranslation(location[0], location[1]);
+
+						g2.drawImage(cardImage2, 0, 0, null);
+						g2.dispose();
+					}
+					else
+					{
+						//if enlarging image
+						g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+						//supposedly better quality, slower
+						//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+						//g2.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
+						//g2.dispose();
+					}
+
+					card.setImage(cardImage);
+
+				} catch(IOException io) {
+					System.err.println(io);
+				}
 			}
 		}
+
+		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
 
     public void mouseClicked(MouseEvent e)
@@ -190,10 +214,56 @@ class PlayArea extends JPanel implements MouseListener
     }
  	public void mousePressed(MouseEvent e)
  	{
+		System.out.println("mousePressed");
+		Rectangle cardArea = new Rectangle();
+		Point clickPoint = e.getPoint();
+		System.out.println(clickPoint);
+		int index = 0;
+
+		while(!cardClicked && index < displayedCards.size())
+		{
+			clickedCard = displayedCards.get(index);
+			int[] cardLocation = clickedCard.getLocation();
+
+			int numAttachments = clickedCard.getAttachments().size();
+
+			cardArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
+			cardArea.setSize(cardWidth, cardHeight + (int)(cardHeight*attachmentHeight*numAttachments));
+
+			System.out.println(cardArea);
+
+			if(cardArea.contains(clickPoint))
+			{
+				cardClicked = true;
+			}
+			else
+			{
+				index++;
+			}
+		}
     }
  	public void mouseReleased(MouseEvent e)
  	{
+		System.out.println("mouseReleased");
+		cardClicked = false;
     }
+
+    public void mouseDragged(MouseEvent e)
+    {
+		System.out.println("mouseDragged");
+		if(cardClicked)
+		{
+			System.out.println("mouseDragged2");
+			Point clickPoint = e.getPoint();
+			System.out.println(clickPoint);
+			clickedCard.setLocation((int)clickPoint.getX(), (int)clickPoint.getY());
+			repaint();
+		}
+	}
+
+    public void mouseMoved(MouseEvent e)
+    {
+	}
 
     //A good fast high-quality image downscaling algorithm hasn't been implemented yet
     //in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
