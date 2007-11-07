@@ -225,4 +225,9 @@ class StoredCard
 	{
 		return honor_req;
 	}
+
+	public String toString()
+	{
+		return name;
+	}
 }

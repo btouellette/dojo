@@ -6,6 +6,7 @@ package l5r;
 
 import java.util.ArrayList;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 
 class PlayableCard
 {
@@ -13,6 +14,7 @@ class PlayableCard
 	String id;
 	ArrayList<PlayableCard> attachments;
 	int[] location;
+	BufferedImage cardImage;
 
     public PlayableCard(String id)
     {
@@ -20,6 +22,7 @@ class PlayableCard
 		location = new int[2];
 		location[0] = 0;
 		location[1] = 0;
+		attachments = new ArrayList<PlayableCard>();
     }
 
 	public String getID()
@@ -61,7 +64,7 @@ class PlayableCard
 		for(int i = 0; i < attachments.size(); i++)
 		{
 			PlayableCard currentCard = attachmentsToUpdate.get(i);
-			currentCard.setLocationSimple(location[0], location[1] - (int)(PlayArea.baseCardHeight*.2));
+			currentCard.setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight));
 			if(!currentCard.getAttachments().isEmpty())
 			{
 				updateAttachmentLocations(currentCard);
@@ -72,5 +75,15 @@ class PlayableCard
 	public ArrayList<PlayableCard> getAttachments()
 	{
 		return attachments;
+	}
+
+	public BufferedImage getImage()
+	{
+		return cardImage;
+	}
+
+	public void setImage(BufferedImage cardImage)
+	{
+		this.cardImage = cardImage;
 	}
 }
