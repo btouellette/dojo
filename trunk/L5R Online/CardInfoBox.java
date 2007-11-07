@@ -51,7 +51,8 @@ class CardInfoBox extends JEditorPane
 		cardHTML3 = "";
 		cardHTML4 = "";
 
-		if(card.getType().equals("actions") || card.getType().equals("kihos"))
+		//TODO: Deal with null values in fields like text properly
+		if(card.getType().equals("actions") || card.getType().equals("kihos") || card.getType().equals("spells"))
 		{
 			//The card text in the window is created as an html table
 			//Complete sytnax isn't necessary as setText() reformats it
@@ -79,7 +80,7 @@ class CardInfoBox extends JEditorPane
 			cardHTML2 = "<tr><td colspan = \"5\"><center>" + card.getCost() + " G</center></td><td></td></tr>";
 			cardHTML3 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
 		}
-		else if(card.getType().equals("items") || card.getType().equals("spells"))
+		else if(card.getType().equals("items"))
 		{
 			cardHTML1 = "<center><table><tr><td><center>" + card.getForce() + "F</center></td><td colspan=\"3\"><center><b>" + card.getName() + "</b></center></td><td><center>" + card.getChi() + "C</center></td></tr>";
 			cardHTML2 = "<tr><td></td><td colspan = \"3\"><center>" + card.getCost() + " G</center></td><td></td></tr>";

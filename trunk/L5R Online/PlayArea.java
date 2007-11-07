@@ -203,6 +203,21 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
 
+	public ArrayList<PlayableCard> getAllAttachments(PlayableCard card)
+	{
+
+		ArrayList<PlayableCard> attachments = card.getAttachments();
+		ArrayList<PlayableCard> allAttachments = new ArrayList<PlayableCard>();
+
+		int index = 0;
+		while(index < attachments.size())
+		{
+
+		}
+
+		return allAttachments;
+	}
+
     public void mouseClicked(MouseEvent e)
     {
     }
@@ -227,6 +242,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 
 			int numAttachments = clickedCard.getAttachments().size();
 
+			//TODO: Make this work properly with attachments. It should realize that it is clicking an attachment.
 			cardArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
 			cardArea.setSize(cardWidth, cardHeight + (int)(cardHeight*attachmentHeight*numAttachments));
 
