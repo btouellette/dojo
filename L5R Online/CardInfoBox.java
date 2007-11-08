@@ -100,13 +100,13 @@ class CardInfoBox extends JEditorPane
 			cardHTML2 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>";
 			cardHTML3 = "<tr><td colspan = \"5\"><center>" + card.getFocus() + " Focus</center></td></tr></table></center>";
 		}
-		else if(card.getType().equals("senseis"))
+		else if(card.getType().equals("senseis") || card.getType().equals("strongholds"))
 		{
-
-		}
-		else if(card.getType().equals("strongholds"))
-		{
-
+			cardHTML1 = "<center><table><tr><td colspan=\"5\"><center><b>" + card.getName() + "</b></center></td></tr>";
+			cardHTML2 = "<tr><td colspan = \"4\" align=right>Province Strength: </td><td colspan = \"2\" align=center>" + card.getProvinceStrength() + "</td></tr>";
+			cardHTML3 = "<tr><td colspan = \"4\" align=right>Gold Production: </td><td colspan = \"2\" align=center>" + card.getGoldProduction() + "</td></tr>";
+			cardHTML3 = cardHTML3 + "<tr><td colspan = \"4\" align=right>Starting Honor: </td><td colspan = \"2\" align=center>" + card.getStartingHonor() + "</td></tr>";
+			cardHTML4 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>";
 		}
 
 		//Set the card window to show the html table for the card

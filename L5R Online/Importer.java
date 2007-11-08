@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import java.util.HashMap;
 
+//TODO: Add support for ruling xml tag
 class Importer extends DefaultHandler
 {
 	private Writer  out;

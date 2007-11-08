@@ -250,7 +250,7 @@ class Main
 		outerInfoArea2.setUI(new BasicSplitPaneUI());
 		outerInfoArea2.setDividerSize(5);
 
-		cardBox.setCard(database.get("WoE091"));
+		cardBox.setCard(database.get("Tomorrow001"));
 
 		return outerInfoArea2;
 	}
