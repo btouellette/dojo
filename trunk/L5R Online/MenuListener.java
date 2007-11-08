@@ -29,6 +29,8 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Deckbuilder"))
 		{
+			Deckbuilder.frame.pack();
+			Deckbuilder.frame.setVisible(true);
 		}
 		else if(name.equals("Preferences"))
 		{
