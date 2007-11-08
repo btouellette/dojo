@@ -116,7 +116,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		while (iterator.hasNext())
 		{
 			PlayableCard element = iterator.next();
-			System.out.println(element.getLocation());
 			displayCard(element, (Graphics2D)g);
     	}
     }
@@ -229,10 +228,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
     }
  	public void mousePressed(MouseEvent e)
  	{
-		System.out.println("mousePressed");
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
-		System.out.println(clickPoint);
 		int index = 0;
 
 		while(!cardClicked && index < displayedCards.size())
