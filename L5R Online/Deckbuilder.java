@@ -52,7 +52,6 @@ class Deckbuilder
 		JPanel resarea = createResults(width,height);
 		JPanel deckarea = createDeckArea(width,height);
 
-
 				//set a card?
 		card.setCard(Main.database.get("EoME037"));
 		frame.add(panel1);
@@ -62,8 +61,8 @@ class Deckbuilder
         frame.setJMenuBar(createMenuBar(width));
         //Display the window
 
-		frame.pack();
-        frame.setVisible(true);
+		//frame.pack();
+        //frame.setVisible(true);
 	}
 
 	private static JPanel createBar()

@@ -205,14 +205,14 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 
 	public ArrayList<PlayableCard> getAllAttachments(PlayableCard card)
 	{
-
+		//TODO: Test to be sure this returns all the attachments and in the correct order
 		ArrayList<PlayableCard> attachments = card.getAttachments();
 		ArrayList<PlayableCard> allAttachments = new ArrayList<PlayableCard>();
 
 		int index = 0;
 		while(index < attachments.size())
 		{
-
+			allAttachments.addAll(getAllAttachments(attachments.get(index)));
 		}
 
 		return allAttachments;
@@ -246,8 +246,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 			cardArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
 			cardArea.setSize(cardWidth, cardHeight + (int)(cardHeight*attachmentHeight*numAttachments));
 
-			System.out.println(cardArea);
-
 			if(cardArea.contains(clickPoint))
 			{
 				cardClicked = true;
@@ -260,18 +258,14 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
     }
  	public void mouseReleased(MouseEvent e)
  	{
-		System.out.println("mouseReleased");
 		cardClicked = false;
     }
 
     public void mouseDragged(MouseEvent e)
     {
-		System.out.println("mouseDragged");
 		if(cardClicked)
 		{
-			System.out.println("mouseDragged2");
 			Point clickPoint = e.getPoint();
-			System.out.println(clickPoint);
 			clickedCard.setLocation((int)clickPoint.getX(), (int)clickPoint.getY());
 			repaint();
 		}
