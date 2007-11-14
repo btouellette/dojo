@@ -24,6 +24,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	boolean cardClicked;
 	//The percent of a card that attachments show
 	static double attachmentHeight = .2;
+	//Number of provinces
+	static int yourNumProv, oppNumProv;
 	PlayableCard clickedCard;
 
     public PlayArea(int width, int height)
@@ -32,6 +34,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		cardWidth = (int)(cardHeight*(2.5/3.5));
 
 		baseCardHeight = cardHeight;
+
+		yourNumProv = 4;
+		oppNumProv = 4;
 
 		//Create a new ArrayList to hold the cards to display and
 		displayedCards = new ArrayList<PlayableCard>(40);
@@ -70,22 +75,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
 
-		//Create dynasty discard
+		//Create fate discard
 		g.setColor(Color.BLACK);
-		g.fillRect(startHand - (2*(cardWidth+8)-2), height - (cardHeight+8), 2*(cardWidth+8), 2*(cardHeight+8));
+		g.fillRect(startHand - (2*(cardWidth+8)-2), height - (cardHeight+8), 2*(cardWidth+8), cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create dynasty deck
+		//Create fate deck
 		g.fillRect(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create fate discard
+		//Create dynasty discard
 		g.setColor(Color.BLACK);
-		g.fillRect(0, height - (cardHeight+8), 2*(cardWidth+8)-2, 2*(cardHeight+8));
+		g.fillRect(0, height - (cardHeight+8), 2*(cardWidth+8)-2, cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create fate deck
+		//Create dynasty deck
 		g.fillRect(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
 		//Create opponent's fate discard
@@ -111,6 +116,30 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		g.fillRect(startHand, 0, sizeHand, height);
 		g.setColor(Color.BLACK);
 		g.fillRect(startHand-2, 0, 2, height);
+
+		//Create your provinces
+		int leftBorder = 2*(cardWidth+8)-2;
+		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
+
+		for(int i = 1; i < yourNumProv+1; i++)
+		{
+			g.setColor(Color.BLACK);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, height - (cardHeight+6), cardWidth+12, cardHeight+6);
+			g.setColor(Color.LIGHT_GRAY);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+		}
+
+		//Create opponents provinces
+		distanceBetween = (rightBorder - leftBorder)/(oppNumProv+1);
+
+		for(int i = 1; i < yourNumProv+1; i++)
+		{
+			g.setColor(Color.BLACK);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, 0, cardWidth+12, cardHeight+6);
+			g.setColor(Color.LIGHT_GRAY);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, 0, cardWidth+8, cardHeight+4);
+		}
 
 		ListIterator<PlayableCard> iterator = displayedCards.listIterator();
 		while (iterator.hasNext())

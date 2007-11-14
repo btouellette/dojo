@@ -230,4 +230,8 @@ class StoredCard
 	{
 		return name;
 	}
+	public ArrayList getLegal()
+	{
+		return legal;
+	}
 }
