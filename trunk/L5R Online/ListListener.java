@@ -19,6 +19,10 @@ class ListListener implements ListSelectionListener
 	{
 		if(e.getValueIsAdjusting() == false)
 		{
+			if(Deckbuilder.list.getSelectedIndex() < 0)
+			{
+				Deckbuilder.list.setSelectedIndex(0);
+			}
 			Deckbuilder.card.setCard(Deckbuilder.vect.elementAt(Deckbuilder.list.getSelectedIndex()));
 		}
     }

@@ -98,8 +98,7 @@ class SearchListener implements ActionListener
 	{
 		Deckbuilder.alphasort(Deckbuilder.vect);
 		Deckbuilder.apples.setText("Card Results("+Deckbuilder.vect.size()+"):");
-		Deckbuilder.listScroller.revalidate();
-		Deckbuilder.listScroller.repaint();
+		Deckbuilder.list.setListData((Vector<StoredCard>)Deckbuilder.vect.clone());
 	}
 
 }

@@ -25,6 +25,9 @@ class StoredCard
 		imageLocation = new ArrayList<String>();
 		imageEdition = new ArrayList<String>();
 		legal = new ArrayList<String>();
+		clan = new ArrayList<String>();
+		//Avoid null values in the text field (it doesn't have to be set)
+		text = "";
     	//Wait for the card to be filled with info from the parser
     }
 
