@@ -14,9 +14,9 @@ class StoredCard
 	String id, type;
 	String name;
 	ArrayList<String> imageLocation, imageEdition;
-	ArrayList<String> legal;
+	ArrayList<String> legal, clan;
 	String edition, text, cost, focus;
-	String clan, province_strength, gold_production, starting_honor;
+	String province_strength, gold_production, starting_honor;
 	String force, chi, personal_honor, honor_req;
 
     public StoredCard(String id)
@@ -79,7 +79,7 @@ class StoredCard
 
     public void setClan(String clan)
     {
-		this.clan = clan;
+		this.clan.add(clan);
 	}
 
     public void setProvinceStrength(String province_strength)
@@ -186,7 +186,7 @@ class StoredCard
 		return focus;
 	}
 
-	public String getClan()
+	public ArrayList<String> getClan()
 	{
 		return clan;
 	}

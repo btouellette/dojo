@@ -4,64 +4,102 @@
 
 package l5r;
 
-//import java.awt.*;
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.util.*;
+import java.util.Vector;
 
-class SearchListener implements ActionListener, ListSelectionListener
+class SearchListener implements ActionListener
 {
-	public static Vector<StoredCard> storage;
-	ArrayList legal, type, faction;
 
+	public static Vector<StoredCard> storage;
+	String type,clan,legal;
+	int max, y;
 	public SearchListener()
 	{
-		//storage = new Vector<StoredCard>();
+		storage = new Vector<StoredCard>();
+		type="";
+		clan=" ";
+		legal="samurai";
+		storage=new Vector<StoredCard>();
+		for (int x=0;x<Deckbuilder.vect.size();x++)
+			storage.add(Deckbuilder.vect.elementAt(x));
 	}
-
 	public void actionPerformed(ActionEvent e)
 	{
-		//One of the JTextFields has changed
-	    sort();
+	        JComboBox cb = (JComboBox)e.getSource();
+	        //String item = (String)cb.getSelectedItem();
+
+
+			for (int x = 0; x < 100; x++)
+			{
+				//assign Legal menu option
+				if (x<Deckbuilder.legalChoices.length &&
+				   ((String)cb.getSelectedItem()).equals(Deckbuilder.legalChoices[x]))
+				        legal=(String)cb.getSelectedItem();
+
+				//assign Card Type menu option
+				else if (x<Deckbuilder.types.length&&((String)cb.getSelectedItem()).equals(Deckbuilder.types[x]))
+				{
+					type=(String)cb.getSelectedItem();
+					if (type.equals("Personality"))
+						type="personalities";
+				}
+
+				//assign Faction menu option
+				else if (x<Deckbuilder.clans.length&&((String)cb.getSelectedItem()).equals(Deckbuilder.clans[x]))
+				{
+					clan=(String)cb.getSelectedItem();
+				}
+
+
+
+
+
+
+			}
+			Display();
     }
 
-    public void valueChanged(ListSelectionEvent e)
+    public void Display()
     {
-		//One of the JLists has changed
-		if(!e.getValueIsAdjusting())
-		{
-			legal = new ArrayList<Object>(Arrays.asList(Deckbuilder.legal.getSelectedValues()));
-			type = new ArrayList<Object>(Arrays.asList(Deckbuilder.type.getSelectedValues()));
-			faction = new ArrayList<Object>(Arrays.asList(Deckbuilder.faction.getSelectedValues()));
-			sort();
-		}
-	}
+		//reset the vector
+		Deckbuilder.vect.clear();
 
-    public void sort()
-    {
-		Deckbuilder.vect.clear();          //put all of the data in storage from vect, then add back to vect
-										   //IT SHOULD JUST TAKE OUT OF VECT AND ADD TO STORAGE IF NEEDED
-		for(int x=0;x<storage.size();x++)
-		{
+		for (int x=0;x<storage.size();x++)
+			Deckbuilder.vect.add(storage.elementAt(x));
 
-			if(storage.elementAt(x).getType().equals(type))
-			{
-				Deckbuilder.vect.add(storage.elementAt(x));
-				//storage.remove(x);
-			}
+		//reset variables
+		max=Deckbuilder.vect.size();
+		y=0;
+
+		do
+		{
+			if(!Deckbuilder.vect.elementAt(y).getLegal().contains(legal.toLowerCase()))
+				Deckbuilder.vect.remove(y);
+			else if(!Deckbuilder.vect.elementAt(y).getType().startsWith(type.toLowerCase()))
+				Deckbuilder.vect.remove(y);
+			else if ((Deckbuilder.vect.elementAt(y).getText()==null))
+				y++;
+			else if(!(clan.equals(" ")) && !(Deckbuilder.vect.elementAt(y).getText().indexOf(clan)>0))
+				Deckbuilder.vect.remove(y);
+			else y++;
+
+			max=Deckbuilder.vect.size();
+
 		}
+		while(y<max);
 
 		refresh();
-		System.out.println(storage.size());
-
-		Deckbuilder.alphasort(Deckbuilder.vect);
 	}
 
 	public void refresh()
 	{
+		Deckbuilder.alphasort(Deckbuilder.vect);
 		Deckbuilder.apples.setText("Card Results("+Deckbuilder.vect.size()+"):");
 		Deckbuilder.listScroller.revalidate();
 		Deckbuilder.listScroller.repaint();
 	}
+
 }

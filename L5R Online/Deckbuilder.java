@@ -29,7 +29,6 @@ class Deckbuilder
 	public static Vector<StoredCard> vect;
 	public static JLabel apples;
 	public static JScrollPane listScroller;
-	public static JList legal, type, faction;
 
 	public Deckbuilder()
 	{
@@ -37,6 +36,14 @@ class Deckbuilder
 		{
 			c[i] = new JLabel(array[i]);
 			c[i].setFont(new Font("Serif", Font.PLAIN, 13));
+		}
+		Object[] p = Main.database.keySet().toArray();
+
+				vect = new Vector<StoredCard>();
+
+				for(int i = 0; i < p.length; i++)
+				{
+					vect.add(Main.database.get(p[i]));
 		}
 	}
 
@@ -67,7 +74,7 @@ class Deckbuilder
         //Display the window
 
 		frame.pack();
-        //frame.setVisible(true);
+        frame.setVisible(true);
 	}
 
 	private static JPanel createBar()
@@ -145,7 +152,7 @@ class Deckbuilder
 		//Create the card info box
 		card = new CardInfoBox();
 		//Kind of hacked. Using a large vertical value so that the info box will take up the rest of the vertical space.
-		card.setPreferredSize(new Dimension((width-12)/4, 3000));
+		card.setPreferredSize(new Dimension((width-12)/4, 2000));
 		JScrollPane cardScrollPane = new JScrollPane(card);
 
 		JLabel infolabel=new JLabel("Card Info:");
@@ -154,24 +161,24 @@ class Deckbuilder
 		JLabel searchlabel = new JLabel("Search Criteria:");
 		searchlabel.setFont(new Font("Serif",Font.BOLD,14));
 
-		legal = new JList(legalChoices);
-		//legal.setSelectedIndex(4);
-		legal.addListSelectionListener(briansanewb);
-		//legal.setPreferredSize(new Dimension(140, 20));
-		//legal.setMaximumSize(legal.getPreferredSize());
-		//legal.setBackground(Color.WHITE);
+		JComboBox Legal = new JComboBox(legalChoices);
+		Legal.setSelectedIndex(4);
+		Legal.addActionListener(briansanewb);
+		Legal.setPreferredSize(new Dimension(140, 20));
+		Legal.setMaximumSize(Legal.getPreferredSize());
+		Legal.setBackground(Color.WHITE);
 
-		type = new JList(types);
-		type.addListSelectionListener(briansanewb);
-		//type.setPreferredSize(new Dimension(140, 20));
-		//type.setMaximumSize(cardType.getPreferredSize());
-		//type.setBackground(Color.WHITE);
+		JComboBox CardType = new JComboBox(types);
+		CardType.addActionListener(briansanewb);
+		CardType.setPreferredSize(new Dimension(140, 20));
+		CardType.setMaximumSize(CardType.getPreferredSize());
+		CardType.setBackground(Color.WHITE);
 
-		faction = new JList(clans);
-		faction.addListSelectionListener(briansanewb);
-		//faction.setPreferredSize(new Dimension(140, 20));
-		//faction.setMaximumSize(faction.getPreferredSize());
-		//faction.setBackground(Color.WHITE);
+		JComboBox faction = new JComboBox(clans);
+		faction.addActionListener(briansanewb);
+		faction.setPreferredSize(new Dimension(140, 20));
+		faction.setMaximumSize(faction.getPreferredSize());
+		faction.setBackground(Color.WHITE);
 
 		JTextField title = new JTextField(10);
 		title.setMaximumSize(new Dimension(140,20));
@@ -206,8 +213,8 @@ class Deckbuilder
 			  .addComponent(c[9])
 			  .addComponent(c[10]))
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(legal)
-		      .addComponent(type)
+		      .addComponent(Legal)
+		      .addComponent(CardType)
 		      .addComponent(faction)
 		      .addComponent(title)
 		      .addComponent(text)
@@ -222,10 +229,10 @@ class Deckbuilder
 		   layout.createSequentialGroup()
 		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		           .addComponent(c[0])
-		           .addComponent(legal))
+		           .addComponent(Legal))
 			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 			  	   .addComponent(c[1])
-			  	   .addComponent(type))
+			  	   .addComponent(CardType))
 			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 			  	   .addComponent(c[2])
 			  	   .addComponent(faction))
@@ -271,16 +278,6 @@ class Deckbuilder
 
 	public static JPanel createResults(int width, int height)
 	{
-		Object[] p = Main.database.keySet().toArray();
-
-		vect = new Vector<StoredCard>();
-
-		for(int i = 0; i < p.length; i++)
-		{
-			vect.add(Main.database.get(p[i]));
-		}
-
-		SearchListener.storage = new Vector<StoredCard>(vect);
 
 		JPanel panel = new JPanel();
 		//panel.setOpaque(true);
@@ -333,9 +330,9 @@ class Deckbuilder
 			for (int y = 0; y < vex.size(); y++)
 				if(vex.elementAt(x).getName().toString().compareToIgnoreCase(vex.elementAt(y).getName().toString())<0)
 				{
-					temp.setElementAt(vex.elementAt(y), 0);    //temp = y
-					vex.set(y, vex.elementAt(x));     //y = x
-					vex.set(x, temp.elementAt(0));    //x = temp
+					temp.setElementAt(vex.elementAt(y),0);    //temp = y
+					vex.setElementAt(vex.elementAt(x),y);     //y = x
+					vex.setElementAt(temp.elementAt(0),x);    //x = temp
 				}
 	}
 }
