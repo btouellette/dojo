@@ -15,11 +15,11 @@ class Deckbuilder
 {
 
 	public static JFrame frame;
-	static String[] legalChoices = {"Open","Lotus","Lotus Extended","Samurai"};
+	static String[] legalChoices = {"Open","Gold","Diamond","Lotus","Samurai"};
 	static String[] array = {"Legal: ","Card Type: ","Faction: ","Title: ","Text: ",
 							 "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
 							 "Focus Value: "};
-	static String[] types = {" ","Stronghold","Event","Holding","Personality","Region","Action",
+	static String[] types = {"","Stronghold","Event","Holding","Personality","Region","Action",
 							 "Follower","Item","Spell","Ancestor","Sensei"};
 	static String[] clans = {" ","Crab Clan","Crane Clan","Dragon Clan","Hare Clan","Lion Clan",
 							 "Mantis Clan","Phoenix Clan","Spider Clan","Unaligned","Unicorn Clan"};
@@ -27,6 +27,9 @@ class Deckbuilder
 	public static CardInfoBox card;
 	public static JList list;
 	public static Vector<StoredCard> vect;
+	public static JLabel apples;
+	public static JScrollPane listScroller;
+	public static JList legal, type, faction;
 
 	public Deckbuilder()
 	{
@@ -41,8 +44,11 @@ class Deckbuilder
 	{
 		frame = new JFrame("DeckBuilder");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
-        frame.setPreferredSize(new Dimension(width,height));
+
+        frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+        //frame.setLayout(new GridLayout(1,3));
+        //frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
+		frame.setPreferredSize(new Dimension(width,height));
 		//Set up defaults if pref file is unavailable
 
         width+=12;
@@ -52,8 +58,7 @@ class Deckbuilder
 		JPanel resarea = createResults(width,height);
 		JPanel deckarea = createDeckArea(width,height);
 
-				//set a card?
-		card.setCard(Main.database.get("EoME037"));
+
 		frame.add(panel1);
 		frame.add(resarea);
 		frame.add(deckarea);
@@ -61,7 +66,7 @@ class Deckbuilder
         frame.setJMenuBar(createMenuBar(width));
         //Display the window
 
-		//frame.pack();
+		frame.pack();
         //frame.setVisible(true);
 	}
 
@@ -129,7 +134,7 @@ class Deckbuilder
 
 	private static JPanel createSearch(int width, int height)
 	{
-		MenuListener tempListener = new MenuListener();
+		SearchListener briansanewb = new SearchListener();
 
 		JPanel panel = new JPanel();
 		panel.setOpaque(true);
@@ -139,37 +144,34 @@ class Deckbuilder
 
 		//Create the card info box
 		card = new CardInfoBox();
-		card.setPreferredSize(new Dimension((width-12)/4, 250));
+		//Kind of hacked. Using a large vertical value so that the info box will take up the rest of the vertical space.
+		card.setPreferredSize(new Dimension((width-12)/4, 3000));
 		JScrollPane cardScrollPane = new JScrollPane(card);
 
 		JLabel infolabel=new JLabel("Card Info:");
 		infolabel.setFont(new Font("Serif",Font.BOLD,14));
-		infolabel.setMaximumSize(new Dimension(140,20));
-		infolabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
 		JLabel searchlabel = new JLabel("Search Criteria:");
 		searchlabel.setFont(new Font("Serif",Font.BOLD,14));
-		searchlabel.setMaximumSize(new Dimension(140,20));
-		searchlabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
-		JComboBox Legal = new JComboBox(legalChoices);
-		Legal.setSelectedIndex(3);
-		Legal.addActionListener(tempListener);
-		Legal.setPreferredSize(new Dimension(140, 20));
-		Legal.setMaximumSize(Legal.getPreferredSize());
-		Legal.setBackground(Color.WHITE);
+		legal = new JList(legalChoices);
+		//legal.setSelectedIndex(4);
+		legal.addListSelectionListener(briansanewb);
+		//legal.setPreferredSize(new Dimension(140, 20));
+		//legal.setMaximumSize(legal.getPreferredSize());
+		//legal.setBackground(Color.WHITE);
 
-		JComboBox CardType = new JComboBox(types);
-		CardType.addActionListener(tempListener);
-		CardType.setPreferredSize(new Dimension(140, 20));
-		CardType.setMaximumSize(CardType.getPreferredSize());
-		CardType.setBackground(Color.WHITE);
+		type = new JList(types);
+		type.addListSelectionListener(briansanewb);
+		//type.setPreferredSize(new Dimension(140, 20));
+		//type.setMaximumSize(cardType.getPreferredSize());
+		//type.setBackground(Color.WHITE);
 
-		JComboBox faction = new JComboBox(clans);
-		faction.addActionListener(tempListener);
-		faction.setPreferredSize(new Dimension(140, 20));
-		faction.setMaximumSize(faction.getPreferredSize());
-		faction.setBackground(Color.WHITE);
+		faction = new JList(clans);
+		faction.addListSelectionListener(briansanewb);
+		//faction.setPreferredSize(new Dimension(140, 20));
+		//faction.setMaximumSize(faction.getPreferredSize());
+		//faction.setBackground(Color.WHITE);
 
 		JTextField title = new JTextField(10);
 		title.setMaximumSize(new Dimension(140,20));
@@ -204,8 +206,8 @@ class Deckbuilder
 			  .addComponent(c[9])
 			  .addComponent(c[10]))
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(Legal)
-		      .addComponent(CardType)
+		      .addComponent(legal)
+		      .addComponent(type)
 		      .addComponent(faction)
 		      .addComponent(title)
 		      .addComponent(text)
@@ -220,10 +222,10 @@ class Deckbuilder
 		   layout.createSequentialGroup()
 		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		           .addComponent(c[0])
-		           .addComponent(Legal))
+		           .addComponent(legal))
 			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 			  	   .addComponent(c[1])
-			  	   .addComponent(CardType))
+			  	   .addComponent(type))
 			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 			  	   .addComponent(c[2])
 			  	   .addComponent(faction))
@@ -253,6 +255,10 @@ class Deckbuilder
 			  	   .addComponent(focus))
 		);
 		//panel.add(Box.createVerticalStrut(5));
+		searchlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		searchMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
+		infolabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		cardScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(searchlabel);
 		panel.add(searchMenu);
 		panel.add(Box.createHorizontalStrut(5));
@@ -274,28 +280,37 @@ class Deckbuilder
 			vect.add(Main.database.get(p[i]));
 		}
 
+		SearchListener.storage = new Vector<StoredCard>(vect);
+
 		JPanel panel = new JPanel();
 		//panel.setOpaque(true);
 		//panel.setBackground(Color.RED);
 		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
-		JLabel apples = new JLabel("Card Results("+vect.size()+"):");
+		apples = new JLabel("Card Results("+vect.size()+"):");
 		apples.setFont(new Font("Serif",Font.BOLD,14));
 		apples.setMaximumSize(new Dimension(140,20));
-		apples.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		alphasort(vect);
 
 		list = new JList(vect); //data has type Object[]
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
 		list.addListSelectionListener(new ListListener());
 		list.setVisibleRowCount(-1);
-		JScrollPane listScroller = new JScrollPane(list);
+		list.setSelectedIndex(0);
+		card.setCard(vect.elementAt(list.getSelectedIndex()));
+
+		System.out.println(vect.elementAt(14).getType().toString());
+
+		listScroller = new JScrollPane(list);
 		listScroller.setPreferredSize(new Dimension(300, 550));
 
+		apples.setAlignmentX(Component.LEFT_ALIGNMENT);
+		listScroller.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(apples);
 		panel.add(listScroller);
 		return(panel);
-
 	}
 
 	public static JPanel createDeckArea(int width, int height)
@@ -308,5 +323,19 @@ class Deckbuilder
 		panel.setLayout(new BorderLayout());
 
 		return(panel);
+	}
+	public static void alphasort(Vector<StoredCard> vex)
+	{
+		Vector<StoredCard> temp = new Vector<StoredCard>();
+		temp.add(null);
+
+		for (int x = 0; x < vex.size(); x++)
+			for (int y = 0; y < vex.size(); y++)
+				if(vex.elementAt(x).getName().toString().compareToIgnoreCase(vex.elementAt(y).getName().toString())<0)
+				{
+					temp.setElementAt(vex.elementAt(y), 0);    //temp = y
+					vex.set(y, vex.elementAt(x));     //y = x
+					vex.set(x, temp.elementAt(0));    //x = temp
+				}
 	}
 }

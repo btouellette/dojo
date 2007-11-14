@@ -67,11 +67,12 @@ class Main
         frame.setJMenuBar(createMenuBar(width, playArea));
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 
+        //Display the window
+        frame.pack();
+
 		deck = new Deckbuilder();
         deck.showGUI(frame.getWidth(),frame.getHeight());
 
-        //Display the window
-        frame.pack();
         frame.setVisible(true);
     }
 
