@@ -233,7 +233,7 @@ class StoredCard
 	{
 		return name;
 	}
-	public ArrayList getLegal()
+	public ArrayList<String> getLegal()
 	{
 		return legal;
 	}

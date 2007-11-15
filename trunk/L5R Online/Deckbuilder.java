@@ -15,20 +15,20 @@ class Deckbuilder
 {
 
 	public static JFrame frame;
-	static String[] legalChoices = {"Open","Gold","Diamond","Lotus","Samurai"};
-	static String[] array = {"Legal: ","Card Type: ","Faction: ","Title: ","Text: ",
+	static ArrayList<String> legalChoices = new ArrayList<String>();
+	static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
 							 "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
 							 "Focus Value: "};
-	static String[] types = {"","Stronghold","Event","Holding","Personality","Region","Action",
-							 "Follower","Item","Spell","Ancestor","Sensei"};
-	static String[] clans = {" ","Crab Clan","Crane Clan","Dragon Clan","Hare Clan","Lion Clan",
-							 "Mantis Clan","Phoenix Clan","Spider Clan","Unaligned","Unicorn Clan"};
+	static ArrayList<String> types = new ArrayList<String>();
+	static ArrayList<String> clans = new ArrayList<String>();
 	public static JLabel[] c = new JLabel[11];
 	public static CardInfoBox card;
 	public static JList list;
 	public static Vector<StoredCard> vect;
 	public static JLabel apples;
 	public static JScrollPane listScroller;
+	public static JComboBox Legal,CardType,faction;
+	public static JTextField title;
 
 	public Deckbuilder()
 	{
@@ -39,12 +39,61 @@ class Deckbuilder
 		}
 		Object[] p = Main.database.keySet().toArray();
 
-				vect = new Vector<StoredCard>();
+		vect = new Vector<StoredCard>();
 
-				for(int i = 0; i < p.length; i++)
+		types.add("");
+		clans.add("");
+
+		for(int i = 0; i < p.length; i++)
+		{
+			StoredCard currentCard = Main.database.get(p[i]);
+			vect.add(Main.database.get(p[i]));
+
+			ArrayList<String> currentCardLegal = currentCard.getLegal();
+			for(int k = 0; k < currentCardLegal.size(); k++)
+			{
+				if(!legalChoices.contains(currentCardLegal.get(k)))
 				{
-					vect.add(Main.database.get(p[i]));
+					legalChoices.add(currentCardLegal.get(k));
+				}
+			}
+
+			String currentCardType = currentCard.getType();
+			if(!types.contains(currentCardType))
+			{
+				types.add(currentCardType);
+			}
+
+			ArrayList<String> currentCardClan = currentCard.getClan();
+			for(int k = 0; k < currentCardClan.size(); k++)
+			{
+				if(!clans.contains(currentCardClan.get(k)))
+				{
+					clans.add(currentCardClan.get(k));
+				}
+			}
 		}
+
+		for(int i = 0; i < legalChoices.size(); i++)
+		{
+			String temp = legalChoices.get(i).substring(0,1).toUpperCase() + legalChoices.get(i).substring(1);
+			legalChoices.set(i, temp);
+		}
+
+		for(int i = 1; i < types.size(); i++)
+		{
+			String temp = types.get(i).substring(0,1).toUpperCase() + types.get(i).substring(1);
+			types.set(i, temp);
+		}
+
+		for(int i = 1; i < clans.size(); i++)
+		{
+			String temp = clans.get(i).substring(0,1).toUpperCase() + clans.get(i).substring(1);
+			clans.set(i, temp);
+		}
+
+		Collections.sort(types);
+		Collections.sort(clans);
 	}
 
 	public static void showGUI(int width, int height)
@@ -64,7 +113,6 @@ class Deckbuilder
 		JPanel panel1 = createSearch(width,height);
 		JPanel resarea = createResults(width,height);
 		JPanel deckarea = createDeckArea(width,height);
-
 
 		frame.add(panel1);
 		frame.add(resarea);
@@ -161,27 +209,28 @@ class Deckbuilder
 		JLabel searchlabel = new JLabel("Search Criteria:");
 		searchlabel.setFont(new Font("Serif",Font.BOLD,14));
 
-		JComboBox Legal = new JComboBox(legalChoices);
+		Legal = new JComboBox(legalChoices.toArray());
 		Legal.setSelectedIndex(4);
 		Legal.addActionListener(briansanewb);
 		Legal.setPreferredSize(new Dimension(140, 20));
 		Legal.setMaximumSize(Legal.getPreferredSize());
 		Legal.setBackground(Color.WHITE);
 
-		JComboBox CardType = new JComboBox(types);
+		CardType = new JComboBox(types.toArray());
 		CardType.addActionListener(briansanewb);
 		CardType.setPreferredSize(new Dimension(140, 20));
 		CardType.setMaximumSize(CardType.getPreferredSize());
 		CardType.setBackground(Color.WHITE);
 
-		JComboBox faction = new JComboBox(clans);
+		faction = new JComboBox(clans.toArray());
 		faction.addActionListener(briansanewb);
 		faction.setPreferredSize(new Dimension(140, 20));
 		faction.setMaximumSize(faction.getPreferredSize());
 		faction.setBackground(Color.WHITE);
 
-		JTextField title = new JTextField(10);
+		title = new JTextField(10);
 		title.setMaximumSize(new Dimension(140,20));
+		title.addActionListener(briansanewb);
 		JTextField text = new JTextField(10);
 		text.setMaximumSize(new Dimension(140,20));
 
@@ -297,8 +346,6 @@ class Deckbuilder
 		list.setVisibleRowCount(-1);
 		list.setSelectedIndex(0);
 		card.setCard(vect.elementAt(list.getSelectedIndex()));
-
-		System.out.println(vect.elementAt(14).getType().toString());
 
 		listScroller = new JScrollPane(list);
 		listScroller.setPreferredSize(new Dimension(300, 550));
