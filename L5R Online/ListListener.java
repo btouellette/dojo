@@ -23,6 +23,7 @@ class ListListener implements ListSelectionListener
 			{
 				Deckbuilder.list.setSelectedIndex(0);
 			}
+			//TODO: Handle case with no selected cards properly
 			Deckbuilder.card.setCard(Deckbuilder.vect.elementAt(Deckbuilder.list.getSelectedIndex()));
 		}
     }

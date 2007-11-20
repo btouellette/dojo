@@ -23,7 +23,7 @@ class SearchListener implements ActionListener
 	{
 		storage = new Vector<StoredCard>();
 		type="";
-		clan=" ";
+		clan="";
 		item="";
 		text="";
 		title="";
@@ -95,7 +95,7 @@ class SearchListener implements ActionListener
 				Deckbuilder.vect.remove(y);
 			else if(!Deckbuilder.vect.elementAt(y).getType().startsWith(type.toLowerCase()))
 				Deckbuilder.vect.remove(y);
-			else if (!clan.equals(" ")&&!Deckbuilder.vect.elementAt(y).getClan().contains(clan.toLowerCase()))
+			else if (!clan.equals("")&&!Deckbuilder.vect.elementAt(y).getClan().contains(clan.toLowerCase()))
 				Deckbuilder.vect.remove(y);
 			//title check = not working
 			else if (Deckbuilder.vect.elementAt(y).getName().toLowerCase().indexOf(title.toLowerCase())<0)

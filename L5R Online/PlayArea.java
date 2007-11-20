@@ -23,10 +23,13 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	static ArrayList<PlayableCard> displayedCards;
 	boolean cardClicked;
 	//The percent of a card that attachments show
-	static double attachmentHeight = .2;
+	static double attachmentHeight = .25;
 	//Number of provinces
 	static int yourNumProv, oppNumProv;
+	//The last card that was clicked on
 	PlayableCard clickedCard;
+	//The distance from where in the card was clicked to it's upper left corner
+	int distanceX, distanceY;
 
     public PlayArea(int width, int height)
     {
@@ -41,7 +44,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		//Create a new ArrayList to hold the cards to display and
 		displayedCards = new ArrayList<PlayableCard>(40);
 
-		addCard(new PlayableCard("WoE091"));
+		addCard(new PlayableCard("CoB009"));
+		displayedCards.get(0).attach(new PlayableCard("TOV068"));
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -275,6 +279,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 			if(cardArea.contains(clickPoint))
 			{
 				cardClicked = true;
+				distanceX = (int)clickPoint.getX() - cardLocation[0];
+				distanceY = (int)clickPoint.getY() - cardLocation[1];
+				//TODO: Make this work properly with attachments
+				Main.cardBox.setCard(Main.database.get(clickedCard.getID()));
 			}
 			else
 			{
@@ -292,7 +300,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		if(cardClicked)
 		{
 			Point clickPoint = e.getPoint();
-			clickedCard.setLocation((int)clickPoint.getX(), (int)clickPoint.getY());
+			clickedCard.setLocation((int)clickPoint.getX() - distanceX, (int)clickPoint.getY() - distanceY);
 			repaint();
 		}
 	}
