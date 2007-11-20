@@ -338,7 +338,7 @@ class Deckbuilder
 
 		alphasort(vect);
 
-		list = new JList((Vector)vect.clone()); //data has type Object[]
+		list = new JList(vect); //data has type Object[]
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
 		list.addListSelectionListener(new ListListener());
