@@ -21,6 +21,7 @@ class SliderListener implements ChangeListener
 		Main.playArea.setCardSize(sliderValue*Main.playArea.baseCardHeight/50);
 
 		//TODO: This can be optimized much better probably. It does file i/o on every tick at the moment.
+		//TODO: This doesn't work properly with attachments yet
 		ListIterator<PlayableCard> iterator = PlayArea.displayedCards.listIterator();
 		while (iterator.hasNext())
 		{
