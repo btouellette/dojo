@@ -327,7 +327,6 @@ class Deckbuilder
 
 	public static JPanel createResults(int width, int height)
 	{
-
 		JPanel panel = new JPanel();
 		//panel.setOpaque(true);
 		//panel.setBackground(Color.RED);
@@ -339,7 +338,7 @@ class Deckbuilder
 
 		alphasort(vect);
 
-		list = new JList((Vector<StoredCard>)vect.clone()); //data has type Object[]
+		list = new JList((Vector)vect.clone()); //data has type Object[]
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
 		list.addListSelectionListener(new ListListener());
