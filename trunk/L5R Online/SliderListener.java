@@ -27,6 +27,12 @@ class SliderListener implements ChangeListener
 		{
 			PlayableCard element = iterator.next();
 			element.setImage(null);
+			element.updateAttachmentLocations();
+			ArrayList<PlayableCard> attachments = element.getAllAttachments();
+			for(int i = 0; i < attachments.size(); i++)
+			{
+				attachments.get(i).setImage(null);
+			}
     	}
 
 		Main.playArea.repaint();

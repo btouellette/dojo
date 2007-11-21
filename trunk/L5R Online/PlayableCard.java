@@ -34,7 +34,7 @@ class PlayableCard
 	{
 		location[0] = x;
 		location[1] = y;
-		updateAttachmentLocations(this);
+		updateAttachmentLocations();
 	}
 
 	public void setLocationSimple(int x, int y)
@@ -58,16 +58,15 @@ class PlayableCard
 		attachments.remove(attachments.indexOf(unattachingCard));
 	}
 
-	public void updateAttachmentLocations(PlayableCard card)
+	public void updateAttachmentLocations()
 	{
-		ArrayList<PlayableCard> attachmentsToUpdate = card.getAttachments();
 		for(int i = 0; i < attachments.size(); i++)
 		{
-			PlayableCard currentCard = attachmentsToUpdate.get(i);
+			PlayableCard currentCard = attachments.get(i);
 			currentCard.setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight));
 			if(!currentCard.getAttachments().isEmpty())
 			{
-				updateAttachmentLocations(currentCard);
+				currentCard.updateAttachmentLocations();
 			}
 		}
 	}
@@ -75,6 +74,17 @@ class PlayableCard
 	public ArrayList<PlayableCard> getAttachments()
 	{
 		return attachments;
+	}
+
+	public ArrayList<PlayableCard> getAllAttachments()
+	{
+		ArrayList<PlayableCard> recursedAttachments = new ArrayList<PlayableCard>();
+		for(int i = 0; i < attachments.size(); i++)
+		{
+			recursedAttachments.add(attachments.get(i));
+			recursedAttachments.addAll(attachments.get(i).getAllAttachments());
+		}
+		return recursedAttachments;
 	}
 
 	public BufferedImage getImage()
