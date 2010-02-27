@@ -3,8 +3,6 @@
 // Part of Dojo
 // Listener for all the menus at the top of the panel.
 
-package l5r;
-
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;

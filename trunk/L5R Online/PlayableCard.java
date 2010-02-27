@@ -2,10 +2,7 @@
 // Written by Brian Ouellette
 // Part of Dojo
 
-package l5r;
-
 import java.util.ArrayList;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 class PlayableCard

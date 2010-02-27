@@ -4,14 +4,8 @@
 // This is the Action and Mouse Listener for the JComboBox that creates tokens
 // It takes input, stores previous token names, and generates tokens.
 
-package l5r;
-
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
-import javax.swing.plaf.basic.*;
 
 class TokenActionListener implements ActionListener, MouseListener
 {
