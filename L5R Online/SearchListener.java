@@ -2,12 +2,8 @@
 // Written by James Spencer
 // Part of Dojo
 
-package l5r;
-
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.util.Vector;
 
 class SearchListener implements ActionListener

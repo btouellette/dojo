@@ -3,24 +3,16 @@
 // Part of Dojo
 // Imports the database from the XML and stores it in a HashMap.
 
-package l5r;
-
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import java.awt.*;
-import java.io.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 import java.util.HashMap;
 
 //TODO: Add support for ruling xml tag
 class Importer extends DefaultHandler
 {
-	private Writer  out;
-	private String version, eName;
+//	private Writer out;
+//	private String version
+	private String eName;
 	private HashMap<String, StoredCard> database;
 	private StoredCard currentCard;
 
@@ -34,7 +26,6 @@ class Importer extends DefaultHandler
             //Create a new HashMap with an initial capacity of 1500
             //This value might need to be tweaked
             database = new HashMap<String, StoredCard>(500);
-
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -44,7 +35,8 @@ class Importer extends DefaultHandler
 	{
 		return database;
 	}
-
+	
+	/*
 	public String getVersion()
 	{
 		return version;
@@ -75,23 +67,23 @@ class Importer extends DefaultHandler
 
 	public void startDocument()	throws SAXException
 	{
-		/*nl();
+		nl();
 		nl();
 		emit("START DOCUMENT");
-        nl();*/
+        nl();
 	}
 
 	public void endDocument() throws SAXException
 	{
-		/*nl();
+		nl();
 		emit("END DOCUMENT");
 		try {
 			nl();
 			out.flush();
 		} catch (IOException e) {
 			throw new SAXException("I/O error", e);
-		}*/
-    }
+		}
+    }*/
 
     public void startElement(String namespaceURI,
 	                             String sName, // simple name (localName)
@@ -113,11 +105,13 @@ class Importer extends DefaultHandler
 				//emit(localName);
 				String localValue = attrs.getValue(i);
 
+				/*
 				if(localName.equals("version"))
 				{
 					version = localValue;
-				}
-				else if(localName.equals("id"))
+				}*/
+				
+				if(localName.equals("id"))
 				{
 					if(currentCard != null)
 					{
@@ -144,17 +138,18 @@ class Importer extends DefaultHandler
 		}
 		emit(">");*/
 	}
-
+    
+    /*
 	public void endElement(String namespaceURI,
 						   String sName, // simple name
 						   String qName  // qualified name
 						  )
 	throws SAXException
 	{
-		/*nl();
+		nl();
 		emit("END_ELM: ");
-		emit("</"+sName+">");*/
-    }
+		emit("</"+sName+">");
+    }*/
 
 	//Function called when the parser encounters a block of characters
     public void characters(char buf[], int offset, int len)
@@ -169,7 +164,7 @@ class Importer extends DefaultHandler
         	//emit(s);
 
 			//Huge if block is ugly but more understandable than mapping the names to values and using switch
-			//NOTE: Java switch statemetns don't operate on String
+			//NOTE: Java switch statements don't operate on String
 			if(eName.equals("name"))
 			{
 				currentCard.setName(s);

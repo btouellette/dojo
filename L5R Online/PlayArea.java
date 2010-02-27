@@ -3,12 +3,9 @@
 // Part of Dojo
 // This is the beefy part of the program. It controls the display for the game.
 
-package l5r;
-
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
 import java.util.*;
@@ -16,6 +13,7 @@ import java.io.*;
 
 class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 {
+	private static final long serialVersionUID = 1L;
 	Dimension dimension;
 	static int cardWidth, cardHeight;
 	//Reference height (height that the card is initially)
@@ -50,12 +48,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		addMouseListener(this);
 		addMouseMotionListener(this);
     }
-
-    public void setCardSize(int cardHeight)
-    {
-		this.cardHeight = cardHeight;
-		this.cardWidth = cardWidth = (int)(cardHeight*(2.5/3.5));
-	}
 
 	public void addCard(PlayableCard card)
 	{

@@ -2,8 +2,6 @@
 // Written by Brian Ouellette
 // Part of Dojo
 
-package l5r;
-
 import java.awt.event.*;
 import javax.swing.*;
 

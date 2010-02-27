@@ -3,8 +3,6 @@
 // Part of Dojo
 // This is the ActionListener that controls the chat panel. It formats the text and sends out commands.
 
-package l5r;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

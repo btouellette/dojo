@@ -5,15 +5,11 @@
 
 //TODO: Add a JPopUpMenu for detaching the panel
 
-package l5r;
-
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.text.*;
-import java.io.*;
 
 class CardInfoBox extends JEditorPane
 {
+	private static final long serialVersionUID = 1L;
 	StoredCard card;
 
     public CardInfoBox()
@@ -30,12 +26,10 @@ class CardInfoBox extends JEditorPane
 
     public void setCard(StoredCard card)
     {
-		String cardHTML1, cardHTML2, cardHTML3, cardHTML4, cardImageLoc;
-		int count = 0;
-
-
+		String cardHTML1, cardHTML2, cardHTML3, cardHTML4;
+		
 		/* Commented out until it's determined whether images should be present in the info box
-		cardImageLoc = card.getImageLocation();
+		String cardImageLoc = card.getImageLocation();
 
 		//Hack to get a non-relative file location as JEditorPane doesn't support relative pathnames in IMG tags
 		//If used then <img src=\"" + cardImageLoc + "\"> is added to the HTML

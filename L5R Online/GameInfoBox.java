@@ -3,14 +3,13 @@
 // Part of Dojo
 // Box for displaying information on the game state.
 
-package l5r;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 class GameInfoBox extends JPanel implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	// y = yours
 	// o = opponents
 	JLabel yHonor, oHonor;

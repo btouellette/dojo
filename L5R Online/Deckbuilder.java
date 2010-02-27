@@ -1,19 +1,10 @@
-package l5r;
-
 import javax.swing.JPanel;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-import javax.swing.plaf.basic.*;
-import java.awt.*;
-import java.io.*;
 import java.util.*;
 
 class Deckbuilder
 {
-
 	public static JFrame frame;
 	static ArrayList<String> legalChoices = new ArrayList<String>();
 	static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",

@@ -3,15 +3,12 @@
 // Part of Dojo
 // Launcher program. Sets up the GUI and sets everything up.
 
-package l5r;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.basic.*;
 import java.awt.*;
 import java.io.*;
 import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.*;
 import java.util.HashMap;
 
@@ -71,7 +68,7 @@ class Main
         frame.pack();
 
 		deck = new Deckbuilder();
-        deck.showGUI(frame.getWidth(),frame.getHeight());
+		Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
 
         frame.setVisible(true);
     }
