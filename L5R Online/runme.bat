@@ -1,2 +1,2 @@
-javac -d . *.java
-java Main
+javac -Xlint -sourcepath src src/*.java -d classes
+java -classpath classes Main
