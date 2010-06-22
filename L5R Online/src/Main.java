@@ -280,7 +280,7 @@ class Main
 			// Get database off kamisasori.net
 			try {	
 				URL url = new URL("http://kamisasori.net/files/cards-gamepukku.zip");
-				URLConnection urlC = url.openConnection();
+				url.openConnection();
 				InputStream is = url.openStream();
 				FileOutputStream fos = new FileOutputStream("cards-gempukku.zip");
 				int oneChar, count = 0;
