@@ -22,7 +22,6 @@ class ButtonListener implements ActionListener
 			}
 			else
 			{
-
 				TextActionListener.send(Main.userName + " unbows all her cards.", "Action");
 			}
 		}

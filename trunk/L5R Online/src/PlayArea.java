@@ -29,8 +29,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	//The distance from where in the card was clicked to it's upper left corner
 	int distanceX, distanceY;
 
-    public PlayArea(int width, int height)
-    {
+	public PlayArea(int width, int height)
+	{
 		cardHeight = height/5;
 		cardWidth = (int)(cardHeight*(2.5/3.5));
 
@@ -47,7 +47,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
-    }
+	}
 
 	public void addCard(PlayableCard card)
 	{
@@ -60,8 +60,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	}
 
 	//Override the default JPanel paint method
-    public void paintComponent(Graphics g)
-    {
+	public void paintComponent(Graphics g)
+	{
 		super.paintComponent(g);
 
 		dimension = this.getSize();
@@ -142,8 +142,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		{
 			PlayableCard element = iterator.next();
 			displayCard(element, (Graphics2D)g);
-    	}
-    }
+		}
+	}
 
 	public void displayCard(PlayableCard card, Graphics2D g)
 	{
@@ -179,7 +179,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 			String imageLocation = databaseCard.getImageLocation();
 			if(imageLocation == null)
 			{
-				//Display a placeholder card
+				//TODO: Display a placeholder card
 			}
 			else
 			{
@@ -215,15 +215,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 						//g2.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
 						//g2.dispose();
 					}
-
 					card.setImage(cardImage);
-
 				} catch(IOException io) {
 					System.err.println(io);
 				}
 			}
 		}
-
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
 
@@ -238,21 +235,23 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		{
 			allAttachments.addAll(getAllAttachments(attachments.get(index)));
 		}
-
 		return allAttachments;
 	}
 
-    public void mouseClicked(MouseEvent e)
-    {
-    }
- 	public void mouseEntered(MouseEvent e)
- 	{
-    }
- 	public void mouseExited(MouseEvent e)
- 	{
-    }
- 	public void mousePressed(MouseEvent e)
- 	{
+	public void mouseClicked(MouseEvent e)
+	{
+	}
+
+	public void mouseEntered(MouseEvent e)
+	{
+	}
+
+	public void mouseExited(MouseEvent e)
+	{
+	}
+
+	public void mousePressed(MouseEvent e)
+	{
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 		int index = 0;
@@ -281,14 +280,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 				index++;
 			}
 		}
-    }
- 	public void mouseReleased(MouseEvent e)
- 	{
-		cardClicked = false;
-    }
+	}
 
-    public void mouseDragged(MouseEvent e)
-    {
+	public void mouseReleased(MouseEvent e)
+	{
+		cardClicked = false;
+	}
+
+	public void mouseDragged(MouseEvent e)
+	{
 		if(cardClicked)
 		{
 			Point clickPoint = e.getPoint();
@@ -297,16 +297,16 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		}
 	}
 
-    public void mouseMoved(MouseEvent e)
-    {
+	public void mouseMoved(MouseEvent e)
+	{
 	}
 
-    //A good fast high-quality image downscaling algorithm hasn't been implemented yet
-    //in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
-    //which rescales the image multiple times using the standard Bilinear interpolation.
-    //It was written by Chris Campbell and found here: http://today.java.net/lpt/a/362#perfnotes
+	//A good fast high-quality image downscaling algorithm hasn't been implemented yet
+	//in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
+	//which rescales the image multiple times using the standard Bilinear interpolation.
+	//It was written by Chris Campbell and found here: http://today.java.net/lpt/a/362#perfnotes
 
-    /**
+	/**
 	 * Convenience method that returns a scaled instance of the
 	 * provided {@code BufferedImage}.
 	 *

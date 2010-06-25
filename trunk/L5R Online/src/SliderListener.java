@@ -32,7 +32,7 @@ class SliderListener implements ChangeListener
 			{
 				attachments.get(i).setImage(null);
 			}
-    	}
+		}
 
 		Main.playArea.repaint();
 	}
