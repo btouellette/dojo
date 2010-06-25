@@ -17,8 +17,8 @@ class StoredCard
 	String province_strength, gold_production, starting_honor;
 	String force, chi, personal_honor, honor_req;
 
-    public StoredCard(String id)
-    {
+	public StoredCard(String id)
+	{
 		this.id = id;
 		imageLocation = new ArrayList<String>();
 		imageEdition = new ArrayList<String>();
@@ -26,28 +26,28 @@ class StoredCard
 		clan = new ArrayList<String>();
 		//Avoid null values in the text field (it doesn't have to be set)
 		text = "";
-    	//Wait for the card to be filled with info from the parser
-    }
+		//Wait for the card to be filled with info from the parser
+	}
 
-    public void setType(String type)
-    {
+	public void setType(String type)
+	{
 		this.type = type;
 	}
 
-    public void setName(String name)
-    {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
-    public void setImageLocation(String imageLocation)
-    {
+	public void setImageLocation(String imageLocation)
+	{
 		//Always add it at the beginning of the list
 		//MRP will be the last card and we want that to be the default return
 		this.imageLocation.add(0, imageLocation);
 	}
 
-    public void setImageEdition(String imageEdition)
-    {
+	public void setImageEdition(String imageEdition)
+	{
 		//Always add it at the beginning of the list
 		//MRP will be the last card and we want that to be the default return
 		this.imageEdition.add(0, imageEdition);
@@ -58,63 +58,63 @@ class StoredCard
 		this.edition = edition;
 	}
 
-    public void setLegal(String legal)
-    {
+	public void setLegal(String legal)
+	{
 		this.legal.add(legal);
 	}
 
-    public void setText(String text)
-    {
+	public void setText(String text)
+	{
 		this.text = text;
 	}
 
-    public void setCost(String cost)
-    {
+	public void setCost(String cost)
+	{
 		this.cost = cost;
 	}
 
-    public void setFocus(String focus)
-    {
+	public void setFocus(String focus)
+	{
 		this.focus = focus;
 	}
 
-    public void setClan(String clan)
-    {
+	public void setClan(String clan)
+	{
 		this.clan.add(clan);
 	}
 
-    public void setProvinceStrength(String province_strength)
-    {
+	public void setProvinceStrength(String province_strength)
+	{
 		this.province_strength = province_strength;
 	}
 
-    public void setGoldProduction(String gold_production)
-    {
+	public void setGoldProduction(String gold_production)
+	{
 		this.gold_production = gold_production;
 	}
 
-    public void setStartingHonor(String starting_honor)
-    {
+	public void setStartingHonor(String starting_honor)
+	{
 		this.starting_honor = starting_honor;
 	}
 
-    public void setForce(String force)
-    {
+	public void setForce(String force)
+	{
 		this.force = force;
 	}
 
-    public void setChi(String chi)
-    {
+	public void setChi(String chi)
+	{
 		this.chi = chi;
 	}
 
-    public void setPersonalHonor(String personal_honor)
-    {
+	public void setPersonalHonor(String personal_honor)
+	{
 		this.personal_honor = personal_honor;
 	}
 
 	public void setHonorReq(String honor_req)
-    {
+	{
 		this.honor_req = honor_req;
 	}
 

@@ -13,14 +13,14 @@ class PlayableCard
 	int[] location;
 	BufferedImage cardImage;
 
-    public PlayableCard(String id)
-    {
+	public PlayableCard(String id)
+	{
 		this.id = id;
 		location = new int[2];
 		location[0] = 0;
 		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
-    }
+	}
 
 	public String getID()
 	{

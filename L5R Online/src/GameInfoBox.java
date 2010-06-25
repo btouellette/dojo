@@ -22,8 +22,8 @@ class GameInfoBox extends JPanel implements ActionListener
 
 	JLabel yFavor, oFavor;
 
-    public GameInfoBox()
-    {
+	public GameInfoBox()
+	{
 		yHonor = new JLabel("3", JLabel.CENTER);
 		oHonor = new JLabel("35", JLabel.CENTER);
 		yHand = new JLabel("8", JLabel.CENTER);

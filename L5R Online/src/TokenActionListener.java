@@ -9,9 +9,9 @@ import javax.swing.*;
 
 class TokenActionListener implements ActionListener, MouseListener
 {
-    public TokenActionListener()
-    {
-    }
+	public TokenActionListener()
+	{
+	}
 
 	// This method is called whenever the user or program changes the selected item.
 	// Note: The new item may be the same as the previous item.
@@ -41,7 +41,7 @@ class TokenActionListener implements ActionListener, MouseListener
 		}
 	}
 
-    public void mouseClicked(MouseEvent e)
+	public void mouseClicked(MouseEvent e)
 	{
 		//This is implementing a tip style combobox (light gray text until clicked in)
 		JComboBox comboBox = (JComboBox)e.getComponent();
@@ -56,16 +56,20 @@ class TokenActionListener implements ActionListener, MouseListener
 			comboBox.requestFocusInWindow();
 		}
 	}
+
 	public void mouseEntered(MouseEvent e)
 	{
 	}
+
 	public void mouseExited(MouseEvent e)
 	{
 	}
+
 	public void mousePressed(MouseEvent e)
 	{
 	}
+
 	public void mouseReleased(MouseEvent e)
 	{
-    }
+	}
 }

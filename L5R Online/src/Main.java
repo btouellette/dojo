@@ -24,29 +24,29 @@ class Main
 	public static PlayArea playArea;
 	public static Deckbuilder deck;
 
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI()
-    {
-        //Create and set up the window
-        JFrame frame = new JFrame("Dojo");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	/**
+	 * Create the GUI and show it.  For thread safety,
+	 * this method should be invoked from the
+	 * event-dispatching thread.
+	 */
+	private static void createAndShowGUI()
+	{
+		//Create and set up the window
+		JFrame frame = new JFrame("Dojo");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//Set up defaults if pref file is unavailable
 
-        //Grab the screen resolution
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        //Default size is to take up 3/4 of the screen horizontally and 1/2 of the screen vertically
-        //If there is a stored preference file then use those numbers
-        int width = (int)(screenSize.getWidth()*.75);
-        int height = (int)(screenSize.getHeight()*.5);
+		//Grab the screen resolution
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//Default size is to take up 3/4 of the screen horizontally and 1/2 of the screen vertically
+		//If there is a stored preference file then use those numbers
+		int width = (int)(screenSize.getWidth()*.75);
+		int height = (int)(screenSize.getHeight()*.5);
 
-        //Default username
-        userName = "New Player";
-        gender = "Male";
+		//Default username
+		userName = "New Player";
+		gender = "Male";
 
 		//Create the play area
 		playArea = createPlayArea(width, height);
@@ -62,21 +62,21 @@ class Main
 		splitPane.setUI(new BasicSplitPaneUI());
 		splitPane.setDividerSize(5);
 
-        //Set the menu bar and add the label to the content pane
-        frame.setJMenuBar(createMenuBar(width, playArea));
-        frame.getContentPane().add(splitPane, BorderLayout.CENTER);
+		//Set the menu bar and add the label to the content pane
+		frame.setJMenuBar(createMenuBar(width, playArea));
+		frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 
-        //Display the window
-        frame.pack();
+		//Display the window
+		frame.pack();
 
 		deck = new Deckbuilder();
-		Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
+		//Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
 
-        frame.setVisible(true);
-    }
+		frame.setVisible(true);
+	}
 
-    private static JMenuBar createMenuBar(int width, PlayArea playArea)
-    {
+	private static JMenuBar createMenuBar(int width, PlayArea playArea)
+	{
 		//Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);
@@ -194,25 +194,25 @@ class Main
 	private static PlayArea createPlayArea(int width, int height)
 	{
 		//Create the main play area
-        PlayArea playAreaPanel = new PlayArea(width, height);
-        playAreaPanel.setOpaque(true);
-        // TODO: Allow for custom backgrounds
-        playAreaPanel.setBackground(Color.WHITE);
-        // TODO: Save the last used size and load it here
-        playAreaPanel.setPreferredSize(new Dimension(width, height));
+		PlayArea playAreaPanel = new PlayArea(width, height);
+		playAreaPanel.setOpaque(true);
+		// TODO: Allow for custom backgrounds
+		playAreaPanel.setBackground(Color.WHITE);
+		// TODO: Save the last used size and load it here
+		playAreaPanel.setPreferredSize(new Dimension(width, height));
 
-        return playAreaPanel;
+		return playAreaPanel;
 	}
 
 	private static JSplitPane createInfoArea(int width, int height)
 	{
 		//Create the chat/info area
-        JPanel infoArea = new JPanel();
-        infoArea.setOpaque(true);
-        infoArea.setBackground(Color.LIGHT_GRAY);
-        // TODO: Remember the previous size of all these windows
-        infoArea.setPreferredSize(new Dimension(2*width/4, 175));
-        //Add a pretty border to it
+		JPanel infoArea = new JPanel();
+		infoArea.setOpaque(true);
+		infoArea.setBackground(Color.LIGHT_GRAY);
+		// TODO: Remember the previous size of all these windows
+		infoArea.setPreferredSize(new Dimension(2*width/4, 175));
+		//Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
 
@@ -262,13 +262,13 @@ class Main
 
 		// Use the default (non-validating) parser
 		SAXParserFactory factory = SAXParserFactory.newInstance();
-        try {
+		try {
 		 	// Parse the input
-		    SAXParser saxParser = factory.newSAXParser();
-		    System.out.print("Loading card database: ");
-		    saxParser.parse( new File("cards.xml"), handler );
+			SAXParser saxParser = factory.newSAXParser();
+			System.out.print("Loading card database: ");
+			saxParser.parse( new File("cards.xml"), handler );
 			database = handler.getDatabase();
-    		System.out.println("success!");
+			System.out.println("success!");
 		} catch (SAXParseException spe) {
 		   // Error generated by the parser
 		   System.err.println("\n** Parsing error"
@@ -330,19 +330,19 @@ class Main
 		}
 	}
 
-    public static void main(String[] args)
-    {
-    	//Read in cards.xml
-    	importDatabase();
+	public static void main(String[] args)
+	{
+		//Read in cards.xml
+		importDatabase();
 
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                createAndShowGUI();
-            }
-        });
-    }
+		//Schedule a job for the event-dispatching thread:
+		//creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				createAndShowGUI();
+			}
+		});
+	}
 }

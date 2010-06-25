@@ -8,13 +8,13 @@ import java.util.Vector;
 
 class SearchListener implements ActionListener
 {
-
 	public static Vector<StoredCard> storage;
 	String type,clan,legal;
 	int max, y;
 	JComboBox cb;
 	JTextField tf;
 	String item,text,title;
+
 	public SearchListener()
 	{
 		storage = new Vector<StoredCard>();
@@ -30,51 +30,54 @@ class SearchListener implements ActionListener
 		cb = new JComboBox();
 		tf = new JTextField();
 	}
+
 	public void actionPerformed(ActionEvent e)
 	{
-	        if(e.getSource() instanceof JComboBox)
-	        {
-
+			if(e.getSource() instanceof JComboBox)
+			{
 				JComboBox cb = (JComboBox)e.getSource();
-	        	item = (String)cb.getSelectedItem();
-	        }
-	        else if (e.getSource() instanceof JTextField)
-	        {
+				item = (String)cb.getSelectedItem();
+			}
+			else if (e.getSource() instanceof JTextField)
+			{
 				JTextField tf = (JTextField)e.getSource();
 				text = tf.getText();
 			}
 
 			//textArea.append(text + newline);
-    		//textField.selectAll();
+			//textField.selectAll();
 
-    		//assign Legal menu option
+			//assign Legal menu option
 			if (item.equals(Deckbuilder.Legal.getSelectedItem().toString()))
+			{
 				legal=item;
-
+			}
 			//assign Card Type menu option
 			else if (item.equals(Deckbuilder.CardType.getSelectedItem().toString()))
 			{
 				type=item;
 				if (type.equals("Personality"))
+				{
 					type="personalities";
+				}
 			}
-
 			//assign Faction menu option
 			else if (item.equals(Deckbuilder.faction.getSelectedItem().toString()))
+			{
 				clan=item;
-
+			}
 			//assign Title TextField option
 			else if (text.equals(Deckbuilder.title.getText()))
+			{
 				title=text;
-
-
+			}
 
 			System.out.println(title);
 			Display();
-    }
+	}
 
-    public void Display()
-    {
+	public void Display()
+	{
 		//reset the vector
 		Deckbuilder.vect.clear();
 

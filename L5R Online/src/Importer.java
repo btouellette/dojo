@@ -10,8 +10,8 @@ import java.util.HashMap;
 //TODO: Add support for ruling xml tag
 class Importer extends DefaultHandler
 {
-//	private Writer out;
-//	private String version
+	//private Writer out;
+	//private String version
 	private String eName;
 	private HashMap<String, StoredCard> database;
 	private StoredCard currentCard;
@@ -20,15 +20,15 @@ class Importer extends DefaultHandler
 	{
 		try
 		{
-            // Set up output stream
-            //out = new OutputStreamWriter(System.out, "UTF8");
+			// Set up output stream
+			//out = new OutputStreamWriter(System.out, "UTF8");
 
-            //Create a new HashMap with an initial capacity of 1500
-            //This value might need to be tweaked
-            database = new HashMap<String, StoredCard>(500);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+			//Create a new HashMap with an initial capacity of 1500
+			//This value might need to be tweaked
+			database = new HashMap<String, StoredCard>(500);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 	public HashMap<String, StoredCard> getDatabase()
@@ -44,13 +44,13 @@ class Importer extends DefaultHandler
 
 	private void emit(String s)	throws SAXException
 	{
-	    try
-	    {
-	        out.write(s);
-	        out.flush();
-	    } catch (IOException e) {
-	        throw new SAXException("I/O error", e);
-	    }
+		try
+		{
+			out.write(s);
+			out.flush();
+		} catch (IOException e) {
+			throw new SAXException("I/O error", e);
+		}
 	}
 
 	private void nl() throws SAXException
@@ -63,14 +63,14 @@ class Importer extends DefaultHandler
 		} catch (IOException e) {
 			throw new SAXException("I/O error", e);
 		}
-    }
+	}
 
 	public void startDocument()	throws SAXException
 	{
 		nl();
 		nl();
 		emit("START DOCUMENT");
-        nl();
+		nl();
 	}
 
 	public void endDocument() throws SAXException
@@ -83,12 +83,12 @@ class Importer extends DefaultHandler
 		} catch (IOException e) {
 			throw new SAXException("I/O error", e);
 		}
-    }*/
+	}*/
 
-    public void startElement(String namespaceURI,
-	                             String sName, // simple name (localName)
-	                             String qName, // qualified name
-	                             Attributes attrs)
+	public void startElement(String namespaceURI,
+								 String sName, // simple name (localName)
+								 String qName, // qualified name
+								 Attributes attrs)
 	throws SAXException
 	{
 		//nl();
@@ -129,7 +129,7 @@ class Importer extends DefaultHandler
 				}
 				//emit("\t\"");
 				//emit(localValue);
-                //emit("\"");
+				//emit("\"");
 			}
 		}
 		/*if(attrs.getLength() > 0)
@@ -138,8 +138,8 @@ class Importer extends DefaultHandler
 		}
 		emit(">");*/
 	}
-    
-    /*
+	
+	/*
 	public void endElement(String namespaceURI,
 						   String sName, // simple name
 						   String qName  // qualified name
@@ -149,19 +149,19 @@ class Importer extends DefaultHandler
 		nl();
 		emit("END_ELM: ");
 		emit("</"+sName+">");
-    }*/
+	}*/
 
 	//Function called when the parser encounters a block of characters
-    public void characters(char buf[], int offset, int len)
-    throws SAXException
-    {
-        //nl();
-        //emit("CHARS:   ");
-        String s = new String(buf, offset, len);
-        //The if statement makes sure it isn't just useless white space
-        if(!s.trim().equals(""))
-        {
-        	//emit(s);
+	public void characters(char buf[], int offset, int len)
+	throws SAXException
+	{
+		//nl();
+		//emit("CHARS:   ");
+		String s = new String(buf, offset, len);
+		//The if statement makes sure it isn't just useless white space
+		if(!s.trim().equals(""))
+		{
+			//emit(s);
 
 			//Huge if block is ugly but more understandable than mapping the names to values and using switch
 			//NOTE: Java switch statements don't operate on String
@@ -226,5 +226,5 @@ class Importer extends DefaultHandler
 				currentCard.setHonorReq(s);
 			}
 		}
-    }
+	}
 }

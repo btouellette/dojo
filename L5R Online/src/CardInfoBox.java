@@ -12,20 +12,20 @@ class CardInfoBox extends JEditorPane
 	private static final long serialVersionUID = 1L;
 	StoredCard card;
 
-    public CardInfoBox()
-    {
+	public CardInfoBox()
+	{
 		setEditable(false);
 		setContentType("text/html");
-    }
+	}
 
-    public CardInfoBox(StoredCard card)
-    {
+	public CardInfoBox(StoredCard card)
+	{
 		this();
 		setCard(card);
 	}
 
-    public void setCard(StoredCard card)
-    {
+	public void setCard(StoredCard card)
+	{
 		String cardHTML1, cardHTML2, cardHTML3, cardHTML4;
 		
 		/* Commented out until it's determined whether images should be present in the info box

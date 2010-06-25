@@ -8,8 +8,8 @@ class Deckbuilder
 	public static JFrame frame;
 	static ArrayList<String> legalChoices = new ArrayList<String>();
 	static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
-							 "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
-							 "Focus Value: "};
+	                         "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
+	                         "Focus Value: "};
 	static ArrayList<String> types = new ArrayList<String>();
 	static ArrayList<String> clans = new ArrayList<String>();
 	public static JLabel[] c = new JLabel[11];
@@ -90,16 +90,16 @@ class Deckbuilder
 	public static void showGUI(int width, int height)
 	{
 		frame = new JFrame("DeckBuilder");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-        //frame.setLayout(new GridLayout(1,3));
-        //frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+		//frame.setLayout(new GridLayout(1,3));
+		//frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
 		frame.setPreferredSize(new Dimension(width,height));
 		//Set up defaults if pref file is unavailable
 
-        width+=12;
-        height+=187;
+		width+=12;
+		height+=187;
 
 		JPanel panel1 = createSearch(width,height);
 		JPanel resarea = createResults(width,height);
@@ -108,12 +108,12 @@ class Deckbuilder
 		frame.add(panel1);
 		frame.add(resarea);
 		frame.add(deckarea);
-        //Set the menu bar and add the label to the content pane
-        frame.setJMenuBar(createMenuBar(width));
-        //Display the window
+		//Set the menu bar and add the label to the content pane
+		frame.setJMenuBar(createMenuBar(width));
+		//Display the window
 
 		frame.pack();
-        frame.setVisible(true);
+		frame.setVisible(true);
 	}
 
 	private static JPanel createBar()
@@ -191,6 +191,7 @@ class Deckbuilder
 		//Create the card info box
 		card = new CardInfoBox();
 		//Kind of hacked. Using a large vertical value so that the info box will take up the rest of the vertical space.
+		//TODO: Make not kind of hacked
 		card.setPreferredSize(new Dimension((width-12)/4, 2000));
 		JScrollPane cardScrollPane = new JScrollPane(card);
 
@@ -237,69 +238,68 @@ class Deckbuilder
 		layout.setAutoCreateGaps(true);
 		//layout.setAutoCreateContainerGaps(true);
 
-
 		layout.setHorizontalGroup(
-		   layout.createSequentialGroup()
-		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(c[0])
-			  .addComponent(c[1])
-			  .addComponent(c[2])
-			  .addComponent(c[3])
-			  .addComponent(c[4])
-			  .addComponent(c[5])
-			  .addComponent(c[6])
-			  .addComponent(c[7])
-			  .addComponent(c[8])
-			  .addComponent(c[9])
-			  .addComponent(c[10]))
-		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(Legal)
-		      .addComponent(CardType)
-		      .addComponent(faction)
-		      .addComponent(title)
-		      .addComponent(text)
-		      .addComponent(goldcost)
-		      .addComponent(force)
-		      .addComponent(chi)
-		      .addComponent(honor)
-		      .addComponent(phonor)
-		      .addComponent(focus))
+		layout.createSequentialGroup()
+		  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+		    .addComponent(c[0])
+		    .addComponent(c[1])
+		    .addComponent(c[2])
+		    .addComponent(c[3])
+		    .addComponent(c[4])
+		    .addComponent(c[5])
+		    .addComponent(c[6])
+		    .addComponent(c[7])
+		    .addComponent(c[8])
+		    .addComponent(c[9])
+		    .addComponent(c[10]))
+		  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+		    .addComponent(Legal)
+		    .addComponent(CardType)
+		    .addComponent(faction)
+		    .addComponent(title)
+		    .addComponent(text)
+		    .addComponent(goldcost)
+		    .addComponent(force)
+		    .addComponent(chi)
+		    .addComponent(honor)
+		    .addComponent(phonor)
+		    .addComponent(focus))
 		);
 		layout.setVerticalGroup(
-		   layout.createSequentialGroup()
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		           .addComponent(c[0])
-		           .addComponent(Legal))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[1])
-			  	   .addComponent(CardType))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[2])
-			  	   .addComponent(faction))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[3])
-			  	   .addComponent(title))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[4])
-			  	   .addComponent(text))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[5])
-			  	   .addComponent(goldcost))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[6])
-			  	   .addComponent(force))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[7])
-			  	   .addComponent(chi))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[8])
-			  	   .addComponent(honor))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[9])
-			  	   .addComponent(phonor))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[10])
-			  	   .addComponent(focus))
+		  layout.createSequentialGroup()
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[0])
+		      .addComponent(Legal))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[1])
+		      .addComponent(CardType))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[2])
+		      .addComponent(faction))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[3])
+		      .addComponent(title))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[4])
+		      .addComponent(text))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[5])
+		      .addComponent(goldcost))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[6])
+		      .addComponent(force))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[7])
+		      .addComponent(chi))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[8])
+		      .addComponent(honor))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[9])
+		      .addComponent(phonor))
+		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addComponent(c[10])
+		      .addComponent(focus))
 		);
 		//panel.add(Box.createVerticalStrut(5));
 		searchlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -313,7 +313,6 @@ class Deckbuilder
 		panel.add(cardScrollPane);
 
 		return(panel);
-
 	}
 
 	public static JPanel createResults(int width, int height)
@@ -364,12 +363,16 @@ class Deckbuilder
 		temp.add(null);
 
 		for (int x = 0; x < vex.size(); x++)
+		{
 			for (int y = 0; y < vex.size(); y++)
+			{
 				if(vex.elementAt(x).getName().toString().compareToIgnoreCase(vex.elementAt(y).getName().toString())<0)
 				{
-					temp.setElementAt(vex.elementAt(y),0);    //temp = y
-					vex.setElementAt(vex.elementAt(x),y);     //y = x
-					vex.setElementAt(temp.elementAt(0),x);    //x = temp
+					temp.setElementAt(vex.elementAt(y),0);	//temp = y
+					vex.setElementAt(vex.elementAt(x),y);	 //y = x
+					vex.setElementAt(temp.elementAt(0),x);	//x = temp
 				}
+			}
+		}
 	}
 }
