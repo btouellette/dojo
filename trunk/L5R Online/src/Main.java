@@ -38,11 +38,13 @@ class Main
 		//Set up defaults if pref file is unavailable
 
 		//Grab the screen resolution
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		//Default size is to take up 3/4 of the screen horizontally and 1/2 of the screen vertically
 		//If there is a stored preference file then use those numbers
-		int width = (int)(screenSize.getWidth()*.75);
-		int height = (int)(screenSize.getHeight()*.5);
+		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//int width = (int)(screenSize.getWidth()*.75);
+		//int height = (int)(screenSize.getHeight()*.5);
+		int width = 1400;
+		int height = 700;
 
 		//Default username
 		userName = "New Player";
@@ -283,10 +285,8 @@ class Main
 				url.openConnection();
 				InputStream is = url.openStream();
 				FileOutputStream fos = new FileOutputStream("cards-gempukku.zip");
-				int oneChar, count = 0;
-				while((oneChar = is.read()) != -1) {
-					fos.write(oneChar);
-					count++;
+				for (int c = is.read(); c != -1; c = is.read()) {
+					fos.write(c);
 				}
 				is.close();
 				fos.close();
@@ -312,7 +312,7 @@ class Main
 				}
 				zis.close();
 
-				System.out.print("** Deleting cards-gempukku.zip: ");
+				System.out.print("** Deleting zip file after extraction: ");
 				File f = new File("cards-gempukku.zip");
 				f.delete();
 				System.out.println("success!");
@@ -321,6 +321,9 @@ class Main
 			} catch (Throwable t) {
 				System.err.println("failed\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
 				t.printStackTrace();
+				File f = new File("cards-gempukku.zip");
+				if(f.exists())
+					f.delete();
 				System.exit(1);
 			}
 		} catch (Throwable t) {

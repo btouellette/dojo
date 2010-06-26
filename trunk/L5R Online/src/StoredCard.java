@@ -43,14 +43,14 @@ class StoredCard
 	{
 		//Always add it at the beginning of the list
 		//MRP will be the last card and we want that to be the default return
-		this.imageLocation.add(0, imageLocation);
+		this.imageLocation.add(imageLocation);
 	}
 
 	public void setImageEdition(String imageEdition)
 	{
 		//Always add it at the beginning of the list
 		//MRP will be the last card and we want that to be the default return
-		this.imageEdition.add(0, imageEdition);
+		this.imageEdition.add(imageEdition);
 	}
 
 	public void setEdition(String edition)
@@ -155,16 +155,15 @@ class StoredCard
 		return null;
 	}
 
-	public String getImageEdition(int count)
+	public String getImageEdition()
 	{
-		if(count < imageEdition.size())
+		if(!imageEdition.isEmpty())
 		{
-			return imageEdition.get(count);
+			// Just return the MRP edition
+			return imageEdition.get(0);
 		}
-		else
-		{
-			return "";
-		}
+
+		return null;
 	}
 
 	public String getEdition()
