@@ -9,25 +9,27 @@ import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
 import java.util.*;
+import java.util.zip.*;
 import java.io.*;
+import java.net.*;
 
 class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 {
 	private static final long serialVersionUID = 1L;
-	Dimension dimension;
+	//The distance from where the card was clicked to its upper left corner
+	private int distanceX, distanceY;
+	//The last card that was clicked on
+	private PlayableCard clickedCard;
+	private boolean cardClicked;
+
+	static ArrayList<PlayableCard> displayedCards;
 	static int cardWidth, cardHeight;
 	//Reference height (height that the card is initially)
 	static int baseCardHeight;
-	static ArrayList<PlayableCard> displayedCards;
-	boolean cardClicked;
 	//The percent of a card that attachments show
 	static double attachmentHeight = .25;
 	//Number of provinces
 	static int yourNumProv, oppNumProv;
-	//The last card that was clicked on
-	PlayableCard clickedCard;
-	//The distance from where in the card was clicked to it's upper left corner
-	int distanceX, distanceY;
 
 	public PlayArea(int width, int height)
 	{
@@ -43,7 +45,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		displayedCards = new ArrayList<PlayableCard>(40);
 
 		addCard(new PlayableCard("CoB009"));
-		displayedCards.get(0).attach(new PlayableCard("TOV068"));
+		displayedCards.get(0).attach(new PlayableCard("TOV069"));
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -64,9 +66,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	{
 		super.paintComponent(g);
 
-		dimension = this.getSize();
-		int height = (int)dimension.getHeight();
-		int width = (int)dimension.getWidth();
+		int height = getHeight();
+		int width = getWidth();
 
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
@@ -147,7 +148,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 
 	public void displayCard(PlayableCard card, Graphics2D g)
 	{
-
 		int[] location = card.getLocation();
 
 		//Recursively show all the attachments on the current card
@@ -179,9 +179,53 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 			String imageLocation = databaseCard.getImageLocation();
 			if(imageLocation == null)
 			{
-				//TODO: Display a placeholder card
+				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
+				// Get image pack off kamisasori.net
+				try {
+					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
+					url.openConnection();
+					InputStream is = url.openStream();
+					FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
+					for (int c = is.read(); c != -1; c = is.read()) {
+						fos.write(c);
+					}
+					is.close();
+					fos.close();
+					System.out.println("success!");
+
+					// Unzip image pack
+					FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
+					ZipInputStream zis = new ZipInputStream(fis);
+					ZipEntry ze = null;
+					while ((ze = zis.getNextEntry()) != null) {
+						System.out.print("** Unzipping " + ze.getName() + ": ");
+						// Make any directories as needed before unzipping
+						File f = new File("images/cards/" + databaseCard.getImageEdition());
+						f.mkdirs();
+						fos = new FileOutputStream("images/cards/" + ze.getName());
+						for (int c = zis.read(); c != -1; c = zis.read()) {
+							fos.write(c);
+						}
+						zis.closeEntry();
+						fos.close();
+						System.out.println("success!");
+					}
+					zis.close();
+
+					System.out.print("** Deleting zip file after extraction: ");
+					File f = new File("tmp-imagepack.zip");
+					f.delete();
+					System.out.println("success!");
+					imageLocation = databaseCard.getImageLocation();
+				} catch (Throwable t) {
+					System.err.println("failed. Check your internet connection.");
+					File f = new File("tmp-imagepack.zip");
+					if(f.exists())
+						f.delete();
+					//TODO: Display a placeholder card
+				}
 			}
-			else
+			if(imageLocation != null)
 			{
 				try
 				{
@@ -292,7 +336,21 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		if(cardClicked)
 		{
 			Point clickPoint = e.getPoint();
-			clickedCard.setLocation((int)clickPoint.getX() - distanceX, (int)clickPoint.getY() - distanceY);
+			int newX = (int)clickPoint.getX() - distanceX;
+			int newY = (int)clickPoint.getY() - distanceY;
+			
+			// Don't let them drag cards off the playing field entirely
+			// TODO: modify for dragging into/out of hand when implemented
+			if(newX < 10 - cardWidth)
+				newX = 10 - cardWidth;
+			else if(newX > getWidth() - 10)
+				newX = getWidth() - 10;
+			if(newY < 10 - cardHeight)
+				newY = 10 - cardHeight;
+			else if(newY > getHeight() - 10)
+				newY = getHeight() - 10;
+
+			clickedCard.setLocation(newX, newY);
 			repaint();
 		}
 	}
