@@ -3,24 +3,30 @@
 // Part of Dojo
 // This is the beefy part of the program. It controls the display for the game.
 
-import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
+import javax.swing.*;
+
 import java.util.*;
 import java.util.zip.*;
 import java.io.*;
 import java.net.*;
 
-class PlayArea extends JPanel implements MouseListener, MouseMotionListener
+class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	//The distance from where the card was clicked to its upper left corner
 	private int distanceX, distanceY;
 	//The last card that was clicked on
 	private PlayableCard clickedCard;
-	private boolean cardClicked;
+	private boolean cardClicked = false;
+	private boolean provClicked = false;
+	private boolean deckClicked = false;
+	private JPopupMenu popupCard;
+	private JPopupMenu popupProvince;
+	private JPopupMenu popupDeck;
 
 	static ArrayList<PlayableCard> displayedCards;
 	static int cardWidth, cardHeight;
@@ -29,34 +35,49 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	//The percent of a card that attachments show
 	static double attachmentHeight = .25;
 	//Number of provinces
-	static int yourNumProv, oppNumProv;
+	static int yourNumProv = 4;
+	static int oppNumProv = 4;
 
 	public PlayArea(int width, int height)
 	{
 		cardHeight = height/5;
 		cardWidth = (int)(cardHeight*(2.5/3.5));
-
 		baseCardHeight = cardHeight;
-
-		yourNumProv = 4;
-		oppNumProv = 4;
 
 		//Create a new ArrayList to hold the cards to display and
 		displayedCards = new ArrayList<PlayableCard>(40);
 
+		//TODO: Remove these lines once testing is done
 		addCard(new PlayableCard("CoB009"));
-		displayedCards.get(0).attach(new PlayableCard("TOV069"));
+		displayedCards.get(0).attach(new PlayableCard("CoB069"));
+		
+		//TODO: Flesh out context menus
+		popupCard = new JPopupMenu();
+		popupProvince = new JPopupMenu();
+		popupDeck = new JPopupMenu();
+		
+		JMenuItem menuItem = new JMenuItem("Attach");
+		menuItem.addActionListener(this);
+		popupCard.add(menuItem);
+		
+		menuItem = new JMenuItem("Destroy");
+		menuItem.addActionListener(this);
+		popupProvince.add(menuItem);
 
+		menuItem = new JMenuItem("Shuffle");
+		menuItem.addActionListener(this);
+		popupDeck.add(menuItem);
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
 
-	public void addCard(PlayableCard card)
+	private void addCard(PlayableCard card)
 	{
 		displayedCards.add(0, card);
 	}
 
-	public void removeCard(PlayableCard card)
+	private void removeCard(PlayableCard card)
 	{
 		displayedCards.remove(card);
 	}
@@ -146,7 +167,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		}
 	}
 
-	public void displayCard(PlayableCard card, Graphics2D g)
+	private void displayCard(PlayableCard card, Graphics2D g)
 	{
 		int[] location = card.getLocation();
 
@@ -282,6 +303,20 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 		return allAttachments;
 	}
 
+	private void showPopup(MouseEvent e)
+	{
+		if(cardClicked)
+		{
+			popupCard.show(e.getComponent(), e.getX(), e.getY());
+		}
+		else if(provClicked)
+		{
+		}
+		else if(deckClicked)
+		{
+		}
+	}
+	
 	public void mouseClicked(MouseEvent e)
 	{
 	}
@@ -298,13 +333,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 	{
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
+		
 		int index = 0;
-
 		while(!cardClicked && index < displayedCards.size())
 		{
 			clickedCard = displayedCards.get(index);
-			int[] cardLocation = clickedCard.getLocation();
-
+			int[] cardLocation = clickedCard.getLocation();	
 			int numAttachments = clickedCard.getAttachments().size();
 
 			//TODO: Make this work properly with attachments. It should realize that it is clicking an attachment.
@@ -316,24 +350,38 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 				cardClicked = true;
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
-				//TODO: Make this work properly with attachments
-				Main.cardBox.setCard(Main.database.get(clickedCard.getID()));
+				if(e.getButton() == MouseEvent.BUTTON1)
+				{
+					//TODO: Make this work properly with attachments
+					Main.cardBox.setCard(Main.database.get(clickedCard.getID()));
+				}
 			}
 			else
 			{
 				index++;
 			}
 		}
+		if(e.isPopupTrigger())
+		{
+			showPopup(e);
+		}
 	}
 
 	public void mouseReleased(MouseEvent e)
 	{
+		if(e.isPopupTrigger())
+		{
+			showPopup(e);
+		}
 		cardClicked = false;
+		deckClicked = false;
+		provClicked = false;
 	}
 
 	public void mouseDragged(MouseEvent e)
 	{
-		if(cardClicked)
+		// e.getButton() doesn't work inside mouseDragged
+		if(cardClicked && SwingUtilities.isLeftMouseButton(e))
 		{
 			Point clickPoint = e.getPoint();
 			int newX = (int)clickPoint.getX() - distanceX;
@@ -357,6 +405,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 
 	public void mouseMoved(MouseEvent e)
 	{
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		String name = ((AbstractButton)e.getSource()).getText();
+		//TODO: Fill out rest of context menu and actions
+		if(name.equals("Destroy"))
+		{
+		}
 	}
 
 	//A good fast high-quality image downscaling algorithm hasn't been implemented yet
