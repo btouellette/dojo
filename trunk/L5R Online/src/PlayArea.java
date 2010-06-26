@@ -191,7 +191,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener
 					}
 					is.close();
 					fos.close();
-					System.out.println("success!");
+					System.err.println("success!");
 
 					// Unzip image pack
 					FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
