@@ -12,8 +12,8 @@ class GameInfoBox extends JPanel implements ActionListener
 	private static final long serialVersionUID = 1L;
 	// y = yours
 	// o = opponents
-	JLabel yHonor, oHonor;
-	JLabel yHand, oHand;
+	private JLabel yHonor, oHonor;
+	private JLabel yHand, oHand;
 	/*
 	JLabel yFateDeck, oFateDeck;
 	JLabel yFateDis, oFateDis;

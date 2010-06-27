@@ -8,10 +8,10 @@ import java.awt.image.BufferedImage;
 class PlayableCard
 {
 	//Info needed
-	String id;
-	ArrayList<PlayableCard> attachments;
-	int[] location;
-	BufferedImage cardImage;
+	private String id;
+	private ArrayList<PlayableCard> attachments;
+	private int[] location;
+	private BufferedImage cardImage;
 
 	public PlayableCard(String id)
 	{

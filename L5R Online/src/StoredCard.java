@@ -9,13 +9,13 @@ import java.io.File;
 class StoredCard
 {
 	//Info
-	String id, type;
-	String name;
-	ArrayList<String> imageLocation, imageEdition;
-	ArrayList<String> legal, clan;
-	String edition, text, cost, focus;
-	String province_strength, gold_production, starting_honor;
-	String force, chi, personal_honor, honor_req;
+	private String id, type;
+	private String name;
+	private ArrayList<String> imageLocation, imageEdition;
+	private ArrayList<String> legal, clan;
+	private String edition, text, cost, focus;
+	private String province_strength, gold_production, starting_honor;
+	private String force, chi, personal_honor, honor_req;
 
 	public StoredCard(String id)
 	{

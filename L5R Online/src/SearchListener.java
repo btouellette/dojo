@@ -8,27 +8,20 @@ import java.util.Vector;
 
 class SearchListener implements ActionListener
 {
-	public static Vector<StoredCard> storage;
-	String type,clan,legal;
-	int max, y;
-	JComboBox cb;
-	JTextField tf;
-	String item,text,title;
+	private Vector<StoredCard> storage;
+	private String type = "";
+	private String clan = "";
+	private String item = "";
+	private String text = "";
+	private String title = "";
+	private String legal = "celestial";
+	private int max, y;
 
 	public SearchListener()
 	{
 		storage = new Vector<StoredCard>();
-		type="";
-		clan="";
-		item="";
-		text="";
-		title="";
-		legal="samurai";
-		storage=new Vector<StoredCard>();
 		for (int x=0;x<Deckbuilder.vect.size();x++)
 			storage.add(Deckbuilder.vect.elementAt(x));
-		cb = new JComboBox();
-		tf = new JTextField();
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -47,13 +40,13 @@ class SearchListener implements ActionListener
 			//textArea.append(text + newline);
 			//textField.selectAll();
 
-			//assign Legal menu option
-			if (item.equals(Deckbuilder.Legal.getSelectedItem().toString()))
+			//assign legal menu option
+			if (item.equals(Deckbuilder.legal.getSelectedItem().toString()))
 			{
-				legal=item;
+				legal = item;
 			}
 			//assign Card Type menu option
-			else if (item.equals(Deckbuilder.CardType.getSelectedItem().toString()))
+			else if (item.equals(Deckbuilder.cardType.getSelectedItem().toString()))
 			{
 				type=item;
 				if (type.equals("Personality"))
@@ -76,7 +69,7 @@ class SearchListener implements ActionListener
 			Display();
 	}
 
-	public void Display()
+	private void Display()
 	{
 		//reset the vector
 		Deckbuilder.vect.clear();
@@ -99,7 +92,8 @@ class SearchListener implements ActionListener
 			//title check = not working
 			else if (Deckbuilder.vect.elementAt(y).getName().toLowerCase().indexOf(title.toLowerCase())<0)
 				Deckbuilder.vect.remove(y);
-			else y++;
+			else
+				y++;
 
 			max=Deckbuilder.vect.size();
 
@@ -109,7 +103,7 @@ class SearchListener implements ActionListener
 		refresh();
 	}
 
-	public void refresh()
+	private void refresh()
 	{
 		Deckbuilder.alphasort(Deckbuilder.vect);
 		Deckbuilder.apples.setText("Card Results("+Deckbuilder.vect.size()+"):");

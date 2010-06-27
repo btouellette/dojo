@@ -24,9 +24,14 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private boolean cardClicked = false;
 	private boolean provClicked = false;
 	private boolean deckClicked = false;
+	private boolean discardClicked = false;
+	private boolean dynastyClicked = false;
+	private boolean fateClicked = false;
+	private int numProvClicked;
 	private JPopupMenu popupCard;
-	private JPopupMenu popupProvince;
+	private JPopupMenu popupProv;
 	private JPopupMenu popupDeck;
+	private JPopupMenu popupDiscard;
 
 	static ArrayList<PlayableCard> displayedCards;
 	static int cardWidth, cardHeight;
@@ -53,8 +58,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		
 		//TODO: Flesh out context menus
 		popupCard = new JPopupMenu();
-		popupProvince = new JPopupMenu();
+		popupProv = new JPopupMenu();
 		popupDeck = new JPopupMenu();
+		popupDiscard = new JPopupMenu();
 		
 		JMenuItem menuItem = new JMenuItem("Attach");
 		menuItem.addActionListener(this);
@@ -62,11 +68,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		
 		menuItem = new JMenuItem("Destroy");
 		menuItem.addActionListener(this);
-		popupProvince.add(menuItem);
+		popupProv.add(menuItem);
 
 		menuItem = new JMenuItem("Shuffle");
 		menuItem.addActionListener(this);
 		popupDeck.add(menuItem);
+
+		menuItem = new JMenuItem("Search");
+		menuItem.addActionListener(this);
+		popupDiscard.add(menuItem);
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -305,15 +315,48 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	private void showPopup(MouseEvent e)
 	{
+		/*int startHand = width - sizeHand;
+
+		//Create fate discard
+		g.fillRect(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+
+		//Create fate deck
+		g.fillRect(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+
+		//Create dynasty discard
+		g.fillRect(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+
+		//Create dynasty deck
+		g.fillRect(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		
+		//Create your provinces
+		int leftBorder = 2*(cardWidth+8)-2;
+		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
+
+		for(int i = 1; i < yourNumProv+1; i++)
+		{
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+		}
+		 */
+		
 		if(cardClicked)
 		{
 			popupCard.show(e.getComponent(), e.getX(), e.getY());
 		}
 		else if(provClicked)
 		{
+			popupProv.show(e.getComponent(), e.getX(), e.getY());
 		}
 		else if(deckClicked)
 		{
+			//TODO: Set (dynasty|fate)Clicked here
+			popupDeck.show(e.getComponent(), e.getX(), e.getY());
+		}
+		else if(discardClicked)
+		{
+			//TODO: Set (dynasty|fate)Clicked here
+			popupDiscard.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
 	
@@ -376,6 +419,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		cardClicked = false;
 		deckClicked = false;
 		provClicked = false;
+		discardClicked = false;
 	}
 
 	public void mouseDragged(MouseEvent e)
