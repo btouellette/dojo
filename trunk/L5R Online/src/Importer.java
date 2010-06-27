@@ -11,7 +11,7 @@ import java.util.HashMap;
 class Importer extends DefaultHandler
 {
 	//private Writer out;
-	//private String version
+	//private String version;
 	private String eName;
 	private HashMap<String, StoredCard> database;
 	private StoredCard currentCard;
@@ -25,7 +25,7 @@ class Importer extends DefaultHandler
 
 			//Create a new HashMap with an initial capacity of 1500
 			//This value might need to be tweaked
-			database = new HashMap<String, StoredCard>(500);
+			database = new HashMap<String, StoredCard>(1500);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -36,7 +36,7 @@ class Importer extends DefaultHandler
 		return database;
 	}
 	
-	/*
+	/* Disabled, debugging code for if importer starts barfing on reading cards.xml
 	public String getVersion()
 	{
 		return version;
@@ -86,10 +86,9 @@ class Importer extends DefaultHandler
 	}*/
 
 	public void startElement(String namespaceURI,
-								 String sName, // simple name (localName)
-								 String qName, // qualified name
-								 Attributes attrs)
-	throws SAXException
+	                         String sName, // simple name (localName)
+	                         String qName, // qualified name
+	                         Attributes attrs) throws SAXException
 	{
 		//nl();
 		//emit("ELEMENT: ");
@@ -152,8 +151,7 @@ class Importer extends DefaultHandler
 	}*/
 
 	//Function called when the parser encounters a block of characters
-	public void characters(char buf[], int offset, int len)
-	throws SAXException
+	public void characters(char buf[], int offset, int len)	throws SAXException
 	{
 		//nl();
 		//emit("CHARS:   ");

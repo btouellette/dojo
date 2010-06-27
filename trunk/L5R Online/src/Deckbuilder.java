@@ -5,21 +5,22 @@ import java.util.*;
 
 class Deckbuilder
 {
-	public static JFrame frame;
-	static ArrayList<String> legalChoices = new ArrayList<String>();
-	static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
+	private static ArrayList<String> legalChoices = new ArrayList<String>();
+	private static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
 	                         "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
 	                         "Focus Value: "};
-	static ArrayList<String> types = new ArrayList<String>();
-	static ArrayList<String> clans = new ArrayList<String>();
-	public static JLabel[] c = new JLabel[11];
-	public static CardInfoBox card;
-	public static JList list;
-	public static Vector<StoredCard> vect;
-	public static JLabel apples;
-	public static JScrollPane listScroller;
-	public static JComboBox Legal,CardType,faction;
-	public static JTextField title;
+	private static ArrayList<String> types = new ArrayList<String>();
+	private static ArrayList<String> clans = new ArrayList<String>();
+	private static JLabel[] c = new JLabel[11];
+	private static JScrollPane listScroller;
+
+	static JFrame frame;
+	static CardInfoBox card;
+	static JList list;
+	static Vector<StoredCard> vect;
+	static JLabel apples;
+	static JComboBox legal, cardType, faction;
+	static JTextField title;
 
 	public Deckbuilder()
 	{
@@ -201,18 +202,18 @@ class Deckbuilder
 		JLabel searchlabel = new JLabel("Search Criteria:");
 		searchlabel.setFont(new Font("Serif",Font.BOLD,14));
 
-		Legal = new JComboBox(legalChoices.toArray());
-		Legal.setSelectedIndex(4);
-		Legal.addActionListener(briansanewb);
-		Legal.setPreferredSize(new Dimension(140, 20));
-		Legal.setMaximumSize(Legal.getPreferredSize());
-		Legal.setBackground(Color.WHITE);
+		legal = new JComboBox(legalChoices.toArray());
+		legal.setSelectedIndex(4);
+		legal.addActionListener(briansanewb);
+		legal.setPreferredSize(new Dimension(140, 20));
+		legal.setMaximumSize(legal.getPreferredSize());
+		legal.setBackground(Color.WHITE);
 
-		CardType = new JComboBox(types.toArray());
-		CardType.addActionListener(briansanewb);
-		CardType.setPreferredSize(new Dimension(140, 20));
-		CardType.setMaximumSize(CardType.getPreferredSize());
-		CardType.setBackground(Color.WHITE);
+		cardType = new JComboBox(types.toArray());
+		cardType.addActionListener(briansanewb);
+		cardType.setPreferredSize(new Dimension(140, 20));
+		cardType.setMaximumSize(cardType.getPreferredSize());
+		cardType.setBackground(Color.WHITE);
 
 		faction = new JComboBox(clans.toArray());
 		faction.addActionListener(briansanewb);
@@ -253,8 +254,8 @@ class Deckbuilder
 		    .addComponent(c[9])
 		    .addComponent(c[10]))
 		  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		    .addComponent(Legal)
-		    .addComponent(CardType)
+		    .addComponent(legal)
+		    .addComponent(cardType)
 		    .addComponent(faction)
 		    .addComponent(title)
 		    .addComponent(text)
@@ -269,10 +270,10 @@ class Deckbuilder
 		  layout.createSequentialGroup()
 		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		      .addComponent(c[0])
-		      .addComponent(Legal))
+		      .addComponent(legal))
 		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		      .addComponent(c[1])
-		      .addComponent(CardType))
+		      .addComponent(cardType))
 		    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		      .addComponent(c[2])
 		      .addComponent(faction))

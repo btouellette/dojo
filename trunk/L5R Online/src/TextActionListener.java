@@ -11,7 +11,6 @@ import javax.swing.text.*;
 class TextActionListener implements ActionListener
 {
 	private JTextPane chatBox;
-	private final static String newline = "\n";
 
 	public TextActionListener()
 	{
@@ -21,8 +20,9 @@ class TextActionListener implements ActionListener
 		chatBox.setText("Welcome to Dojo!");
 	}
 
-	public void addStyles()
+	private void addStyles()
 	{
+		//TODO: Make customizable
 		Style style = chatBox.addStyle("Default", null);
 
 		style = chatBox.addStyle("Action", null);
@@ -46,11 +46,11 @@ class TextActionListener implements ActionListener
 
 	public static void send(String text, String style)
 	{
-		//Just updates the chat area locally for now, needs to be updated to send a network command
+		//TODO: Just updates the chat area locally for now, needs to be updated to send a network command
 		try
 		{
 			StyledDocument doc = Main.chatBox.getStyledDocument();
-			doc.insertString(doc.getLength(), newline + text, doc.getStyle(style));
+			doc.insertString(doc.getLength(), "\n" + text, doc.getStyle(style));
 		}
 		catch(BadLocationException e)
 		{

@@ -16,13 +16,13 @@ import org.xml.sax.*;
 
 class Main
 {
-	public static HashMap<String, StoredCard> database;
-	public static String userName, gender;
-	public static JTextPane chatBox;
-	public static CardInfoBox cardBox;
-	public static boolean highRes;
-	public static PlayArea playArea;
-	public static Deckbuilder deck;
+	static HashMap<String, StoredCard> database;
+	static String userName, gender;
+	static JTextPane chatBox;
+	static CardInfoBox cardBox;
+	static boolean highRes;
+	static PlayArea playArea;
+	static Deckbuilder deckBuilder;
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -38,11 +38,9 @@ class Main
 		//Set up defaults if pref file is unavailable
 
 		//Grab the screen resolution
-		//Default size is to take up 3/4 of the screen horizontally and 1/2 of the screen vertically
-		//If there is a stored preference file then use those numbers
 		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		//int width = (int)(screenSize.getWidth()*.75);
-		//int height = (int)(screenSize.getHeight()*.5);
+		
+		//If there is a stored preference file then use those numbers
 		int width = 1400;
 		int height = 700;
 
@@ -71,7 +69,7 @@ class Main
 		//Display the window
 		frame.pack();
 
-		deck = new Deckbuilder();
+		deckBuilder = new Deckbuilder();
 		//Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
 
 		frame.setVisible(true);
