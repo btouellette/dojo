@@ -13,6 +13,7 @@ class Importer extends DefaultHandler
 	//private Writer out;
 	//private String version;
 	private String eName;
+	// ID maps to card
 	private HashMap<String, StoredCard> database;
 	private StoredCard currentCard;
 

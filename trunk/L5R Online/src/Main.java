@@ -16,6 +16,7 @@ import org.xml.sax.*;
 
 class Main
 {
+	// ID maps to card
 	static HashMap<String, StoredCard> database;
 	static String userName, gender;
 	static JTextPane chatBox;
