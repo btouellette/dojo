@@ -19,6 +19,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private static final long serialVersionUID = 1L;
 	//The distance from where the card was clicked to its upper left corner
 	private int distanceX, distanceY;
+	//Size of PlayArea
+	private int height, width;
 	//The last card that was clicked on
 	private PlayableCard clickedCard;
 	private boolean cardClicked = false;
@@ -28,11 +30,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private boolean dynastyClicked = false;
 	private boolean fateClicked = false;
 	private int numProvClicked;
-	private JPopupMenu popupCard;
-	private JPopupMenu popupProv;
-	private JPopupMenu popupDeck;
-	private JPopupMenu popupDiscard;
-
+	private JPopupMenu popupCard, popupProv, popupDeck, popupDiscard;
+	
+	static Deck dynastyDeck, fateDeck, dynastyDiscard, fateDiscard;
 	static ArrayList<PlayableCard> displayedCards;
 	static int cardWidth, cardHeight;
 	//Reference height (height that the card is initially)
@@ -78,6 +78,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		menuItem.addActionListener(this);
 		popupDiscard.add(menuItem);
 		
+		//TODO: Add code elsewhere to set these up
+		dynastyDeck = new Deck(false);
+		fateDeck = new Deck(false);
+		dynastyDiscard = new Deck(true);
+		fateDiscard = new Deck(true);
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
@@ -97,8 +103,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	{
 		super.paintComponent(g);
 
-		int height = getHeight();
-		int width = getWidth();
+		height = getHeight();
+		width = getWidth();
 
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
@@ -315,19 +321,37 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	private void showPopup(MouseEvent e)
 	{
-		/*int startHand = width - sizeHand;
+		Point clickPoint = e.getPoint();
+		int sizeHand = (int)(cardWidth*1.5);
+		int startHand = width - sizeHand;
 
-		//Create fate discard
-		g.fillRect(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		Rectangle area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		if(area.contains(clickPoint))
+		{
+			fateClicked = true;
+			discardClicked = true;
+		}
+		
+		area = new Rectangle(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		if(area.contains(clickPoint))
+		{
+			fateClicked = true;
+			deckClicked = true;
+		}
+		
+		area = new Rectangle(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		if(area.contains(clickPoint))
+		{
+			dynastyClicked = true;
+			discardClicked = true;
+		}
 
-		//Create fate deck
-		g.fillRect(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
-
-		//Create dynasty discard
-		g.fillRect(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
-
-		//Create dynasty deck
-		g.fillRect(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		area = new Rectangle(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+		if(area.contains(clickPoint))
+		{
+			dynastyClicked = true;
+			deckClicked = true;
+		}
 		
 		//Create your provinces
 		int leftBorder = 2*(cardWidth+8)-2;
@@ -336,9 +360,13 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
-			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+			area = new Rectangle(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				provClicked = true;
+				numProvClicked = i;
+			}
 		}
-		 */
 		
 		if(cardClicked)
 		{
@@ -350,12 +378,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		else if(deckClicked)
 		{
-			//TODO: Set (dynasty|fate)Clicked here
 			popupDeck.show(e.getComponent(), e.getX(), e.getY());
 		}
 		else if(discardClicked)
 		{
-			//TODO: Set (dynasty|fate)Clicked here
 			popupDiscard.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
@@ -457,6 +483,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		//TODO: Fill out rest of context menu and actions
 		if(name.equals("Destroy"))
 		{
+			
+		}
+		else if(name.equals("Shuffle"))
+		{
+			if(dynastyClicked)
+			{
+				dynastyDeck.shuffle();
+			}
+			else if(fateClicked)
+			{
+				fateDeck.shuffle();
+			}
+		}
+		else if(name.equals("Search"))
+		{
+			
 		}
 	}
 
