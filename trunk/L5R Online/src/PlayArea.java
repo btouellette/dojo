@@ -17,145 +17,191 @@ import java.net.*;
 class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	//The distance from where the card was clicked to its upper left corner
+	// The distance from where the card was clicked to the upper left corner of the base card
+	// Used for movement logic
 	private int distanceX, distanceY;
-	//Size of PlayArea
+	// Size of PlayArea in pixels
 	private int height, width;
-	//The last card that was clicked on
+	// The last card that was clicked on depending on whether it was attached to anything or not
+	// If clickedAttachment != null then clickedCard is the base card of the unit
 	private PlayableCard clickedCard;
+	private PlayableCard clickedAttachment;
+	// Tests used for launching context menus correctly
 	private boolean cardClicked = false;
+	private boolean attachmentClicked = false;
 	private boolean provClicked = false;
 	private boolean deckClicked = false;
 	private boolean discardClicked = false;
 	private boolean dynastyClicked = false;
 	private boolean fateClicked = false;
+	// Which of your provinces was clicked (left to right)
 	private int numProvClicked;
+	// Context (right-click) menus
 	private JPopupMenu popupCard, popupProv, popupDeck, popupDiscard;
 	
+	// Provinces (left to right from 0->max)
+	static ArrayList<Province> provinces;
 	static Deck dynastyDeck, fateDeck, dynastyDiscard, fateDiscard;
+	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
 	static ArrayList<PlayableCard> displayedCards;
+	// Current size of a single card
 	static int cardWidth, cardHeight;
-	//Reference height (height that the card is initially)
+	// Reference height (height that the card is initially)
 	static int baseCardHeight;
-	//The percent of a card that attachments show
-	static double attachmentHeight = .25;
-	//Number of provinces
+	// The percent of a card that attachments show above their base card
+	static double attachmentHeight = .2;
+	// Number of provinces
+	//TODO: Support Ratling/Spirit or other starting sizes
 	static int yourNumProv = 4;
 	static int oppNumProv = 4;
 
 	public PlayArea(int width, int height)
 	{
+		// Setting the default height as a fifth of the PlayArea height
+		// This allows for vertically: two sets of provinces and two units with a few attachments
 		cardHeight = height/5;
+		// Normal sized cards are 2.5" wide and 3.5" tall
 		cardWidth = (int)(cardHeight*(2.5/3.5));
 		baseCardHeight = cardHeight;
 
-		//Create a new ArrayList to hold the cards to display and
-		displayedCards = new ArrayList<PlayableCard>(40);
+		// Create a new ArrayList to hold the cards to display
+		displayedCards = new ArrayList<PlayableCard>(30);
 
 		//TODO: Remove these lines once testing is done
 		addCard(new PlayableCard("CoB009"));
-		displayedCards.get(0).attach(new PlayableCard("CoB069"));
+		PlayableCard test = new PlayableCard("CoB069");
+		displayedCards.get(0).attach(test);
+		displayedCards.get(0).attach(new PlayableCard("CoB070"));
+		test.attach(new PlayableCard("CoB071"));
+		test.attach(new PlayableCard("CoB071"));
+		test.attach(new PlayableCard("CoB071"));
 		
-		//TODO: Flesh out context menus
+		//TODO: Flesh out context menus		
+		// Create context menu for card clicks
 		popupCard = new JPopupMenu();
-		popupProv = new JPopupMenu();
-		popupDeck = new JPopupMenu();
-		popupDiscard = new JPopupMenu();
-		
 		JMenuItem menuItem = new JMenuItem("Attach");
 		menuItem.addActionListener(this);
 		popupCard.add(menuItem);
-		
+		menuItem = new JMenuItem("Unattach");
+		menuItem.addActionListener(this);
+		popupCard.add(menuItem);
+
+		// Create context menu for province clicks
+		popupProv = new JPopupMenu();
 		menuItem = new JMenuItem("Destroy");
 		menuItem.addActionListener(this);
 		popupProv.add(menuItem);
+		menuItem = new JMenuItem("Add Province On Left");
+		menuItem.addActionListener(this);
+		popupProv.add(menuItem);
+		menuItem = new JMenuItem("Add Province On Right");
+		menuItem.addActionListener(this);
+		popupProv.add(menuItem);
 
+		// Create context menu for deck clicks
+		popupDeck = new JPopupMenu();
 		menuItem = new JMenuItem("Shuffle");
 		menuItem.addActionListener(this);
 		popupDeck.add(menuItem);
+		menuItem = new JMenuItem("Search");
+		menuItem.addActionListener(this);
+		popupDeck.add(menuItem);
 
+		// Create context menu for discard clicks
+		popupDiscard = new JPopupMenu();
 		menuItem = new JMenuItem("Search");
 		menuItem.addActionListener(this);
 		popupDiscard.add(menuItem);
 		
-		//TODO: Add code elsewhere to set these up
-		dynastyDeck = new Deck(false);
-		fateDeck = new Deck(false);
-		dynastyDiscard = new Deck(true);
-		fateDiscard = new Deck(true);
+		// Create decks, discards, and provinces
+		//TODO: Add code elsewhere to set these up (after reading in deck file)
+		dynastyDeck = new Deck();
+		fateDeck = new Deck();
+		dynastyDiscard = new Deck();
+		fateDiscard = new Deck();
 		
+		provinces = new ArrayList<Province>(4);
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
+		
+		// Interaction is handled within the class
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
 
+	// Adds a new unit to be displayed on the screen
 	private void addCard(PlayableCard card)
 	{
 		displayedCards.add(0, card);
 	}
 
+	// Removes a unit from the screen
 	private void removeCard(PlayableCard card)
 	{
 		displayedCards.remove(card);
 	}
 
-	//Override the default JPanel paint method
+	// Override the default JPanel paint method
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
 
+		// In case of resize we'll get the new height and width parameters
 		height = getHeight();
 		width = getWidth();
 
+		// Create an area for you to keep your hand
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
 
-		//Create fate discard
+		// Create fate discard
 		g.setColor(Color.BLACK);
 		g.fillRect(startHand - (2*(cardWidth+8)-2), height - (cardHeight+8), 2*(cardWidth+8), cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create fate deck
+		// Create fate deck
 		g.fillRect(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create dynasty discard
+		// Create dynasty discard
 		g.setColor(Color.BLACK);
 		g.fillRect(0, height - (cardHeight+8), 2*(cardWidth+8)-2, cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create dynasty deck
+		// Create dynasty deck
 		g.fillRect(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 
-		//Create opponent's fate discard
+		// Create opponent's fate discard
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, 2*(cardWidth+8)-2, cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(2, 2, cardWidth+4, cardHeight+4);
 
-		//Create opponent's fate deck
+		// Create opponent's fate deck
 		g.fillRect(cardWidth+8, 2, cardWidth+4, cardHeight+4);
 
-		//Create opponent's dynasty discard
+		// Create opponent's dynasty discard
 		g.setColor(Color.BLACK);
 		g.fillRect(startHand - (2*(cardWidth+8)-2), 0, 2*(cardWidth+8), cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(startHand - (cardWidth+6), 2, cardWidth+4, cardHeight+4);
 
-		//Create opponent's dynasty deck
+		// Create opponent's dynasty deck
 		g.fillRect(startHand - 2*(cardWidth+6), 2, cardWidth+4, cardHeight+4);
 
-		//Create fate hand
+		// Create fate hand
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(startHand, 0, sizeHand, height);
 		g.setColor(Color.BLACK);
 		g.fillRect(startHand-2, 0, 2, height);
 
-		//Create your provinces
+		// Create your provinces
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
-
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
 			g.setColor(Color.BLACK);
@@ -164,10 +210,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
 		}
 
-		//Create opponents provinces
+		// Create opponents provinces
 		distanceBetween = (rightBorder - leftBorder)/(oppNumProv+1);
-
-		for(int i = 1; i < yourNumProv+1; i++)
+		for(int i = 1; i < oppNumProv+1; i++)
 		{
 			g.setColor(Color.BLACK);
 			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, 0, cardWidth+12, cardHeight+6);
@@ -175,6 +220,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, 0, cardWidth+8, cardHeight+4);
 		}
 
+		// Now that we've drawn all the play surface draw all the cards
 		ListIterator<PlayableCard> iterator = displayedCards.listIterator();
 		while (iterator.hasNext())
 		{
@@ -185,40 +231,28 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	private void displayCard(PlayableCard card, Graphics2D g)
 	{
-		int[] location = card.getLocation();
-
-		//Recursively show all the attachments on the current card
-		//Will also show all the attachments on attached cards in correct order.
-
-		/* Example of intended use
-		 * 1 has 2 and 4 attached to it
-		 * 2 has 3 attached to it
-		 * 4 has 5 attached to it
-		 *
-		 * This starts at the last attachment of the current card
-		 * which will be 4 as 1 is the only card stored in displayedCards
-		 * (attachments are displayed by default)
-		 * First the attachments of 4 are displayed. Then 4 itself is displayed.
-		 * Then the next to last attachment on 1 is called. It's attachments are
-		 * displayed so 3 gets put out. Then 2 and finally 1. So 1 will be "on top"
-		 * with 2-3-4-5 in that order stacked "underneath" it.
-		 */
+		// Display all the attachments first. This will draw the top attachment first and at the farthest back
 		ArrayList<PlayableCard> attachments = card.getAttachments();
 		for(int i = attachments.size()-1; i >= 0; i--)
 		{
 			displayCard(attachments.get(i), g);
 		}
 
+		// Load in the image from the class, the file, or kamisasori.net
 		BufferedImage displayImage = card.getImage();
+		// If we have't loaded in an image for this yet
 		if(displayImage == null)
 		{
+			// Go to the database to find out where the image should be located
 			StoredCard databaseCard = Main.database.get(card.getID());
 			String imageLocation = databaseCard.getImageLocation();
+			// If there wasn't a valid file in the file system
 			if(imageLocation == null)
 			{
 				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
 				// Get image pack off kamisasori.net
 				try {
+					// Download image pack as zip via http
 					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
 					url.openConnection();
 					InputStream is = url.openStream();
@@ -249,10 +283,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					}
 					zis.close();
 
+					// Delete leftover zip file
 					System.out.print("** Deleting zip file after extraction: ");
 					File f = new File("tmp-imagepack.zip");
 					f.delete();
 					System.out.println("success!");
+					// Successfully got the files so we should have a valid imageLocation now
 					imageLocation = databaseCard.getImageLocation();
 				} catch (Throwable t) {
 					System.err.println("failed. Check your internet connection.");
@@ -262,23 +298,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					//TODO: Display a placeholder card
 				}
 			}
+			//TODO: Check to see if there are performance increases that can be done here
 			if(imageLocation != null)
 			{
 				try
 				{
-					//TODO: Check to see if there are performance increases that can be done here
-					//Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
-
-					//We read in and resize the image once, after that it is stored in PlayableCard
+					// We read in and resize the image once, after that it is stored in PlayableCard
+					// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
 					BufferedImage tempImage = ImageIO.read(new File(imageLocation));
 					BufferedImage cardImage = new BufferedImage(cardWidth, cardHeight, tempImage.getType());
 					Graphics2D g2 = cardImage.createGraphics();
 
+					// If downsizing image
 					if(cardImage.getHeight() >= cardHeight)
 					{
-						//if downsizing image
-						//Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
-						//then they can be swapped.
+						// Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
+						// then they can be swapped.
 						//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
 						Image cardImage2 = tempImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
 						//AffineTransform transform = new AffineTransform();
@@ -287,9 +322,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						g2.drawImage(cardImage2, 0, 0, null);
 						g2.dispose();
 					}
+					// If enlarging image
 					else
 					{
-						//if enlarging image
 						g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 						//supposedly better quality, slower
 						//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -302,43 +337,34 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				}
 			}
 		}
+		int[] location = card.getLocation();
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
 
-	public ArrayList<PlayableCard> getAllAttachments(PlayableCard card)
-	{
-		//TODO: Test to be sure this returns all the attachments and in the correct order
-		ArrayList<PlayableCard> attachments = card.getAttachments();
-		ArrayList<PlayableCard> allAttachments = new ArrayList<PlayableCard>();
-
-		int index = 0;
-		while(index < attachments.size())
-		{
-			allAttachments.addAll(getAllAttachments(attachments.get(index)));
-		}
-		return allAttachments;
-	}
-
+	// Pop up the correct context menu
 	private void showPopup(MouseEvent e)
 	{
 		Point clickPoint = e.getPoint();
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
 
+		// Check to see if click was inside fate discard
 		Rectangle area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 		if(area.contains(clickPoint))
 		{
 			fateClicked = true;
 			discardClicked = true;
 		}
-		
+
+		// Check to see if click was inside fate deck
 		area = new Rectangle(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
 		if(area.contains(clickPoint))
 		{
 			fateClicked = true;
 			deckClicked = true;
 		}
-		
+
+		// Check to see if click was inside dynasty discard
 		area = new Rectangle(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 		if(area.contains(clickPoint))
 		{
@@ -346,6 +372,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			discardClicked = true;
 		}
 
+		// Check to see if click was inside dynasty deck
 		area = new Rectangle(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
 		if(area.contains(clickPoint))
 		{
@@ -353,11 +380,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			deckClicked = true;
 		}
 		
-		//Create your provinces
+		// Check to see if click was inside one of your provinces
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
-
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
 			area = new Rectangle(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
@@ -368,21 +394,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			}
 		}
 		
+		// Now launch the right menu at the click location
 		if(cardClicked)
 		{
-			popupCard.show(e.getComponent(), e.getX(), e.getY());
+			popupCard.show(this, e.getX(), e.getY());
 		}
 		else if(provClicked)
 		{
-			popupProv.show(e.getComponent(), e.getX(), e.getY());
+			popupProv.show(this, e.getX(), e.getY());
 		}
 		else if(deckClicked)
 		{
-			popupDeck.show(e.getComponent(), e.getX(), e.getY());
+			popupDeck.show(this, e.getX(), e.getY());
 		}
 		else if(discardClicked)
 		{
-			popupDiscard.show(e.getComponent(), e.getX(), e.getY());
+			popupDiscard.show(this, e.getX(), e.getY());
 		}
 	}
 	
@@ -398,31 +425,50 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	{
 	}
 
+	// On mouse click check to see if anything relevant was clicked
 	public void mousePressed(MouseEvent e)
-	{
+	{		
 		Rectangle cardArea = new Rectangle();
+		Rectangle attachmentArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 		
 		int index = 0;
+		// Search first to see if any cards displayed on the JPanel were clicked
+		//TODO: Test overlapping cards. Might need to reverse search through displayedCards
 		while(!cardClicked && index < displayedCards.size())
 		{
 			clickedCard = displayedCards.get(index);
 			int[] cardLocation = clickedCard.getLocation();	
-			int numAttachments = clickedCard.getAttachments().size();
+			ArrayList<PlayableCard> attachments = clickedCard.getAllAttachments();
+			int numAttachments = attachments.size();
 
-			//TODO: Make this work properly with attachments. It should realize that it is clicking an attachment.
-			cardArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
-			cardArea.setSize(cardWidth, cardHeight + (int)(cardHeight*attachmentHeight*numAttachments));
+			//TODO: Test with different chains of attached cards
+			cardArea.setLocation(cardLocation[0], cardLocation[1]);
+			cardArea.setSize(cardWidth, cardHeight);			
+			attachmentArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
+			attachmentArea.setSize(cardWidth, (int)(cardHeight*attachmentHeight*numAttachments));
 
 			if(cardArea.contains(clickPoint))
 			{
 				cardClicked = true;
+				attachmentClicked = false;
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
 				if(e.getButton() == MouseEvent.BUTTON1)
 				{
-					//TODO: Make this work properly with attachments
 					Main.cardBox.setCard(Main.database.get(clickedCard.getID()));
+				}
+			}
+			else if(attachmentArea.contains(clickPoint))
+			{
+				cardClicked = true;
+				attachmentClicked = true;
+				distanceX = (int)clickPoint.getX() - cardLocation[0];
+				distanceY = (int)clickPoint.getY() - cardLocation[1];
+				clickedAttachment = attachments.get((int)(-distanceY/(cardHeight*attachmentHeight)));
+				if(e.getButton() == MouseEvent.BUTTON1)
+				{
+					Main.cardBox.setCard(Main.database.get(clickedAttachment.getID()));
 				}
 			}
 			else
@@ -443,6 +489,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			showPopup(e);
 		}
 		cardClicked = false;
+		attachmentClicked = false;
 		deckClicked = false;
 		provClicked = false;
 		discardClicked = false;
@@ -483,7 +530,21 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		//TODO: Fill out rest of context menu and actions
 		if(name.equals("Destroy"))
 		{
-			
+			provinces.get(numProvClicked).destroy();
+			yourNumProv--;
+			repaint();
+		}
+		else if(name.equals("Add Province On Left"))
+		{
+			provinces.add(numProvClicked, new Province());
+			yourNumProv++;
+			repaint();
+		}
+		else if(name.equals("Add Province On Right"))
+		{
+			provinces.add(numProvClicked+1, new Province());
+			yourNumProv++;
+			repaint();
 		}
 		else if(name.equals("Shuffle"))
 		{
@@ -502,10 +563,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 	}
 
-	//A good fast high-quality image downscaling algorithm hasn't been implemented yet
-	//in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
-	//which rescales the image multiple times using the standard Bilinear interpolation.
-	//It was written by Chris Campbell and found here: http://today.java.net/lpt/a/362#perfnotes
+	// A good fast high-quality image downscaling algorithm hasn't been implemented yet
+	// in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
+	// which rescales the image multiple times using the standard Bilinear interpolation.
+	// It was written by Chris Campbell and found here:
+	// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
 
 	/**
 	 * Convenience method that returns a scaled instance of the

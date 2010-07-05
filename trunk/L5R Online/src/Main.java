@@ -32,42 +32,43 @@ class Main
 	 */
 	private static void createAndShowGUI()
 	{
-		//Create and set up the window
+		// Create and set up the window
 		JFrame frame = new JFrame("Dojo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//Set up defaults if pref file is unavailable
+		// Set up defaults if pref file is unavailable
 
-		//Grab the screen resolution
-		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		// Grab the screen resolution
+		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		
-		//If there is a stored preference file then use those numbers
+		// If there is a stored preference file then use those numbers
 		int width = 1400;
 		int height = 700;
 
-		//Default username
+		// Default username
+		//TODO: Get this info from a pop-up if no config found
 		userName = "New Player";
 		gender = "Male";
 
-		//Create the play area
+		// Create the play area
 		playArea = createPlayArea(width, height);
 
-		//Create the info area (card box, chat box, game info box)
+		// Create the info area (card box, chat box, game info box)
 		JSplitPane infoArea = createInfoArea(width, height);
 
-		//Create a split panel so that the relative size of the areas can be user controlled
+		// Create a split panel so that the relative size of the areas can be user controlled
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, playArea, infoArea);
-		//Set it so that the play area gets all the extra space by default (from resizing the main window)
+		// Set it so that the play area gets all the extra space by default (from resizing the main window)
 		splitPane.setResizeWeight(1);
-		//Don't use the ugly default Java divider
+		// Don't use the ugly default Java divider
 		splitPane.setUI(new BasicSplitPaneUI());
 		splitPane.setDividerSize(5);
 
-		//Set the menu bar and add the label to the content pane
+		// Set the menu bar and add the label to the content pane
 		frame.setJMenuBar(createMenuBar(width, playArea));
 		frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 
-		//Display the window
+		// Display the window
 		frame.pack();
 
 		deckBuilder = new Deckbuilder();
@@ -78,17 +79,17 @@ class Main
 
 	private static JMenuBar createMenuBar(int width, PlayArea playArea)
 	{
-		//Create the menu bar
+		// Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);
-		//Size is across the entire application and 25 pixels high
+		// Size is across the entire application and 25 pixels high
 		menuBar.setPreferredSize(new Dimension(width, 25));
-		//We use a BoxLayout so that we can easily add other components to the menu bar and space them how we want
+		// We use a BoxLayout so that we can easily add other components to the menu bar and space them how we want
 		menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
 
-		//Lay out the Game menu
+		// Lay out the Game menu
 		JMenu game = new JMenu("Game");
-		//Prevent the menu button from being occluded if the layout is condensed
+		// Prevent the menu button from being occluded if the layout is condensed
 		game.setMinimumSize(game.getPreferredSize());
 		MenuListener menuListener = new MenuListener();
 		JMenuItem connect = new JMenuItem("Connect");
@@ -112,12 +113,12 @@ class Main
 		game.add(pref);
 		game.addSeparator();
 		game.add(exit);
-		//Add the Game menu to the menu bar
+		// Add the Game menu to the menu bar
 		menuBar.add(game);
 
-		//Lay out the Action menu
+		// Lay out the Action menu
 		JMenu action = new JMenu("Action");
-		//Prevent the menu button from being occluded if the layout is condensed
+		// Prevent the menu button from being occluded if the layout is condensed
 		action.setMinimumSize(action.getPreferredSize());
 		JMenuItem flipCoin = new JMenuItem("Flip Coin");
 		flipCoin.addActionListener(menuListener);
@@ -129,34 +130,34 @@ class Main
 		action.addSeparator();
 		action.add(randomCard);
 		action.add(revealHand);
-		//Add the Action menu to the menu bar
+		// Add the Action menu to the menu bar
 		menuBar.add(action);
 
-		//Lay out the About menu
+		// Lay out the About menu
 		JMenu about = new JMenu("About");
 		JMenuItem aboutDojo = new JMenuItem("About Dojo");
 		aboutDojo.addActionListener(menuListener);
 		about.add(aboutDojo);
-		//Add the About menu to the menu bar
+		// Add the About menu to the menu bar
 		menuBar.add(about);
 
-		//Create the top bar
-		//Create the card size slider
-		// TODO: More intelligent max/min for the slider
+		// Create the top bar
+		// Create the card size slider
+		//TODO: More intelligent max/min for the slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
 		sizeSlider.addChangeListener(new SliderListener());
 		sizeSlider.setPreferredSize(new Dimension(100, 25));
 		sizeSlider.setMaximumSize(sizeSlider.getPreferredSize());
-		//Make it so the menu background color shows through behind the slider
+		// Make it so the menu background color shows through behind the slider
 		sizeSlider.setOpaque(false);
 
-		//Create the token generator (naming box and button)
+		// Create the token generator (naming box and button)
 		JComboBox tokenName = new JComboBox();
 		tokenName.setPreferredSize(new Dimension(175, 23));
 		tokenName.setMaximumSize(tokenName.getPreferredSize());
-		//Indent the text by 3 pixels
+		// Indent the text by 3 pixels
 		((BasicComboBoxRenderer)tokenName.getRenderer()).setBorder(new EmptyBorder(0,3,0,0));
-		//Prevent the popup from appearing on the first click
+		// Prevent the popup from appearing on the first click
 		tokenName.setEnabled(false);
 		tokenName.setForeground(Color.LIGHT_GRAY);
 		tokenName.addItem("Create token");
@@ -164,20 +165,20 @@ class Main
 		tokenName.addMouseListener(tokenListener);
 		tokenName.addActionListener(tokenListener);
 
-		//Create the buttons
+		// Create the buttons
 		JButton unbowButton = new JButton("Unbow All");
-		//No reason for the button to hold focus
+		// No reason for the button to hold focus
 		unbowButton.setFocusable(false);
 
 		JButton turnButton = new JButton("End Turn");
-		//No reason for the button to hold focus
+		// No reason for the button to hold focus
 		turnButton.setFocusable(false);
 
 		ButtonListener buttonListener = new ButtonListener();
 		unbowButton.addActionListener(buttonListener);
 		turnButton.addActionListener(buttonListener);
 
-		//Add some horizontal glue to push the action boxes to the right side
+		// Add some horizontal glue to push the action boxes to the right side
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(new JLabel("Card Size"));
 		menuBar.add(sizeSlider);
@@ -194,12 +195,12 @@ class Main
 
 	private static PlayArea createPlayArea(int width, int height)
 	{
-		//Create the main play area
+		// Create the main play area
 		PlayArea playAreaPanel = new PlayArea(width, height);
 		playAreaPanel.setOpaque(true);
-		// TODO: Allow for custom backgrounds
+		//TODO: Allow for custom backgrounds
 		playAreaPanel.setBackground(Color.WHITE);
-		// TODO: Save the last used size and load it here
+		//TODO: Save the last used size and load it here
 		playAreaPanel.setPreferredSize(new Dimension(width, height));
 
 		return playAreaPanel;
@@ -207,17 +208,17 @@ class Main
 
 	private static JSplitPane createInfoArea(int width, int height)
 	{
-		//Create the chat/info area
+		// Create the chat/info area
 		JPanel infoArea = new JPanel();
 		infoArea.setOpaque(true);
 		infoArea.setBackground(Color.LIGHT_GRAY);
-		// TODO: Remember the previous size of all these windows
+		//TODO: Remember the previous size of all these windows
 		infoArea.setPreferredSize(new Dimension(2*width/4, 175));
 		//Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
 
-		//Create the chat area
+		// Create the chat area
 		chatBox = new JTextPane();
 		JTextField chatSend = new JTextField();
 		chatBox.setEditable(false);
@@ -228,7 +229,7 @@ class Main
 		infoArea.add(scrollPane, BorderLayout.CENTER);
 		infoArea.add(chatSend, BorderLayout.SOUTH);
 
-		//Create the card info box
+		// Create the card info box
 		cardBox = new CardInfoBox();
 		cardBox.setPreferredSize(new Dimension(width/4, 175));
 		JScrollPane cardBoxScrollPane = new JScrollPane(cardBox);
@@ -236,13 +237,13 @@ class Main
 		GameInfoBox gameInfo = new GameInfoBox();
 		gameInfo.setPreferredSize(new Dimension(width/4, 175));
 
-		//Set up JSplitPanes to allow for dynamic resizing
-		// TODO: Allow corner dragging to resize multiple SplitPanes. Would have to use a different component. Possible?
+		// Set up JSplitPanes to allow for dynamic resizing
+		//TODO: Allow corner dragging to resize multiple SplitPanes. Would have to use a different component. Possible?
 		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
-		//Set it so that the chatbox gets all the extra space by default (from resizing the main window)
+		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea1.setResizeWeight(0);
 		JSplitPane outerInfoArea2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, outerInfoArea1, gameInfo);
-		//Set it so that the chatbox gets all the extra space by default (from resizing the main window)
+		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea2.setResizeWeight(1);
 
 		outerInfoArea1.setUI(new BasicSplitPaneUI());
@@ -335,8 +336,8 @@ class Main
 		//Read in cards.xml
 		importDatabase();
 
-		//Schedule a job for the event-dispatching thread:
-		//creating and showing this application's GUI.
+		// Schedule a job for the event-dispatching thread:
+		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
