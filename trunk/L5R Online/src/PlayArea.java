@@ -72,9 +72,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		PlayableCard test = new PlayableCard("CoB069");
 		displayedCards.get(0).attach(test);
 		displayedCards.get(0).attach(new PlayableCard("CoB070"));
-		test.attach(new PlayableCard("CoB071"));
-		test.attach(new PlayableCard("CoB071"));
-		test.attach(new PlayableCard("CoB071"));
+		test.attach(new PlayableCard("IE096"));
+		test.attach(new PlayableCard("TH142"));
+		test.attach(new PlayableCard("IE097"));
 		
 		//TODO: Flesh out context menus		
 		// Create context menu for card clicks
@@ -143,7 +143,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		displayedCards.remove(card);
 	}
 
-	// Override the default JPanel paint method
+	// Override the default JComponent paint method
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);

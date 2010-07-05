@@ -18,12 +18,13 @@ class Main
 {
 	// ID maps to card
 	static HashMap<String, StoredCard> database;
-	static String userName, gender;
+	//TODO: It'd be nice to be able to set the font size of these elements in preferences somewhere
 	static JTextPane chatBox;
 	static CardInfoBox cardBox;
-	static boolean highRes;
 	static PlayArea playArea;
 	static Deckbuilder deckBuilder;
+	static String userName, gender;
+	static boolean highRes;
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -276,6 +277,7 @@ class Main
 			  + ", uri " + spe.getSystemId());
 		   System.err.println("   " + spe.getMessage() );
 		} catch (IOException io) {
+			//TODO: Make this more transparent (popup with cancel button)
 			System.out.print("failed\n** Card database missing. Attempting to get from kamisasori.net: ");
 			// Get database off kamisasori.net
 			try {	
