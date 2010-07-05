@@ -4,11 +4,10 @@ class Deck
 {
 	// 0 is top card
 	ArrayList<StoredCard> cards;
-	boolean isDiscard;
 	
-	public Deck(boolean isDiscard)
+	public Deck()
 	{
-		this.isDiscard = isDiscard;
+		cards = new ArrayList<StoredCard>(45);
 	}
 	
 	public PlayableCard removeCard()

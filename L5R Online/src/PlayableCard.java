@@ -52,19 +52,17 @@ class PlayableCard
 
 	public void unattach(PlayableCard unattachingCard)
 	{
-		attachments.remove(attachments.indexOf(unattachingCard));
+		//TODO: Make sure this works properly with multiple of the same card attached
+		attachments.remove(unattachingCard);
 	}
 
 	public void updateAttachmentLocations()
 	{
-		for(int i = 0; i < attachments.size(); i++)
+		ArrayList<PlayableCard> allAttachments = getAllAttachments();
+		for(int i = 0; i < allAttachments.size(); i++)
 		{
-			PlayableCard currentCard = attachments.get(i);
-			currentCard.setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight));
-			if(!currentCard.getAttachments().isEmpty())
-			{
-				currentCard.updateAttachmentLocations();
-			}
+			PlayableCard currentCard = allAttachments.get(i);
+			currentCard.setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight*(i+1)));
 		}
 	}
 
