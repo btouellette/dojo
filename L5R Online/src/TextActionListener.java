@@ -14,7 +14,7 @@ class TextActionListener implements ActionListener
 
 	public TextActionListener()
 	{
-		//Recieves the textfield to which the ActionListener outputs
+		//Receives the textfield to which the ActionListener outputs
 		this.chatBox = Main.chatBox;
 		addStyles();
 		chatBox.setText("Welcome to Dojo!");
