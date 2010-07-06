@@ -1,3 +1,4 @@
+package dojo;
 import java.util.ArrayList;
 
 class Province

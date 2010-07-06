@@ -1,3 +1,4 @@
+package dojo;
 // MenuListener.java
 // Written by Brian Ouellette
 // Part of Dojo

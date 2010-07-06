@@ -1,3 +1,4 @@
+package dojo;
 // PlayArea.java
 // Written by Brian Ouellette
 // Part of Dojo

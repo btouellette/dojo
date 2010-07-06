@@ -1,3 +1,4 @@
+package dojo;
 // PlayableCard.java
 // Written by Brian Ouellette
 // Part of Dojo
