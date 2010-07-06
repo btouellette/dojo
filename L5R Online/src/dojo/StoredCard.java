@@ -1,3 +1,4 @@
+package dojo;
 // StoredCard.java
 // Written by Brian Ouellette
 // Part of Dojo

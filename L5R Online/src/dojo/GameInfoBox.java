@@ -1,3 +1,4 @@
+package dojo;
 // GameInfoBox.java
 // Written by Brian Ouellette
 // Part of Dojo

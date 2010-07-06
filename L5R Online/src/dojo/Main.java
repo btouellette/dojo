@@ -1,3 +1,4 @@
+package dojo;
 // Main.java
 // Written by Brian Ouellette
 // Part of Dojo

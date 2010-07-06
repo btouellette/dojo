@@ -1,3 +1,4 @@
+package dojo;
 // SliderListener.java
 // Written by Brian Ouellette
 // Part of Dojo

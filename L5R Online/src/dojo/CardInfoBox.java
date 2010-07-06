@@ -1,3 +1,4 @@
+package dojo;
 // CardInfoBox.java
 // Written by Brian Ouellette
 // Part of Dojo

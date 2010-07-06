@@ -1,3 +1,4 @@
+package dojo;
 // SearchListener.java
 // Written by James Spencer
 // Part of Dojo
