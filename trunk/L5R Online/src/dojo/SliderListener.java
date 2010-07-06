@@ -16,8 +16,9 @@ class SliderListener implements ChangeListener
 		PlayArea.cardHeight = sliderValue*PlayArea.baseCardHeight/50;
 		PlayArea.cardWidth = (int)(PlayArea.cardHeight*(2.5/3.5));
 
-		//TODO: This can be optimized much better probably. It does file i/o on every tick at the moment.
-		//TODO: This doesn't work properly with attachments yet
+		//TODO: This can be optimized much better. It does file i/o on every tick at the moment.
+		//      Potentially store unaltered image in PlayableCard when loading in and work from that.
+		//      Might need to work around RAM usage if doing so.
 		ListIterator<PlayableCard> iterator = PlayArea.displayedCards.listIterator();
 		while (iterator.hasNext())
 		{

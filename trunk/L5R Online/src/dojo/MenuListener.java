@@ -64,7 +64,19 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("About Dojo"))
 		{
-			//TODO: Create about panel
+			//TODO: If Dojo gets an icon add it here
+			//TODO: Make this a legit JFrame that looks decent
+			JOptionPane.showMessageDialog(Main.frame,
+			                              "Dojo is an unofficial Java-based client for playing \n" +
+			                              "the card game Legend of the Five Rings (L5R) online.\n\n" +
+			                              "Written by Brian Ouellette (aka btouellette aka Hida Tatsura) \n" +
+			                              "with help from James Spencer (aka blitz blitz blitz).\n" +
+			                              "To contribute, file bug reports, request features, or discuss visit:\n" +
+			                              "http://code.google.com/p/dojo\n\n" +
+			                              "Legend of the Five Rings, L5R, and all images used herein are\n" +
+			                              "Copyright © 2010 Alderac Entertainment Group",
+			                              "About Dojo",
+			                              JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 }

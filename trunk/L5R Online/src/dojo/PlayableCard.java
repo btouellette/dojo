@@ -4,6 +4,7 @@ package dojo;
 // Part of Dojo
 
 import java.util.ArrayList;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 class PlayableCard
@@ -102,6 +103,28 @@ class PlayableCard
 	public BufferedImage getImage()
 	{
 		return cardImage;
+	}
+	
+	public BufferedImage createImage()
+	{
+		// 306x428 is size of high res images provided by Alderac
+		BufferedImage image = new BufferedImage(306, 428, BufferedImage.TYPE_BYTE_GRAY);
+		image.createGraphics();
+		Graphics2D g = (Graphics2D)image.getGraphics();
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, 306, 428);
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(10, 10, 286, 408);
+		//TODO: Handle long names well
+		//TODO: Consider using templates that are type appropriate
+		String name = Main.database.get(id).getName();
+		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
+		g.setFont(font);
+	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
+		g.setColor(Color.BLACK);  
+		g.drawString(name, x, 50);
+		cardImage = image;
+		return image;
 	}
 
 	public void setImage(BufferedImage cardImage)

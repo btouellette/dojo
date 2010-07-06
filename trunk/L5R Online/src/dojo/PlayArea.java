@@ -73,7 +73,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		addCard(new PlayableCard("CoB009"));
 		PlayableCard test = new PlayableCard("CoB069");
 		displayedCards.get(0).attach(test);
-		displayedCards.get(0).attach(new PlayableCard("CoB070"));
+		displayedCards.get(0).attach(new PlayableCard("DJH047"));
 		test.attach(new PlayableCard("IE096"));
 		test.attach(new PlayableCard("TH142"));
 		test.attach(new PlayableCard("IE097"));
@@ -253,6 +253,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			{
 				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
 				// Get image pack off kamisasori.net
+				//TODO: Allow preference option to disable automatic download
+				//TODO: Fail once don't try again
 				try {
 					// Download image pack as zip via http
 					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
@@ -296,52 +298,58 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					// Successfully got the files so we should have a valid imageLocation now
 					imageLocation = databaseCard.getImageLocation();
 				} catch (Throwable t) {
-					System.err.println("failed. Check your internet connection.");
+					System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
 					File f = new File("tmp-imagepack.zip");
 					if(f.exists())
 					{
 						f.delete();
 					}
-					//TODO: Display a placeholder card
+					card.createImage();
 				}
 			}
+			// We should either have loaded in a valid image or have generated a placeholder one
 			//TODO: Check to see if there are performance increases that can be done here
-			if(imageLocation != null)
+			try
 			{
-				try
+				// We read in and resize the image once, after that it is stored in PlayableCard
+				// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
+				BufferedImage tempImage;
+				if(imageLocation != null)
 				{
-					// We read in and resize the image once, after that it is stored in PlayableCard
-					// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
-					BufferedImage tempImage = ImageIO.read(new File(imageLocation));
-					BufferedImage cardImage = new BufferedImage(cardWidth, cardHeight, tempImage.getType());
-					Graphics2D g2 = cardImage.createGraphics();
-
-					// If downsizing image
-					if(cardImage.getHeight() >= cardHeight)
-					{
-						// Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
-						// then they can be swapped.
-						//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-						Image cardImage2 = tempImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
-						//AffineTransform transform = new AffineTransform();
-						//transform.setToTranslation(location[0], location[1]);
-
-						g2.drawImage(cardImage2, 0, 0, null);
-						g2.dispose();
-					}
-					// If enlarging image
-					else
-					{
-						g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-						//supposedly better quality, slower
-						//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-						//g2.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
-						//g2.dispose();
-					}
-					card.setImage(cardImage);
-				} catch(IOException io) {
-					System.err.println(io);
+					tempImage = ImageIO.read(new File(imageLocation));
 				}
+				else
+				{
+					tempImage = card.getImage();
+				}
+				BufferedImage cardImage = new BufferedImage(cardWidth, cardHeight, tempImage.getType());
+				Graphics2D g2 = cardImage.createGraphics();
+
+				// If downsizing image
+				if(cardImage.getHeight() >= cardHeight)
+				{
+					// Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
+					// then they can be swapped.
+					//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+					Image cardImage2 = tempImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
+					//AffineTransform transform = new AffineTransform();
+					//transform.setToTranslation(location[0], location[1]);
+
+					g2.drawImage(cardImage2, 0, 0, null);
+					g2.dispose();
+				}
+				// If enlarging image
+				else
+				{
+					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+					//supposedly better quality, slower
+					//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+					//g2.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
+					//g2.dispose();
+				}
+				card.setImage(cardImage);
+			} catch(IOException io) {
+				System.err.println(io);
 			}
 		}
 		int[] location = card.getLocation();
@@ -470,9 +478,18 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			{
 				cardClicked = true;
 				attachmentClicked = true;
-				distanceX = (int)clickPoint.getX() - cardLocation[0];
-				distanceY = (int)clickPoint.getY() - cardLocation[1];
-				clickedAttachment = attachments.get((int)(-distanceY/(cardHeight*attachmentHeight)));
+				distanceY = cardLocation[1] - (int)clickPoint.getY();
+				// double->int cast loses precision which means around boundaries clicks can be problematic
+				// Ensure we don't try to get an attachment outside our array range
+				int attachment = (int)(distanceY/(cardHeight*attachmentHeight));
+				if(attachment > numAttachments -1)
+				{
+					clickedAttachment = attachments.get(numAttachments-1);
+				}
+				else
+				{
+					clickedAttachment = attachments.get(attachment);	
+				}
 				if(e.getButton() == MouseEvent.BUTTON1)
 				{
 					Main.cardBox.setCard(Main.database.get(clickedAttachment.getID()));

@@ -26,6 +26,7 @@ class Main
 	static Deckbuilder deckBuilder;
 	static String userName, gender;
 	static boolean highRes;
+	static JFrame frame;
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -35,7 +36,7 @@ class Main
 	private static void createAndShowGUI()
 	{
 		// Create and set up the window
-		JFrame frame = new JFrame("Dojo");
+		frame = new JFrame("Dojo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Set up defaults if pref file is unavailable
