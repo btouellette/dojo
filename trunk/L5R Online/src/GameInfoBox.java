@@ -14,16 +14,17 @@ class GameInfoBox extends JPanel implements ActionListener
 	// o = opponents
 	private JLabel yHonor, oHonor;
 	private JLabel yHand, oHand;
+	private JLabel yFavor, oFavor;
 	/*
 	JLabel yFateDeck, oFateDeck;
 	JLabel yFateDis, oFateDis;
 	JLabel yDynDeck, oDynDeck;
 	JLabel yDynDis, oDynDis;*/
 
-	JLabel yFavor, oFavor;
 
 	public GameInfoBox()
 	{
+		super();
 		yHonor = new JLabel("3", JLabel.CENTER);
 		oHonor = new JLabel("35", JLabel.CENTER);
 		yHand = new JLabel("8", JLabel.CENTER);
@@ -61,18 +62,16 @@ class GameInfoBox extends JPanel implements ActionListener
 
 	private JComponent createJPanel(String arg)
 	{
-		JComponent panel = null;
+		JComponent panel = new JPanel();
 
 		if(arg.equals("name"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 2));
 			panel.add(new JLabel("Your", JLabel.CENTER));
 			panel.add(new JLabel("Opponent's", JLabel.CENTER));
 		}
 		else if(arg.equals("honor"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 
 			JPanel panel2 = new JPanel();
@@ -117,7 +116,6 @@ class GameInfoBox extends JPanel implements ActionListener
 		}
 		else if(arg.equals("hand"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yHand);
 			panel.add(new JLabel(":Hand:", JLabel.CENTER));
@@ -126,12 +124,10 @@ class GameInfoBox extends JPanel implements ActionListener
 		/*
 		else if(arg.equals("fate"))
 		{
-			panel = new JPanel();
 			panel.add(new JLabel("Fate", JLabel.CENTER));
 		}
 		else if(arg.equals("fatedeck"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yFateDeck);
 			panel.add(new JLabel(":Deck:", JLabel.CENTER));
@@ -139,7 +135,6 @@ class GameInfoBox extends JPanel implements ActionListener
 		}
 		else if(arg.equals("fatediscard"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yFateDis);
 			panel.add(new JLabel(":Discard:", JLabel.CENTER));
@@ -147,12 +142,10 @@ class GameInfoBox extends JPanel implements ActionListener
 		}
 		else if(arg.equals("dynasty"))
 		{
-			panel = new JPanel();
 			panel.add(new JLabel("Dynasty", JLabel.CENTER));
 		}
 		else if(arg.equals("dyndeck"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yDynDeck);
 			panel.add(new JLabel(":Deck:", JLabel.CENTER));
@@ -160,7 +153,6 @@ class GameInfoBox extends JPanel implements ActionListener
 		}
 		else if(arg.equals("dyndiscard"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yDynDis);
 			panel.add(new JLabel(":Discard:", JLabel.CENTER));
@@ -169,7 +161,6 @@ class GameInfoBox extends JPanel implements ActionListener
 		*/
 		else if(arg.equals("favor"))
 		{
-			panel = new JPanel();
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yFavor);
 			panel.add(new JLabel(":Favor:", JLabel.CENTER));
@@ -185,12 +176,12 @@ class GameInfoBox extends JPanel implements ActionListener
 	{
 		if(e.getActionCommand().equals("up"))
 		{
-			yHonor.setText("" + (Integer.valueOf(yHonor.getText()).intValue() + 1));
+			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) + 1));
 			TextActionListener.send(Main.userName + " increases honor to " + yHonor.getText() + "." , "Action");
 		}
 		else if(e.getActionCommand().equals("down"))
 		{
-			yHonor.setText("" + (Integer.valueOf(yHonor.getText()).intValue() - 1));
+			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) - 1));
 			TextActionListener.send(Main.userName + " decreases honor to " + yHonor.getText() + "." , "Action");
 		}
 	}

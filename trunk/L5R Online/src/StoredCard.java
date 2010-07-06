@@ -14,8 +14,8 @@ class StoredCard
 	private ArrayList<String> imageLocation, imageEdition;
 	private ArrayList<String> legal, clan;
 	private String edition, text, cost, focus;
-	private String province_strength, gold_production, starting_honor;
-	private String force, chi, personal_honor, honor_req;
+	private String provinceStrength, goldProduction, startingHonor;
+	private String force, chi, personalHonor, honorReq;
 
 	public StoredCard(String id)
 	{
@@ -83,19 +83,19 @@ class StoredCard
 		this.clan.add(clan);
 	}
 
-	public void setProvinceStrength(String province_strength)
+	public void setProvinceStrength(String provinceStrength)
 	{
-		this.province_strength = province_strength;
+		this.provinceStrength = provinceStrength;
 	}
 
-	public void setGoldProduction(String gold_production)
+	public void setGoldProduction(String goldProduction)
 	{
-		this.gold_production = gold_production;
+		this.goldProduction = goldProduction;
 	}
 
-	public void setStartingHonor(String starting_honor)
+	public void setStartingHonor(String startingHonor)
 	{
-		this.starting_honor = starting_honor;
+		this.startingHonor = startingHonor;
 	}
 
 	public void setForce(String force)
@@ -108,14 +108,14 @@ class StoredCard
 		this.chi = chi;
 	}
 
-	public void setPersonalHonor(String personal_honor)
+	public void setPersonalHonor(String personalHonor)
 	{
-		this.personal_honor = personal_honor;
+		this.personalHonor = personalHonor;
 	}
 
-	public void setHonorReq(String honor_req)
+	public void setHonorReq(String honorReq)
 	{
-		this.honor_req = honor_req;
+		this.honorReq = honorReq;
 	}
 
 	public String getID()
@@ -135,21 +135,16 @@ class StoredCard
 
 	public String getImageLocation()
 	{
-		String cardImageLoc = null;
-		boolean imageExists = false;
+		String cardImageLoc;
 		int count = 0;
 
 		//Find the first valid image location
-		while(!imageExists && count < imageLocation.size())
+		while(count < imageLocation.size())
 		{
 			cardImageLoc = imageLocation.get(count);
-			imageExists = (new File(cardImageLoc)).exists();
+			if((new File(cardImageLoc)).exists())
+				return cardImageLoc;
 			count++;
-		}
-
-		if(imageExists)
-		{
-			return cardImageLoc;
 		}
 
 		return null;
@@ -193,17 +188,17 @@ class StoredCard
 
 	public String getProvinceStrength()
 	{
-		return province_strength;
+		return provinceStrength;
 	}
 
 	public String getGoldProduction()
 	{
-		return gold_production;
+		return goldProduction;
 	}
 
 	public String getStartingHonor()
 	{
-		return starting_honor;
+		return startingHonor;
 	}
 
 	public String getForce()
@@ -218,12 +213,12 @@ class StoredCard
 
 	public String getPersonalHonor()
 	{
-		return personal_honor;
+		return personalHonor;
 	}
 
 	public String getHonorReq()
 	{
-		return honor_req;
+		return honorReq;
 	}
 
 	public String toString()

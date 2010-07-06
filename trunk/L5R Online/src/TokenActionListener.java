@@ -9,10 +9,6 @@ import javax.swing.*;
 
 class TokenActionListener implements ActionListener, MouseListener
 {
-	public TokenActionListener()
-	{
-	}
-
 	// This method is called whenever the user or program changes the selected item.
 	// Note: The new item may be the same as the previous item.
 	public void actionPerformed(ActionEvent e)

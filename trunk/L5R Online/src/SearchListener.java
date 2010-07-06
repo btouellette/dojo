@@ -4,22 +4,22 @@
 
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.Vector;
+
+import java.util.ArrayList;
 
 class SearchListener implements ActionListener
 {
-	private Vector<StoredCard> storage;
+	private ArrayList<StoredCard> storage;
 	private String type = "";
 	private String clan = "";
 	private String item = "";
 	private String text = "";
 	private String title = "";
 	private String legal = "celestial";
-	private int max, y;
 
 	public SearchListener()
 	{
-		storage = new Vector<StoredCard>();
+		storage = new ArrayList<StoredCard>();
 		for (int x=0;x<Deckbuilder.vect.size();x++)
 			storage.add(Deckbuilder.vect.elementAt(x));
 	}
@@ -31,7 +31,7 @@ class SearchListener implements ActionListener
 				JComboBox cb = (JComboBox)e.getSource();
 				item = (String)cb.getSelectedItem();
 			}
-			else if (e.getSource() instanceof JTextField)
+			else if(e.getSource() instanceof JTextField)
 			{
 				JTextField tf = (JTextField)e.getSource();
 				text = tf.getText();
@@ -41,64 +41,76 @@ class SearchListener implements ActionListener
 			//textField.selectAll();
 
 			//assign legal menu option
-			if (item.equals(Deckbuilder.legal.getSelectedItem().toString()))
+			if(item.equals(Deckbuilder.legal.getSelectedItem().toString()))
 			{
 				legal = item;
 			}
 			//assign Card Type menu option
-			else if (item.equals(Deckbuilder.cardType.getSelectedItem().toString()))
+			else if(item.equals(Deckbuilder.cardType.getSelectedItem().toString()))
 			{
 				type=item;
-				if (type.equals("Personality"))
+				if(type.equals("Personality"))
 				{
 					type="personalities";
 				}
 			}
 			//assign Faction menu option
-			else if (item.equals(Deckbuilder.faction.getSelectedItem().toString()))
+			else if(item.equals(Deckbuilder.faction.getSelectedItem().toString()))
 			{
 				clan=item;
 			}
 			//assign Title TextField option
-			else if (text.equals(Deckbuilder.title.getText()))
+			else if(text.equals(Deckbuilder.title.getText()))
 			{
 				title=text;
 			}
 
 			System.out.println(title);
-			Display();
+			display();
 	}
 
-	private void Display()
+	private void display()
 	{
 		//reset the vector
 		Deckbuilder.vect.clear();
 
-		for (int x=0;x<storage.size();x++)
-			Deckbuilder.vect.add(storage.elementAt(x));
+		for(int x = 0; x < storage.size(); x++)
+		{
+			Deckbuilder.vect.add(storage.get(x));
+		}
 
 		//reset variables
-		max=Deckbuilder.vect.size();
-		y=0;
+		int max = Deckbuilder.vect.size();
+		int y = 0;
 
 		do
 		{
 			if(!Deckbuilder.vect.elementAt(y).getLegal().contains(legal.toLowerCase()))
+			{
 				Deckbuilder.vect.remove(y);
+			}
 			else if(!Deckbuilder.vect.elementAt(y).getType().startsWith(type.toLowerCase()))
+			{
 				Deckbuilder.vect.remove(y);
-			else if (!clan.equals("")&&!Deckbuilder.vect.elementAt(y).getClan().contains(clan.toLowerCase()))
+			}
+			else if(!clan.equals("") && !Deckbuilder.vect.elementAt(y).getClan().contains(clan.toLowerCase()))
+			{
 				Deckbuilder.vect.remove(y);
+			}
 			//title check = not working
-			else if (Deckbuilder.vect.elementAt(y).getName().toLowerCase().indexOf(title.toLowerCase())<0)
+			else if(Deckbuilder.vect.elementAt(y).getName().toLowerCase().indexOf(title.toLowerCase()) < 0)
+			{
 				Deckbuilder.vect.remove(y);
+			}
 			else
+			{
 				y++;
+			}
 
-			max=Deckbuilder.vect.size();
+			max = Deckbuilder.vect.size();
 
 		}
-		while(y<max);
+		while(y < max);
 
 		refresh();
 	}
@@ -106,7 +118,7 @@ class SearchListener implements ActionListener
 	private void refresh()
 	{
 		Deckbuilder.alphasort(Deckbuilder.vect);
-		Deckbuilder.apples.setText("Card Results("+Deckbuilder.vect.size()+"):");
+		Deckbuilder.apples.setText("Card Results(" + Deckbuilder.vect.size() + "):");
 		Deckbuilder.list.setListData(Deckbuilder.vect);
 	}
 }

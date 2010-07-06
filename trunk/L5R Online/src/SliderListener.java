@@ -9,10 +9,6 @@ import java.util.*;
 
 class SliderListener implements ChangeListener
 {
-	public SliderListener()
-	{
-	}
-
 	public void stateChanged(ChangeEvent e)
 	{
 		int sliderValue = ((JSlider)e.getSource()).getValue();
