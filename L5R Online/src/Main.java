@@ -66,7 +66,7 @@ class Main
 		splitPane.setDividerSize(5);
 
 		// Set the menu bar and add the label to the content pane
-		frame.setJMenuBar(createMenuBar(width, playArea));
+		frame.setJMenuBar(createMenuBar(width));
 		frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 
 		// Display the window
@@ -78,7 +78,7 @@ class Main
 		frame.setVisible(true);
 	}
 
-	private static JMenuBar createMenuBar(int width, PlayArea playArea)
+	private static JMenuBar createMenuBar(int width)
 	{
 		// Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
@@ -191,7 +191,7 @@ class Main
 		menuBar.add(turnButton);
 		menuBar.add(Box.createHorizontalStrut(3));
 
-		return(menuBar);
+		return menuBar;
 	}
 
 	private static PlayArea createPlayArea(int width, int height)
@@ -239,7 +239,9 @@ class Main
 		gameInfo.setPreferredSize(new Dimension(width/4, 175));
 
 		// Set up JSplitPanes to allow for dynamic resizing
-		//TODO: Allow corner dragging to resize multiple SplitPanes. Would have to use a different component. Possible?
+		//TODO: Allow corner dragging to resize multiple SplitPanes
+		//      Would have to use a different component since SplitPanes only take 2 components
+		//      Might be possible with org.jdesktop.swingx.JXMultiSplitPane (not yet in mainline swing)
 		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
 		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea1.setResizeWeight(0);
@@ -291,7 +293,7 @@ class Main
 				is.close();
 				fos.close();
 				System.out.println("success!");
-			} catch (Throwable t) {
+			} catch (IOException io_e) {
 				System.err.println("failed. Check your internet connection.");
 				System.exit(1);
 			}
@@ -299,10 +301,11 @@ class Main
 			try {
 				FileInputStream fis = new FileInputStream("cards-gempukku.zip");
 				ZipInputStream zis = new ZipInputStream(fis);
-				ZipEntry ze = null;
+				ZipEntry ze;
+				FileOutputStream fos;
 				while ((ze = zis.getNextEntry()) != null) {
 					System.out.print("** Unzipping " + ze.getName() + ": ");
-					FileOutputStream fos = new FileOutputStream(ze.getName());
+					fos = new FileOutputStream(ze.getName());
 					for (int c = zis.read(); c != -1; c = zis.read()) {
 						fos.write(c);
 					}
@@ -318,9 +321,9 @@ class Main
 				System.out.println("success!");
 				System.out.println("** Reattempting database import");
 				importDatabase();
-			} catch (Throwable t) {
+			} catch (IOException io_e) {
 				System.err.println("failed\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
-				t.printStackTrace();
+				io_e.printStackTrace();
 				File f = new File("cards-gempukku.zip");
 				if(f.exists())
 					f.delete();

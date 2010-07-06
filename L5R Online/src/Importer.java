@@ -7,7 +7,6 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import java.util.HashMap;
 
-//TODO: Add support for ruling xml tag
 class Importer extends DefaultHandler
 {
 	//private Writer out;
@@ -19,17 +18,19 @@ class Importer extends DefaultHandler
 
 	public Importer()
 	{
-		try
+		super();
+		/*try
 		{
 			// Set up output stream
-			//out = new OutputStreamWriter(System.out, "UTF8");
+			out = new OutputStreamWriter(System.out, "UTF8");
 
-			//Create a new HashMap with an initial capacity of 1500
-			//This value might need to be tweaked
-			database = new HashMap<String, StoredCard>(1500);
 		} catch (Throwable t) {
 			t.printStackTrace();
-		}
+		} */
+		
+		//Create a new HashMap with an initial capacity of 1500
+		//This value might need to be tweaked
+		database = new HashMap<String, StoredCard>(1500);
 	}
 
 	public HashMap<String, StoredCard> getDatabase()
@@ -94,7 +95,10 @@ class Importer extends DefaultHandler
 		//nl();
 		//emit("ELEMENT: ");
 		eName = sName;
-		if ("".equals(eName)) eName = qName; // namespaceAware = false
+		if ("".equals(eName))
+		{
+			eName = qName;
+		}
 		//emit("<"+eName);
 
 		if (attrs != null) {

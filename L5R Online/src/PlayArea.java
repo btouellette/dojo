@@ -57,6 +57,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public PlayArea(int width, int height)
 	{
+		super();
 		// Setting the default height as a fifth of the PlayArea height
 		// This allows for vertically: two sets of provinces and two units with a few attachments
 		cardHeight = height/5;
@@ -257,7 +258,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					url.openConnection();
 					InputStream is = url.openStream();
 					FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
-					for (int c = is.read(); c != -1; c = is.read()) {
+					for (int c = is.read(); c != -1; c = is.read())
+					{
 						fos.write(c);
 					}
 					is.close();
@@ -267,14 +269,16 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					// Unzip image pack
 					FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
 					ZipInputStream zis = new ZipInputStream(fis);
-					ZipEntry ze = null;
-					while ((ze = zis.getNextEntry()) != null) {
+					ZipEntry ze;
+					while((ze = zis.getNextEntry()) != null)
+					{
 						System.out.print("** Unzipping " + ze.getName() + ": ");
 						// Make any directories as needed before unzipping
 						File f = new File("images/cards/" + databaseCard.getImageEdition());
 						f.mkdirs();
 						fos = new FileOutputStream("images/cards/" + ze.getName());
-						for (int c = zis.read(); c != -1; c = zis.read()) {
+						for (int c = zis.read(); c != -1; c = zis.read())
+						{
 							fos.write(c);
 						}
 						zis.closeEntry();
@@ -294,7 +298,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					System.err.println("failed. Check your internet connection.");
 					File f = new File("tmp-imagepack.zip");
 					if(f.exists())
+					{
 						f.delete();
+					}
 					//TODO: Display a placeholder card
 				}
 			}
@@ -507,13 +513,21 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			// Don't let them drag cards off the playing field entirely
 			// TODO: modify for dragging into/out of hand when implemented
 			if(newX < 10 - cardWidth)
+			{
 				newX = 10 - cardWidth;
+			}
 			else if(newX > getWidth() - 10)
+			{
 				newX = getWidth() - 10;
+			}
 			if(newY < 10 - cardHeight)
+			{
 				newY = 10 - cardHeight;
+			}
 			else if(newY > getHeight() - 10)
+			{
 				newY = getHeight() - 10;
+			}
 
 			clickedCard.setLocation(newX, newY);
 			repaint();
@@ -559,7 +573,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		else if(name.equals("Search"))
 		{
-			
+			//TODO: Add search interface
 		}
 	}
 

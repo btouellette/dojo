@@ -7,10 +7,6 @@ import javax.swing.*;
 
 class ButtonListener implements ActionListener
 {
-	public ButtonListener()
-	{
-	}
-
 	public void actionPerformed(ActionEvent e)
 	{
 		String name = ((AbstractButton)e.getSource()).getText();

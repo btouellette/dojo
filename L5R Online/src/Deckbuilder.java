@@ -1,4 +1,3 @@
-import javax.swing.JPanel;
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
@@ -17,6 +16,7 @@ class Deckbuilder
 	static JFrame frame;
 	static CardInfoBox card;
 	static JList list;
+	//TODO: Replace with ArrayList
 	static Vector<StoredCard> vect;
 	static JLabel apples;
 	static JComboBox legal, cardType, faction;
@@ -130,7 +130,7 @@ class Deckbuilder
 		panel.add(min);
 		panel.add(to);
 		panel.add(max);
-		return (panel);
+		return panel;
 	}
 
 	private static JMenuBar createMenuBar(int width)
@@ -176,7 +176,7 @@ class Deckbuilder
 		//Add the Options menu to the menu bar
 		menuBar.add(option);
 
-		return(menuBar);
+		return menuBar;
 	}
 
 	private static JPanel createSearch(int width, int height)
@@ -313,7 +313,7 @@ class Deckbuilder
 		panel.add(infolabel);
 		panel.add(cardScrollPane);
 
-		return(panel);
+		return panel;
 	}
 
 	public static JPanel createResults(int width, int height)
@@ -344,7 +344,7 @@ class Deckbuilder
 		listScroller.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(apples);
 		panel.add(listScroller);
-		return(panel);
+		return panel;
 	}
 
 	public static JPanel createDeckArea(int width, int height)
@@ -356,7 +356,7 @@ class Deckbuilder
 		//Add a pretty border to it
 		panel.setLayout(new BorderLayout());
 
-		return(panel);
+		return panel;
 	}
 	public static void alphasort(Vector<StoredCard> vex)
 	{

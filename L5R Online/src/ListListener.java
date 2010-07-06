@@ -6,13 +6,9 @@ import javax.swing.event.*;
 
 class ListListener implements ListSelectionListener
 {
-	public ListListener()
-	{
-	}
-
 	public void valueChanged(ListSelectionEvent e)
 	{
-		if(e.getValueIsAdjusting() == false)
+		if(!e.getValueIsAdjusting())
 		{
 			if(Deckbuilder.list.getSelectedIndex() < 0)
 			{

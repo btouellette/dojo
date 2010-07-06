@@ -8,10 +8,12 @@ import java.awt.image.BufferedImage;
 class PlayableCard
 {
 	//Info needed
-	private String id;
+	private final String id;
+	private final String type;
 	private ArrayList<PlayableCard> attachments;
 	private int[] location;
 	private BufferedImage cardImage;
+	private boolean isDynasty;
 
 	public PlayableCard(String id)
 	{
@@ -20,6 +22,19 @@ class PlayableCard
 		location[0] = 0;
 		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
+		type = Main.database.get(id).getType();
+		
+		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
+		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
+		   type.equals("rings")     || type.equals("senseis")   || type.equals("winds"))
+		{
+			isDynasty = false;
+		}
+		else
+		{
+			// True for: events, regions, holdings, personalities, strongholds
+			isDynasty = true;
+		}
 	}
 
 	public String getID()
@@ -42,7 +57,8 @@ class PlayableCard
 
 	public int[] getLocation()
 	{
-		return location;
+		// Return copy so as not to allow inadvertent changes
+		return location.clone();
 	}
 
 	public void attach(PlayableCard attachingCard)
@@ -90,5 +106,15 @@ class PlayableCard
 	public void setImage(BufferedImage cardImage)
 	{
 		this.cardImage = cardImage;
+	}
+	
+	public boolean isDynasty()
+	{
+		return isDynasty;
+	}
+	
+	public boolean isFate()
+	{
+		return !isDynasty;
 	}
 }

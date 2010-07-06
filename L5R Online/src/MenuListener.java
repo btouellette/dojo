@@ -9,10 +9,6 @@ import java.util.Random;
 
 class MenuListener implements ActionListener
 {
-	public MenuListener()
-	{
-	}
-
 	public void actionPerformed(ActionEvent e)
 	{
 		String name = ((AbstractButton)e.getSource()).getText();
@@ -67,6 +63,7 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("About Dojo"))
 		{
+			//TODO: Create about panel
 		}
 	}
 }
