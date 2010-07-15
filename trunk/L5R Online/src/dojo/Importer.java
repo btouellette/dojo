@@ -93,14 +93,14 @@ class Importer extends DefaultHandler
 	                         String qName, // qualified name
 	                         Attributes attrs) throws SAXException
 	{
-		//nl();
-		//emit("ELEMENT: ");
+		/* nl();
+		emit("ELEMENT: ");
 		eName = sName;
 		if ("".equals(eName))
 		{
 			eName = qName;
 		}
-		//emit("<"+eName);
+		emit("<"+eName); */
 
 		if (attrs != null) {
 			for (int i = 0; i < attrs.getLength(); i++) {

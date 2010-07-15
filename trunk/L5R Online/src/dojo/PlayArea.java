@@ -355,6 +355,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		int[] location = card.getLocation();
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
+	
+	public void clearArea()
+	{
+		//TODO: Wipe decks/displayed cards and redraw
+	}
 
 	// Pop up the correct context menu
 	private void showPopup(MouseEvent e)
