@@ -34,12 +34,15 @@ class TextActionListener implements ActionListener
 
 		style = chatBox.addStyle("Opp", null);
 		StyleConstants.setForeground(style, new Color(204, 51, 51)); // Red
+		
+		style = chatBox.addStyle("Error", null);
+		StyleConstants.setForeground(style, new Color(255, 0, 0)); // Red
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
 		JTextField textBox = (JTextField)e.getSource();
-		//Send the inputted text to the display
+		//Send the input text to the display
 		send(Main.userName + ": " + textBox.getText(), "You");
 		//Clear the text box
 		textBox.setText("");

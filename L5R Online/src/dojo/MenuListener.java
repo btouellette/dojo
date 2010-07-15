@@ -5,6 +5,8 @@ package dojo;
 // Listener for all the menus at the top of the panel.
 
 import java.awt.event.*;
+import java.io.*;
+
 import javax.swing.*;
 import java.util.Random;
 
@@ -13,8 +15,48 @@ class MenuListener implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		String name = ((AbstractButton)e.getSource()).getText();
+		
 		if(name.equals("Connect"))
 		{
+		}
+		//TODO: Set so it filters out .l5d and .dck files
+		else if(name.equals("Load Deck"))
+		{
+			final JFileChooser fc = new JFileChooser("decks");
+			int returnVal = fc.showOpenDialog(Main.frame);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            File file = fc.getSelectedFile();
+	            try {
+					BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
+					
+					Deck dynasty = new Deck();
+					Deck fate = new Deck();
+					
+					String line;
+					while ((line = br.readLine()) != null)
+					{
+						if(!line.isEmpty() && line.charAt(0) != '#')
+						{
+							int count = 0;
+							int num = 0;
+							while(Character.isDigit(line.charAt(count)))
+							{
+								num *= 10;
+								num += Character.getNumericValue(line.charAt(count));;
+								count++;
+							}
+							String cardName = line.substring(count+1);
+						}
+					}
+				} catch (FileNotFoundException err) {
+					TextActionListener.send("Deck not found.\n", "Error");
+					err.printStackTrace();
+				} catch (IOException err) {
+					TextActionListener.send("Failed to read in deck.\n", "Error");
+					err.printStackTrace();
+				}
+	        }
 		}
 		else if(name.equals("Start Game"))
 		{

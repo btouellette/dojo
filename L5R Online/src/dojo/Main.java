@@ -97,6 +97,8 @@ class Main
 		MenuListener menuListener = new MenuListener();
 		JMenuItem connect = new JMenuItem("Connect");
 		connect.addActionListener(menuListener);
+		JMenuItem load = new JMenuItem("Load Deck");
+		load.addActionListener(menuListener);
 		JMenuItem startGame = new JMenuItem("Start Game");
 		startGame.addActionListener(menuListener);
 		JMenuItem findGame = new JMenuItem("Find Game");
@@ -108,6 +110,7 @@ class Main
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.addActionListener(menuListener);
 		game.add(connect);
+		game.add(load);
 		game.add(startGame);
 		game.add(findGame);
 		game.addSeparator();
