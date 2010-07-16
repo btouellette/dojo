@@ -22,6 +22,7 @@ class MenuListener implements ActionListener
 		//TODO: Set so it filters out .l5d and .dck files
 		else if(name.equals("Load Deck"))
 		{
+			//TODO: This should be in another class or at least its own method
 			final JFileChooser fc = new JFileChooser("decks");
 			int returnVal = fc.showOpenDialog(Main.frame);
 
@@ -47,8 +48,38 @@ class MenuListener implements ActionListener
 								count++;
 							}
 							String cardName = line.substring(count+1);
+							StoredCard currentCard = Main.databaseName.get(cardName);
+							String type = currentCard.getType();
+							if(type.equals("winds") || type.equals("strongholds"))
+							{
+								//TODO: Set location appropriately
+								PlayArea.displayedCards.add(new PlayableCard(currentCard));
+								//TODO: Decide whether to handle multiple strongholds/winds in a deck specially or not
+								//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction), attach wind to stronghold in this same check
+							}
+							else if(currentCard.isDynasty())
+							{
+								for(int i = 0; i < num; i++)
+								{
+									dynasty.add(currentCard);
+								}
+							}
+							else
+							{
+								for(int i = 0; i < num; i++)
+								{
+									fate.add(currentCard);
+								}
+							}
 						}
 					}
+
+					System.out.println("FATE: " + fate.numCards() + "\nDYN: " + dynasty.numCards());
+					TextActionListener.send(Main.userName + " loads a new deck.", "Action");
+					fate.shuffle();
+					dynasty.shuffle();
+					
+					Main.playArea.clearArea(dynasty, fate);
 				} catch (FileNotFoundException err) {
 					TextActionListener.send("Deck not found.\n", "Error");
 					err.printStackTrace();
@@ -82,11 +113,11 @@ class MenuListener implements ActionListener
 			Random gen = new Random();
 			if(gen.nextBoolean())
 			{
-				TextActionListener.send(Main.userName + " flips a coin and it comes up heads", "Action");
+				TextActionListener.send(Main.userName + " flips a coin and it comes up heads.", "Action");
 			}
 			else
 			{
-				TextActionListener.send(Main.userName + " flips a coin and it comes up tails", "Action");
+				TextActionListener.send(Main.userName + " flips a coin and it comes up tails.", "Action");
 			}
 		}
 		else if(name.equals("Drop Random Fate Card"))
@@ -95,14 +126,7 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Reveal Hand"))
 		{
-			if(Main.gender.equals("Male"))
-			{
-				TextActionListener.send(Main.userName + " reveals his hand.", "Action");
-			}
-			else
-			{
-				TextActionListener.send(Main.userName + " reveals her hand.", "Action");
-			}
+			TextActionListener.send(Main.userName + " reveals " + Main.gender + " hand.", "Action");
 		}
 		else if(name.equals("About Dojo"))
 		{

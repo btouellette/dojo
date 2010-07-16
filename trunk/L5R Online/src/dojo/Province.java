@@ -18,7 +18,7 @@ class Province
 	
 	public void setCard(StoredCard card)
 	{
-		this.card = new PlayableCard(card.getID());
+		this.card = new PlayableCard(card);
 	}
 	
 	public PlayableCard getCard()

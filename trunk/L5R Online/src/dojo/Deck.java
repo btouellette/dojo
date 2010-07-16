@@ -11,26 +11,31 @@ class Deck
 		cards = new ArrayList<StoredCard>(45);
 	}
 	
-	public PlayableCard removeCard()
+	public PlayableCard remove()
 	{
-		return new PlayableCard(cards.remove(0).getID());
+		return new PlayableCard(cards.remove(0));
 	}
 	
-	public PlayableCard removeCard(StoredCard card)
+	public PlayableCard remove(StoredCard card)
 	{
 		cards.remove(card);
-		return new PlayableCard(card.getID());
+		return new PlayableCard(card);
 	}
 	
-	public void addCard(StoredCard card)
+	public void removeAll()
+	{
+		cards.clear();
+	}
+	
+	public void add(StoredCard card)
 	{
 		// Put on top
 		cards.add(0, card);
 	}
 
-	public void addCard(PlayableCard card)
+	public void add(PlayableCard card)
 	{
-		cards.add(0, Main.database.get(card.getID()));
+		cards.add(0, Main.databaseID.get(card.getID()));
 	}
 	
 	public void shuffle()
