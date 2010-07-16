@@ -30,7 +30,7 @@ class Deckbuilder
 			c[i] = new JLabel(array[i]);
 			c[i].setFont(new Font("Serif", Font.PLAIN, 13));
 		}
-		Object[] p = Main.database.keySet().toArray();
+		Object[] p = Main.databaseID.keySet().toArray();
 
 		vect = new Vector<StoredCard>();
 
@@ -39,8 +39,8 @@ class Deckbuilder
 
 		for(int i = 0; i < p.length; i++)
 		{
-			StoredCard currentCard = Main.database.get(p[i]);
-			vect.add(Main.database.get(p[i]));
+			StoredCard currentCard = Main.databaseID.get(p[i]);
+			vect.add(Main.databaseID.get(p[i]));
 
 			ArrayList<String> currentCardLegal = currentCard.getLegal();
 			for(int k = 0; k < currentCardLegal.size(); k++)

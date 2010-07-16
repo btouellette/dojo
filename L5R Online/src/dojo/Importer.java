@@ -14,7 +14,7 @@ class Importer extends DefaultHandler
 	//private String version;
 	private String eName;
 	// ID maps to card
-	private HashMap<String, StoredCard> database;
+	private HashMap<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
 	public Importer()
@@ -31,12 +31,18 @@ class Importer extends DefaultHandler
 		
 		//Create a new HashMap with an initial capacity of 1500
 		//This value might need to be tweaked
-		database = new HashMap<String, StoredCard>(1500);
+		databaseID = new HashMap<String, StoredCard>(1500);
+		databaseName = new HashMap<String, StoredCard>(1500);
 	}
 
-	public HashMap<String, StoredCard> getDatabase()
+	public HashMap<String, StoredCard> getIDDatabase()
 	{
-		return database;
+		return databaseID;
+	}
+	
+	public HashMap<String, StoredCard> getNameDatabase()
+	{
+		return databaseName;
 	}
 	
 	/* Disabled, debugging code for if importer starts barfing on reading cards.xml
@@ -93,14 +99,14 @@ class Importer extends DefaultHandler
 	                         String qName, // qualified name
 	                         Attributes attrs) throws SAXException
 	{
-		/* nl();
-		emit("ELEMENT: ");
+		//nl();
+		//emit("ELEMENT: ");
 		eName = sName;
 		if ("".equals(eName))
 		{
 			eName = qName;
 		}
-		emit("<"+eName); */
+		//emit("<"+eName);
 
 		if (attrs != null) {
 			for (int i = 0; i < attrs.getLength(); i++) {
@@ -120,7 +126,8 @@ class Importer extends DefaultHandler
 				{
 					if(currentCard != null)
 					{
-						database.put(currentCard.getID(), currentCard);
+						databaseID.put(currentCard.getID(), currentCard);
+						databaseName.put(currentCard.getName(), currentCard);
 					}
 					currentCard = new StoredCard(localValue);
 				}
@@ -167,7 +174,6 @@ class Importer extends DefaultHandler
 		{
 			//emit(s);
 
-			//Huge if block is ugly but more understandable than mapping the names to values and using switch
 			//NOTE: Java switch statements don't operate on String
 			if(eName.equals("name"))
 			{

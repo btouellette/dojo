@@ -7,24 +7,23 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-class PlayableCard
+class PlayableCard extends Card
 {
-	//Info needed
-	private final String id;
-	private final String type;
+	private String type;
 	private ArrayList<PlayableCard> attachments;
 	private int[] location;
 	private BufferedImage cardImage;
-	private boolean isDynasty;
 
 	public PlayableCard(String id)
 	{
-		this.id = id;
+		super(id);
+		
 		location = new int[2];
 		location[0] = 0;
 		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
-		type = Main.database.get(id).getType();
+
+		type = Main.databaseID.get(id).getType();
 		
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
 		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
@@ -38,10 +37,10 @@ class PlayableCard
 			isDynasty = true;
 		}
 	}
-
-	public String getID()
+	
+	public PlayableCard(StoredCard card)
 	{
-		return id;
+		this(card.getID());
 	}
 
 	public void setLocation(int x, int y)
@@ -72,6 +71,23 @@ class PlayableCard
 	{
 		//TODO: Make sure this works properly with multiple of the same card attached
 		attachments.remove(unattachingCard);
+	}
+	
+	public void destroy()
+	{
+		while(!attachments.isEmpty())
+		{
+			attachments.remove(0).destroy();
+		}
+		PlayArea.displayedCards.remove(this);
+		if(isDynasty())
+		{
+			PlayArea.dynastyDiscard.add(this);
+		}
+		else
+		{
+			PlayArea.fateDiscard.add(this);
+		}
 	}
 
 	public void updateAttachmentLocations()
@@ -117,7 +133,7 @@ class PlayableCard
 		g.fillRect(10, 10, 286, 408);
 		//TODO: Handle long names well
 		//TODO: Consider using templates that are type appropriate
-		String name = Main.database.get(id).getName();
+		String name = Main.databaseID.get(id).getName();
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
 	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
@@ -130,15 +146,5 @@ class PlayableCard
 	public void setImage(BufferedImage cardImage)
 	{
 		this.cardImage = cardImage;
-	}
-	
-	public boolean isDynasty()
-	{
-		return isDynasty;
-	}
-	
-	public boolean isFate()
-	{
-		return !isDynasty;
 	}
 }

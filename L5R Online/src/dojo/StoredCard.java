@@ -7,10 +7,10 @@ package dojo;
 import java.util.ArrayList;
 import java.io.File;
 
-class StoredCard
+class StoredCard extends Card
 {
 	//Info
-	private String id, type;
+	private String type;
 	private String name;
 	private ArrayList<String> imageLocation, imageEdition;
 	private ArrayList<String> legal, clan;
@@ -20,19 +20,30 @@ class StoredCard
 
 	public StoredCard(String id)
 	{
-		this.id = id;
+		super(id);
 		imageLocation = new ArrayList<String>();
 		imageEdition = new ArrayList<String>();
 		legal = new ArrayList<String>();
 		clan = new ArrayList<String>();
-		//Avoid null values in the text field (it doesn't have to be set)
+		//Avoid null values in the text field (it isn't guaranteed present in cards.xml)
 		text = "";
-		//Wait for the card to be filled with info from the parser
 	}
 
 	public void setType(String type)
 	{
 		this.type = type;
+		
+		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
+		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
+		   type.equals("rings")     || type.equals("senseis")   || type.equals("winds"))
+		{
+			isDynasty = false;
+		}
+		else
+		{
+			// True for: events, regions, holdings, personalities, strongholds
+			isDynasty = true;
+		}
 	}
 
 	public void setName(String name)
@@ -42,15 +53,15 @@ class StoredCard
 
 	public void setImageLocation(String imageLocation)
 	{
-		//Always add it at the beginning of the list
-		//MRP will be the last card and we want that to be the default return
+		//Always add it at the end of the list
+		//MRP will be the last card and we want that in the first position
 		this.imageLocation.add(imageLocation);
 	}
 
 	public void setImageEdition(String imageEdition)
 	{
-		//Always add it at the beginning of the list
-		//MRP will be the last card and we want that to be the default return
+		//Always add it at the end of the list
+		//MRP will be the last card and we want that in the first position
 		this.imageEdition.add(imageEdition);
 	}
 
@@ -117,11 +128,6 @@ class StoredCard
 	public void setHonorReq(String honorReq)
 	{
 		this.honorReq = honorReq;
-	}
-
-	public String getID()
-	{
-		return id;
 	}
 
 	public String getType()
@@ -226,6 +232,7 @@ class StoredCard
 	{
 		return name;
 	}
+	
 	public ArrayList<String> getLegal()
 	{
 		return legal;

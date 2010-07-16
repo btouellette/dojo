@@ -13,14 +13,7 @@ class ButtonListener implements ActionListener
 		String name = ((AbstractButton)e.getSource()).getText();
 		if(name.equals("Unbow All"))
 		{
-			if(Main.gender.equals("Male"))
-			{
-				TextActionListener.send(Main.userName + " unbows all his cards.", "Action");
-			}
-			else
-			{
-				TextActionListener.send(Main.userName + " unbows all her cards.", "Action");
-			}
+			TextActionListener.send(Main.userName + " unbows all " + Main.gender + " cards.", "Action");
 		}
 		else if(name.equals("End Turn"))
 		{
