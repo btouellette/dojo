@@ -26,9 +26,9 @@ class MenuListener implements ActionListener
 			final JFileChooser fc = new JFileChooser("decks");
 			int returnVal = fc.showOpenDialog(Main.frame);
 
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            File file = fc.getSelectedFile();
-	            try {
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				try {
 					BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
 					
 					Deck dynasty = new Deck();
