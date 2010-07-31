@@ -4,16 +4,25 @@ package dojo;
 // Part of Dojo
 // This is the beefy part of the program. It controls the display for the game.
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import java.util.*;
-import java.util.zip.*;
-import java.io.*;
-import java.net.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import javax.swing.AbstractButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 //TODO: Split logic and display into separate classes (potentially menu stuff too)
 class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
@@ -41,15 +50,16 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	// Context (right-click) menus
 	private JPopupMenu popupCard, popupAttachment, popupProv, popupDeck, popupDiscard;
 	// Provinces (left to right from 0->max)
-	private ArrayList<Province> provinces;
+	private List<Province> provinces;
 	//TODO: Support Ratling/Spirit or other starting sizes
 	// Number of provinces
 	private int yourNumProv = 4;
 	private int oppNumProv = 4;
 	
-	static Deck dynastyDeck, fateDeck, dynastyDiscard, fateDiscard;
+	static Deck dynastyDeck, fateDeck;
+	static Discard dynastyDiscard, fateDiscard;
 	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
-	static ArrayList<PlayableCard> displayedCards;
+	static List<PlayableCard> displayedCards;
 	// Current size of a single card
 	static int cardWidth, cardHeight;
 	// Reference height (height that the card is initially)
@@ -71,6 +81,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		displayedCards = new ArrayList<PlayableCard>(30);
 
 		//TODO: Remove these lines once testing is done
+		//Takuji
 		displayedCards.add(0, new PlayableCard("CoB009"));;
 		PlayableCard test = new PlayableCard("CoB069");
 		displayedCards.get(0).attach(test);
@@ -117,10 +128,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		popupDiscard.add(menuItem);
 		
 		// Create decks, discards, and provinces
-		dynastyDeck = new Deck();
-		fateDeck = new Deck();
-		dynastyDiscard = new Deck();
-		fateDiscard = new Deck();
+		dynastyDeck = new Deck(true);
+		fateDeck = new Deck(false);
+		dynastyDiscard = new Discard();
+		fateDiscard = new Discard();
 		
 		provinces = new ArrayList<Province>(4);
 		provinces.add(new Province());
@@ -212,134 +223,43 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		// Now that we've drawn all the play surface draw all the cards
 		ListIterator<PlayableCard> iterator = displayedCards.listIterator();
-		while (iterator.hasNext())
+		while(iterator.hasNext())
 		{
 			PlayableCard element = iterator.next();
 			displayCard(element, (Graphics2D)g);
+		}
+		
+		BufferedImage currentImage = dynastyDeck.getImage();
+		if(currentImage != null)
+		{
+			g.drawImage(currentImage, cardWidth+10, height - (cardHeight+4), cardWidth, cardHeight, null);
+		}
+		currentImage = dynastyDiscard.getImage();
+		if(currentImage != null)
+		{
+			g.drawImage(currentImage, 5, height - (cardHeight+4), cardWidth, cardHeight, null);
+		}
+		currentImage = fateDeck.getImage();
+		if(currentImage != null)
+		{
+			g.drawImage(currentImage, startHand - 2*(cardWidth+5), height - (cardHeight+4), cardWidth, cardHeight, null);
+		}
+		currentImage = fateDiscard.getImage();
+		if(currentImage != null)
+		{
+			g.drawImage(currentImage, startHand - (cardWidth+4), height - (cardHeight+4), cardWidth, cardHeight, null);
 		}
 	}
 
 	private void displayCard(PlayableCard card, Graphics2D g)
 	{
 		// Display all the attachments first. This will draw the top attachment first and at the farthest back
-		ArrayList<PlayableCard> attachments = card.getAttachments();
+		List<PlayableCard> attachments = card.getAttachments();
 		for(int i = attachments.size()-1; i >= 0; i--)
 		{
 			displayCard(attachments.get(i), g);
 		}
 
-		// Load in the image from the class, the file, or kamisasori.net
-		BufferedImage displayImage = card.getImage();
-		// If we have't loaded in an image for this yet
-		if(displayImage == null)
-		{
-			// Go to the database to find out where the image should be located
-			StoredCard databaseCard = Main.databaseID.get(card.getID());
-			String imageLocation = databaseCard.getImageLocation();
-			// If there wasn't a valid file in the file system
-			if(imageLocation == null)
-			{
-				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
-				// Get image pack off kamisasori.net
-				//TODO: Allow preference option to disable automatic download
-				//TODO: Fail once don't try again
-				try {
-					// Download image pack as zip via http
-					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
-					url.openConnection();
-					InputStream is = url.openStream();
-					FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
-					for (int c = is.read(); c != -1; c = is.read())
-					{
-						fos.write(c);
-					}
-					is.close();
-					fos.close();
-					System.err.println("success!");
-
-					// Unzip image pack
-					FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
-					ZipInputStream zis = new ZipInputStream(fis);
-					ZipEntry ze;
-					while((ze = zis.getNextEntry()) != null)
-					{
-						System.out.print("** Unzipping " + ze.getName() + ": ");
-						// Make any directories as needed before unzipping
-						File f = new File("images/cards/" + databaseCard.getImageEdition());
-						f.mkdirs();
-						fos = new FileOutputStream("images/cards/" + ze.getName());
-						for (int c = zis.read(); c != -1; c = zis.read())
-						{
-							fos.write(c);
-						}
-						zis.closeEntry();
-						fos.close();
-						System.out.println("success!");
-					}
-					zis.close();
-
-					// Delete leftover zip file
-					System.out.print("** Deleting zip file after extraction: ");
-					File f = new File("tmp-imagepack.zip");
-					f.delete();
-					System.out.println("success!");
-					// Successfully got the files so we should have a valid imageLocation now
-					imageLocation = databaseCard.getImageLocation();
-				} catch (Throwable t) {
-					System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
-					File f = new File("tmp-imagepack.zip");
-					if(f.exists())
-					{
-						f.delete();
-					}
-					card.createImage();
-				}
-			}
-			// We should either have loaded in a valid image or have generated a placeholder one
-			//TODO: Check to see if there are performance increases that can be done here
-			try
-			{
-				// We read in and resize the image once, after that it is stored in PlayableCard
-				// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
-				BufferedImage tempImage;
-				if(imageLocation != null)
-				{
-					tempImage = ImageIO.read(new File(imageLocation));
-				}
-				else
-				{
-					tempImage = card.getImage();
-				}
-				BufferedImage cardImage = new BufferedImage(cardWidth, cardHeight, tempImage.getType());
-				Graphics2D g2 = cardImage.createGraphics();
-
-				// If downsizing image
-				if(cardImage.getHeight() >= cardHeight)
-				{
-					// Using the old .getScaledInsteance instead of the helper method as it produces much better results. If speed becomes an issue
-					// then they can be swapped.
-					//Image cardImage2 = getScaledInstance(cardImage, cardWidth, cardHeight, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-					Image cardImage2 = tempImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING);
-					//AffineTransform transform = new AffineTransform();
-					//transform.setToTranslation(location[0], location[1]);
-
-					g2.drawImage(cardImage2, 0, 0, null);
-					g2.dispose();
-				}
-				// If enlarging image
-				else
-				{
-					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-					//supposedly better quality, slower
-					//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-					//g2.drawImage(cardImage, location[0], location[1], cardWidth, cardHeight, null);
-					//g2.dispose();
-				}
-				card.setImage(cardImage);
-			} catch(IOException io) {
-				System.err.println(io);
-			}
-		}
 		int[] location = card.getLocation();
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
@@ -457,7 +377,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		{
 			clickedCard = displayedCards.get(index);
 			int[] cardLocation = clickedCard.getLocation();	
-			ArrayList<PlayableCard> attachments = clickedCard.getAllAttachments();
+			List<PlayableCard> attachments = clickedCard.getAllAttachments();
 			int numAttachments = attachments.size();
 
 			//TODO: Test with different chains of attached cards
@@ -465,7 +385,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			cardArea.setSize(cardWidth, cardHeight);			
 			attachmentArea.setLocation(cardLocation[0], cardLocation[1] - (int)(cardHeight*attachmentHeight*numAttachments));
 			attachmentArea.setSize(cardWidth, (int)(cardHeight*attachmentHeight*numAttachments));
-
+			
 			if(cardArea.contains(clickPoint))
 			{
 				cardClicked = true;
@@ -481,10 +401,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			{
 				cardClicked = true;
 				attachmentClicked = true;
-				distanceY = cardLocation[1] - (int)clickPoint.getY();
+				distanceX = (int)clickPoint.getX() - cardLocation[0];
+				distanceY = (int)clickPoint.getY() - cardLocation[1];
 				// double->int cast loses precision which means around boundaries clicks can be problematic
 				// Ensure we don't try to get an attachment outside our array range
-				int attachment = (int)(distanceY/(cardHeight*attachmentHeight));
+				int attachment = (int)(-distanceY/(cardHeight*attachmentHeight));
 				if(attachment > numAttachments -1)
 				{
 					clickedAttachment = attachments.get(numAttachments-1);
@@ -563,6 +484,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	{
 		String name = ((AbstractButton)e.getSource()).getText();
 		//TODO: Fill out rest of context menu and actions
+		/********** Province Menu Items **********/
 		if(name.equals("Destroy"))
 		{
 			provinces.get(numProvClicked).destroy();
@@ -581,6 +503,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			yourNumProv++;
 			repaint();
 		}
+		/********** Deck Menu Items **********/
 		else if(name.equals("Shuffle"))
 		{
 			if(dynastyClicked)
@@ -598,83 +521,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		{
 			//TODO: Add search interface
 		}
-	}
-
-	// A good fast high-quality image downscaling algorithm hasn't been implemented yet
-	// in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
-	// which rescales the image multiple times using the standard Bilinear interpolation.
-	// It was written by Chris Campbell and found here:
-	// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
-
-	/**
-	 * Convenience method that returns a scaled instance of the
-	 * provided {@code BufferedImage}.
-	 *
-	 * @param img the original image to be scaled
-	 * @param targetWidth the desired width of the scaled instance,
-	 *    in pixels
-	 * @param targetHeight the desired height of the scaled instance,
-	 *    in pixels
-	 * @param hint one of the rendering hints that corresponds to
-	 *    {@code RenderingHints.KEY_INTERPOLATION} (e.g.
-	 *    {@code RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR},
-	 *    {@code RenderingHints.VALUE_INTERPOLATION_BILINEAR},
-	 *    {@code RenderingHints.VALUE_INTERPOLATION_BICUBIC})
-	 * @param higherQuality if true, this method will use a multi-step
-	 *    scaling technique that provides higher quality than the usual
-	 *    one-step technique (only useful in downscaling cases, where
-	 *    {@code targetWidth} or {@code targetHeight} is
-	 *    smaller than the original dimensions, and generally only when
-	 *    the {@code BILINEAR} hint is specified)
-	 * @return a scaled version of the original {@code BufferedImage}
-	 */
-	/*public BufferedImage getScaledInstance(BufferedImage img,
-										   int targetWidth,
-										   int targetHeight,
-										   Object hint,
-										   boolean higherQuality)
-	{
-		int type = (img.getTransparency() == Transparency.OPAQUE) ?
-			BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-		BufferedImage ret = (BufferedImage)img;
-		int w, h;
-		if (higherQuality) {
-			// Use multi-step technique: start with original size, then
-			// scale down in multiple passes with drawImage()
-			// until the target size is reached
-			w = img.getWidth();
-			h = img.getHeight();
-		} else {
-			// Use one-step technique: scale directly from original
-			// size to target size with a single drawImage() call
-			w = targetWidth;
-			h = targetHeight;
+		/********** Card Menu Items **********/
+		else if(name.equals("Unattach"))
+		{
+			clickedCard.unattach(clickedAttachment);
 		}
-
-		do {
-			if (higherQuality && w > targetWidth) {
-				w /= 2;
-				if (w < targetWidth) {
-					w = targetWidth;
-				}
-			}
-
-			if (higherQuality && h > targetHeight) {
-				h /= 2;
-				if (h < targetHeight) {
-					h = targetHeight;
-				}
-			}
-
-			BufferedImage tmp = new BufferedImage(w, h, type);
-			Graphics2D g2 = tmp.createGraphics();
-			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
-			g2.drawImage(ret, 0, 0, w, h, null);
-			g2.dispose();
-
-			ret = tmp;
-		} while (w != targetWidth || h != targetHeight);
-
-		return ret;
-	}*/
+	}
 }
