@@ -31,8 +31,8 @@ class MenuListener implements ActionListener
 				try {
 					BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
 					
-					Deck dynasty = new Deck();
-					Deck fate = new Deck();
+					Deck dynasty = new Deck(true);
+					Deck fate = new Deck(false);
 					
 					String line;
 					while ((line = br.readLine()) != null)
@@ -74,7 +74,6 @@ class MenuListener implements ActionListener
 						}
 					}
 
-					System.out.println("FATE: " + fate.numCards() + "\nDYN: " + dynasty.numCards());
 					TextActionListener.send(Main.userName + " loads a new deck.", "Action");
 					fate.shuffle();
 					dynasty.shuffle();
