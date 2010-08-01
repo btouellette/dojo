@@ -30,13 +30,22 @@ class Deck
 	
 	public PlayableCard remove()
 	{
-		return new PlayableCard(cards.remove(0));
+		PlayableCard returnedCard = null;
+		if(!cards.isEmpty())
+		{
+			returnedCard = new PlayableCard(cards.remove(0));
+		}
+		return returnedCard;
 	}
 	
 	public PlayableCard remove(StoredCard card)
 	{
-		cards.remove(card);
-		return new PlayableCard(card);
+		PlayableCard returnedCard = null;
+		if(cards.remove(card))
+		{
+			returnedCard = new PlayableCard(card);
+		}
+		return returnedCard;
 	}
 	
 	public void removeAll()
