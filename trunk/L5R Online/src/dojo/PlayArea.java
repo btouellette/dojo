@@ -35,8 +35,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private int height, width;
 	// The last card that was clicked on depending on whether it was attached to anything or not
 	// If clickedAttachment != null then clickedCard is the base card of the unit
-	private PlayableCard clickedCard;
-	private PlayableCard clickedAttachment;
+	private PlayableCard clickedCard, clickedAttachment, attachingCard;
 	// Tests used for launching context menus correctly
 	private boolean cardClicked = false;
 	private boolean attachmentClicked = false;
@@ -80,16 +79,27 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Create a new ArrayList to hold the cards to display
 		displayedCards = new ArrayList<PlayableCard>(30);
 
-		//TODO: Remove these lines once testing is done
-		//Takuji
-		displayedCards.add(0, new PlayableCard("CoB009"));;
-		PlayableCard test = new PlayableCard("CoB069");
-		displayedCards.get(0).attach(test);
-		displayedCards.get(0).attach(new PlayableCard("DJH047"));
-		test.attach(new PlayableCard("IE096"));
-		test.attach(new PlayableCard("TH142"));
-		test.attach(new PlayableCard("IE097"));
+		// Create decks, discards, and provinces
+		dynastyDeck = new Deck(true);
+		fateDeck = new Deck(false);
+		dynastyDiscard = new Discard();
+		fateDiscard = new Discard();
 		
+		provinces = new ArrayList<Province>(4);
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
+		
+		// Interaction is handled within the class
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		
+		createMenu();
+	}
+	
+	private void createMenu()
+	{
 		//TODO: Flesh out context menus		
 		popupCard = new JPopupMenu();
 		popupAttachment = new JPopupMenu();
@@ -126,22 +136,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		menuItem.addActionListener(this);
 		popupDeck.add(menuItem);
 		popupDiscard.add(menuItem);
-		
-		// Create decks, discards, and provinces
-		dynastyDeck = new Deck(true);
-		fateDeck = new Deck(false);
-		dynastyDiscard = new Discard();
-		fateDiscard = new Discard();
-		
-		provinces = new ArrayList<Province>(4);
-		provinces.add(new Province());
-		provinces.add(new Province());
-		provinces.add(new Province());
-		provinces.add(new Province());
-		
-		// Interaction is handled within the class
-		addMouseListener(this);
-		addMouseMotionListener(this);
 	}
 
 	// Override the default JComponent paint method
@@ -229,6 +223,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			displayCard(element, (Graphics2D)g);
 		}
 		
+		// Draw fate and dynasty decks and discards
 		BufferedImage currentImage = dynastyDeck.getImage();
 		if(currentImage != null)
 		{
@@ -237,7 +232,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		currentImage = dynastyDiscard.getImage();
 		if(currentImage != null)
 		{
-			g.drawImage(currentImage, 5, height - (cardHeight+4), cardWidth, cardHeight, null);
+			g.drawImage(currentImage, 4, height - (cardHeight+4), cardWidth, cardHeight, null);
 		}
 		currentImage = fateDeck.getImage();
 		if(currentImage != null)
@@ -370,11 +365,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		Rectangle attachmentArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 		
-		int index = 0;
+		int index = displayedCards.size();
 		// Search first to see if any cards displayed on the JPanel were clicked
-		//TODO: Test overlapping cards. Might need to reverse search through displayedCards
-		while(!cardClicked && index < displayedCards.size())
+		while(!cardClicked && index > 0)
 		{
+			index--;
 			clickedCard = displayedCards.get(index);
 			int[] cardLocation = clickedCard.getLocation();	
 			List<PlayableCard> attachments = clickedCard.getAllAttachments();
@@ -389,6 +384,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			if(cardArea.contains(clickPoint))
 			{
 				cardClicked = true;
+				displayedCards.remove(clickedCard);
+				displayedCards.add(clickedCard);
 				attachmentClicked = false;
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
@@ -400,6 +397,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			else if(attachmentArea.contains(clickPoint))
 			{
 				cardClicked = true;
+				displayedCards.remove(clickedCard);
+				displayedCards.add(clickedCard);
 				attachmentClicked = true;
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
@@ -419,9 +418,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					Main.cardBox.setCard(Main.databaseID.get(clickedAttachment.getID()));
 				}
 			}
-			else
+			if(attachingCard != null && attachingCard != clickedCard)
 			{
-				index++;
+				clickedCard.attach(attachingCard);
+				attachingCard = null;
 			}
 		}
 		if(e.isPopupTrigger())
@@ -478,6 +478,17 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseMoved(MouseEvent e)
 	{
+		if(displayedCards.isEmpty() && dynastyDeck.numCards() == 0)
+		{
+			//TODO: Remove these lines once testing is done
+			displayedCards.add(0, new PlayableCard("CoB009"));;
+			PlayableCard test = new PlayableCard("CoB069");
+			displayedCards.get(0).attach(test);
+			displayedCards.get(0).attach(new PlayableCard("DJH047"));
+			test.attach(new PlayableCard("IE096"));
+			test.attach(new PlayableCard("TH142"));
+			test.attach(new PlayableCard("IE097"));
+		}
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -525,6 +536,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		else if(name.equals("Unattach"))
 		{
 			clickedCard.unattach(clickedAttachment);
+		}
+		else if(name.equals("Attach"))
+		{
+			attachingCard = clickedCard;
 		}
 	}
 }

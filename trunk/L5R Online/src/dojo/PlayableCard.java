@@ -83,13 +83,33 @@ class PlayableCard extends Card
 	public void attach(PlayableCard attachingCard)
 	{
 		attachments.add(attachingCard);
+		PlayArea.displayedCards.remove(attachingCard);
+		updateAttachmentLocations();
+		Main.playArea.repaint();
 	}
 
-	public void unattach(PlayableCard unattachingCard)
+	public boolean unattach(PlayableCard unattachingCard)
 	{
-		//TODO: Make sure this works properly with multiple of the same card attached
-		attachments.remove(unattachingCard);
-		PlayArea.displayedCards.add(unattachingCard);
+		boolean removed = attachments.remove(unattachingCard);
+		int index = 0;
+		// Found attached to this card
+		if(removed)
+		{
+			// Move the card into its own unit, update locations, and repaint
+			int[] location = unattachingCard.getLocation();
+			unattachingCard.setLocation(location[0]+PlayArea.cardWidth, location[1]);
+			PlayArea.displayedCards.add(unattachingCard);
+		}
+		// We didn't find it attached to the base card in the unit.
+		// Recurse through attachments of attachments
+		while(!removed && index < attachments.size())
+		{
+			removed = attachments.get(index).unattach(unattachingCard);
+			index++;
+		}
+		updateAttachmentLocations();
+		Main.playArea.repaint();
+		return removed;
 	}
 	
 	public void destroy()
@@ -124,7 +144,6 @@ class PlayableCard extends Card
 		return attachments;
 	}
 
-	//TODO: Remove recursive attachments. Only allow attaching to a single base card
 	public List<PlayableCard> getAllAttachments()
 	{
 		List<PlayableCard> recursedAttachments = new ArrayList<PlayableCard>();
@@ -153,7 +172,7 @@ class PlayableCard extends Card
 				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
 				// Get image pack off kamisasori.net
 				//TODO: Allow preference option to disable automatic download
-				//TODO: Fail once don't try again
+				//TODO: Fail once don't try again (save in config)
 				try {
 					// Download image pack as zip via http
 					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
@@ -246,7 +265,7 @@ class PlayableCard extends Card
 		return cardImage;
 
 		// A good fast high-quality image downscaling algorithm hasn't been implemented yet
-		// in Graphics2D. This is a helper method to avoid using the old .getScaledInstance
+		// in Graphics2D. There is a helper method to avoid using the old .getScaledInstance
 		// which rescales the image multiple times using the standard Bilinear interpolation.
 		// It was written by Chris Campbell and found here:
 		// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
