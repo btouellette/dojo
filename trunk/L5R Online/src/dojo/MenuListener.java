@@ -1,7 +1,6 @@
 package dojo;
 // MenuListener.java
 // Written by Brian Ouellette
-// Part of Dojo
 // Listener for all the menus at the top of the panel.
 
 import java.awt.event.*;
@@ -22,7 +21,7 @@ class MenuListener implements ActionListener
 		//TODO: Set so it filters out .l5d and .dck files
 		else if(name.equals("Load Deck"))
 		{
-			//TODO: This should be in another class or at least its own method
+			//TODO: This should be in another class or at the very least its own method
 			final JFileChooser fc = new JFileChooser("decks");
 			int returnVal = fc.showOpenDialog(Main.frame);
 

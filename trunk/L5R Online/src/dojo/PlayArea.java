@@ -1,7 +1,6 @@
 package dojo;
 // PlayArea.java
 // Written by Brian Ouellette
-// Part of Dojo
 // This is the beefy part of the program. It controls the display for the game.
 
 import java.awt.Color;

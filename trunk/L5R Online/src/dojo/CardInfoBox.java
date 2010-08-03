@@ -1,7 +1,6 @@
 package dojo;
 // CardInfoBox.java
 // Written by Brian Ouellette
-// Part of Dojo
 // Box for showing the current selected cards information.
 
 //TODO: Add a JPopUpMenu for detaching the panel

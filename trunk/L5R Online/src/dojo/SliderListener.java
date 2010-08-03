@@ -1,12 +1,14 @@
 package dojo;
 // SliderListener.java
 // Written by Brian Ouellette
-// Part of Dojo
 // This is the listener for the JSlider that controls the card size. It makes the cards bigger or smaller.
 
+import java.util.List;
+import java.util.ListIterator;
 import javax.swing.JSlider;
-import javax.swing.event.*;
-import java.util.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 
 class SliderListener implements ChangeListener
 {

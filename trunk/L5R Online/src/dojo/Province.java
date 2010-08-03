@@ -1,31 +1,20 @@
 package dojo;
+// Province.java
+// Written by Brian Ouellette
+// Used for representing your provinces
+
 import java.util.ArrayList;
 
-class Province
+class Province extends CardHolder
 {
 	private ArrayList<PlayableCard> attachments;
-	private PlayableCard card;
 	
 	public Province()
 	{
+		super(1);
 		attachments = new ArrayList<PlayableCard>();
 	}
-	
-	public void setCard(PlayableCard card)
-	{
-		this.card = card;
-	}
-	
-	public void setCard(StoredCard card)
-	{
-		this.card = new PlayableCard(card);
-	}
-	
-	public PlayableCard getCard()
-	{
-		return card;
-	}
-	
+		
 	public ArrayList<PlayableCard> getAttachments()
 	{
 		return attachments;
@@ -33,6 +22,13 @@ class Province
 	
 	public void destroy()
 	{
-		//TODO: Discard attachments/contents
+		while(!attachments.isEmpty())
+		{
+			attachments.remove(0).destroy();
+		}
+		while(!cards.isEmpty())
+		{
+			cards.remove(0).destroy();
+		}
 	}
 }

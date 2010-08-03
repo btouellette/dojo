@@ -1,7 +1,6 @@
 package dojo;
 // SearchListener.java
 // Written by James Spencer
-// Part of Dojo
 
 import java.awt.event.*;
 import javax.swing.*;

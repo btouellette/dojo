@@ -1,8 +1,9 @@
 package dojo;
 // StoredCard.java
 // Written by Brian Ouellette
-// Part of Dojo
 // Format in which cards are stored in the database after being read in from XML.
+// Only to be used in database interactions.
+// Use PlayableCard for anything outside the database to keep object size down.
 
 import java.util.ArrayList;
 import java.io.File;

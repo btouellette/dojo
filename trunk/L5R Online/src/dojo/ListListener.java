@@ -1,7 +1,6 @@
 package dojo;
 // ListListener.java
 // Written by James Spencer
-// Part of Dojo
 
 import javax.swing.event.*;
 
