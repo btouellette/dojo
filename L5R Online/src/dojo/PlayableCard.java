@@ -1,7 +1,7 @@
 package dojo;
 // PlayableCard.java
 // Written by Brian Ouellette
-// Part of Dojo
+// Represents any card which might be on the field at some point
 
 import java.awt.Color;
 import java.awt.Font;
@@ -114,11 +114,14 @@ class PlayableCard extends Card
 	
 	public void destroy()
 	{
+		// Destroy all our attachments firsts
 		while(!attachments.isEmpty())
 		{
 			attachments.remove(0).destroy();
 		}
+		// Make sure we aren't being displayed on the field anymore
 		PlayArea.displayedCards.remove(this);
+		// And put in appropriate discard
 		if(isDynasty())
 		{
 			PlayArea.dynastyDiscard.add(this);
@@ -131,6 +134,7 @@ class PlayableCard extends Card
 
 	public void updateAttachmentLocations()
 	{
+		// Set all attachment locations to move upwards a fixed percent of cardHeight per attachment
 		List<PlayableCard> allAttachments = getAllAttachments();
 		for(int i = 0; i < allAttachments.size(); i++)
 		{
@@ -144,12 +148,15 @@ class PlayableCard extends Card
 		return attachments;
 	}
 
+	// Return a complete list of attachments, including attachments of attachments and so on
 	public List<PlayableCard> getAllAttachments()
 	{
 		List<PlayableCard> recursedAttachments = new ArrayList<PlayableCard>();
 		for(int i = 0; i < attachments.size(); i++)
 		{
+			// Put all the current attachments in the list
 			recursedAttachments.add(attachments.get(i));
+			// And all the attachments attachments
 			recursedAttachments.addAll(attachments.get(i).getAllAttachments());
 		}
 		return recursedAttachments;

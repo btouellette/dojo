@@ -1,7 +1,6 @@
 package dojo;
 // Main.java
 // Written by Brian Ouellette
-// Part of Dojo
 // Launcher program. Sets up the GUI and sets everything up.
 
 import java.awt.*;

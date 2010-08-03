@@ -1,4 +1,8 @@
 package dojo;
+// Deckbuilder.java
+// Written by James Spencer
+// Deck building interface and logic
+
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;

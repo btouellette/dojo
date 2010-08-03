@@ -1,4 +1,7 @@
 package dojo;
+// Card.java
+// Written by Brian Ouellette
+// Base class for PlayableCard and StoredCard's commonalities
 
 public abstract class Card
 {

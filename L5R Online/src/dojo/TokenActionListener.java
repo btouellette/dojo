@@ -1,12 +1,16 @@
 package dojo;
 // TokenActionListener.java
 // Written by Brian Ouellette
-// Part of Dojo
 // This is the Action and Mouse Listener for the JComboBox that creates tokens
 // It takes input, stores previous token names, and generates tokens.
 
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 class TokenActionListener implements ActionListener, MouseListener
 {

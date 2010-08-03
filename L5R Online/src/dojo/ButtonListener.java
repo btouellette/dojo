@@ -1,7 +1,7 @@
 package dojo;
 // ButtonListener.java
 // Written by Brian Ouellette
-// Part of Dojo
+// Listener for all GUI buttons on the main interface
 
 import java.awt.event.*;
 import javax.swing.*;

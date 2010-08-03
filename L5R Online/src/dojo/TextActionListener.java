@@ -1,13 +1,17 @@
 package dojo;
 // TextActionListener.java
 // Written by Brian Ouellette
-// Part of Dojo
 // This is the ActionListener that controls the chat panel. It formats the text and sends out commands.
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 class TextActionListener implements ActionListener
 {

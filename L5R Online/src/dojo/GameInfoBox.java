@@ -1,13 +1,13 @@
 package dojo;
 // GameInfoBox.java
 // Written by Brian Ouellette
-// Part of Dojo
 // Box for displaying information on the game state.
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+//TODO: This sucks. Needs to be better.
 class GameInfoBox extends JPanel implements ActionListener
 {
 	private static final long serialVersionUID = 1L;
