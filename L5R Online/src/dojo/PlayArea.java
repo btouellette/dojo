@@ -49,9 +49,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private JPopupMenu popupCard, popupAttachment, popupProv, popupDeck, popupDiscard;
 	// Provinces (left to right from 0->max)
 	private List<Province> provinces;
-	//TODO: Support Ratling/Spirit or other starting sizes
 	// Number of provinces
-	private int yourNumProv = 4;
 	private int oppNumProv = 4;
 	
 	static Deck dynastyDeck, fateDeck;
@@ -83,7 +81,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		fateDeck = new Deck(false);
 		dynastyDiscard = new Discard();
 		fateDiscard = new Discard();
-		
+
+		//TODO: Support Ratling/Spirit or other starting sizes
 		provinces = new ArrayList<Province>(4);
 		provinces.add(new Province());
 		provinces.add(new Province());
@@ -195,6 +194,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Create your provinces
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		int yourNumProv = provinces.size();
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
@@ -311,6 +311,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Check to see if click was inside one of your provinces
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		int yourNumProv = provinces.size();
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
@@ -498,19 +499,16 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		if(name.equals("Destroy"))
 		{
 			provinces.get(numProvClicked).destroy();
-			yourNumProv--;
 			repaint();
 		}
 		else if(name.equals("Add Province On Left"))
 		{
 			provinces.add(numProvClicked, new Province());
-			yourNumProv++;
 			repaint();
 		}
 		else if(name.equals("Add Province On Right"))
 		{
 			provinces.add(numProvClicked+1, new Province());
-			yourNumProv++;
 			repaint();
 		}
 		/********** Deck Menu Items **********/
