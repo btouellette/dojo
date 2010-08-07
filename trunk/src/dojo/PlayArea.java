@@ -485,9 +485,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			PlayableCard test = new PlayableCard("CoB069");
 			displayedCards.get(0).attach(test);
 			displayedCards.get(0).attach(new PlayableCard("DJH047"));
-			test.attach(new PlayableCard("IE096"));
+			test.attach(new PlayableCard("IE094"));
 			test.attach(new PlayableCard("TH142"));
-			test.attach(new PlayableCard("IE097"));
+			test.attach(new PlayableCard("IE095"));
 		}
 	}
 
