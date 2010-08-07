@@ -255,6 +255,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 
 		int[] location = card.getLocation();
+		if(location[0] > getWidth() - 10)
+		{
+			location[0] = getWidth() - 10;
+		}
+		else if(location[0] < 10 - cardWidth)
+		{
+			location[0] = 10 - cardWidth;
+		}
+		if(location[1] > getHeight() - 10)
+		{
+			location[1] = getHeight() - 10;
+		}
+		else if(location[1] < 10 - cardHeight)
+		{
+			location[1] = 10 - cardHeight;
+		}
 		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
 	}
 	
