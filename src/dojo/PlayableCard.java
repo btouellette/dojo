@@ -27,6 +27,7 @@ class PlayableCard extends Card
 {
 	private String type;
 	private List<PlayableCard> attachments;
+	//TODO: This shouldn't be in every card. Need to move elsewhere
 	private Set<String> downloadedEditions;
 	private int[] location;
 	private BufferedImage cardImage;
@@ -243,6 +244,10 @@ class PlayableCard extends Card
 				{
 					tempImage = ImageIO.read(new File(imageLocation));
 				}
+				else if(cardImage == null)
+				{
+					tempImage = createImage();
+				}
 				else
 				{
 					tempImage = cardImage;
@@ -261,7 +266,7 @@ class PlayableCard extends Card
 				else
 				{
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-					g.drawImage(cardImage, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
+					g.drawImage(tempImage, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
 					g.dispose();
 				}
 				cardImage = newImage;
