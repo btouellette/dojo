@@ -23,7 +23,6 @@ class Main
 	static CardInfoBox cardBox;
 	static PlayArea playArea;
 	static Deckbuilder deckBuilder;
-	static String userName, gender;
 	static boolean highRes;
 	static JFrame frame;
 
@@ -38,19 +37,7 @@ class Main
 		frame = new JFrame("Dojo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// Set up defaults if pref file is unavailable
-
-		// Grab the screen resolution
-		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		
-		// If there is a stored preference file then use those numbers
-		int width = 1400;
-		int height = 700;
-
-		// Default username
-		//TODO: Get this info from a pop-up if no config found
-		userName = "Tatsura";
-		gender = "his";
+		Preferences.importPreferences();
 
 		// Create the play area
 		playArea = createPlayArea(width, height);
@@ -265,7 +252,7 @@ class Main
 	private static void importDatabase()
 	{
 		// Initialize the SAX event handler
-		Importer handler = new Importer();
+		XMLImporter handler = new XMLImporter();
 
 		// Use the default (non-validating) parser
 		SAXParserFactory factory = SAXParserFactory.newInstance();

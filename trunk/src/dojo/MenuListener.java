@@ -21,70 +21,11 @@ class MenuListener implements ActionListener
 		//TODO: Set so it filters out .l5d and .dck files
 		else if(name.equals("Load Deck"))
 		{
-			//TODO: This should be in another class or at the very least its own method
 			final JFileChooser fc = new JFileChooser("decks");
 			int returnVal = fc.showOpenDialog(Main.frame);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
-				try {
-					BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
-					
-					Deck dynasty = new Deck(true);
-					Deck fate = new Deck(false);
-					
-					String line;
-					while ((line = br.readLine()) != null)
-					{
-						if(!line.isEmpty() && line.charAt(0) != '#')
-						{
-							int count = 0;
-							int num = 0;
-							while(Character.isDigit(line.charAt(count)))
-							{
-								num *= 10;
-								num += Character.getNumericValue(line.charAt(count));;
-								count++;
-							}
-							String cardName = line.substring(count+1);
-							StoredCard currentCard = Main.databaseName.get(cardName);
-							String type = currentCard.getType();
-							if(type.equals("winds") || type.equals("strongholds"))
-							{
-								//TODO: Set location appropriately
-								PlayArea.displayedCards.add(new PlayableCard(currentCard));
-								//TODO: Decide whether to handle multiple strongholds/winds in a deck specially or not
-								//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction), attach wind to stronghold in this same check
-							}
-							else if(currentCard.isDynasty())
-							{
-								for(int i = 0; i < num; i++)
-								{
-									dynasty.add(currentCard);
-								}
-							}
-							else
-							{
-								for(int i = 0; i < num; i++)
-								{
-									fate.add(currentCard);
-								}
-							}
-						}
-					}
-
-					TextActionListener.send(Main.userName + " loads a new deck.", "Action");
-					fate.shuffle();
-					dynasty.shuffle();
-					
-					Main.playArea.clearArea(dynasty, fate);
-				} catch (FileNotFoundException err) {
-					TextActionListener.send("Deck not found.\n", "Error");
-					err.printStackTrace();
-				} catch (IOException err) {
-					TextActionListener.send("Failed to read in deck.\n", "Error");
-					err.printStackTrace();
-				}
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				DeckImporter.importDeck(fc.getSelectedFile());
 	        }
 		}
 		else if(name.equals("Start Game"))
