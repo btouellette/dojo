@@ -1,5 +1,5 @@
 package dojo;
-// Importer.java
+// XMLImporter.java
 // Written by Brian Ouellette
 // Imports the database from the XML and stores it in a HashMap.
 
@@ -7,7 +7,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import java.util.HashMap;
 
-class Importer extends DefaultHandler
+class XMLImporter extends DefaultHandler
 {
 	//private Writer out;
 	//private String version;
@@ -16,7 +16,7 @@ class Importer extends DefaultHandler
 	private HashMap<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
-	public Importer()
+	public XMLImporter()
 	{
 		super();
 		/*try

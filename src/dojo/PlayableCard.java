@@ -17,8 +17,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
@@ -27,8 +25,6 @@ class PlayableCard extends Card
 {
 	private String type;
 	private List<PlayableCard> attachments;
-	//TODO: This shouldn't be in every card. Need to move elsewhere
-	private Set<String> downloadedEditions;
 	private int[] location;
 	private BufferedImage cardImage;
 
@@ -40,7 +36,6 @@ class PlayableCard extends Card
 		location[0] = 0;
 		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
-		downloadedEditions = new HashSet<String>();
 
 		type = Main.databaseID.get(id).getType();
 		
@@ -174,9 +169,9 @@ class PlayableCard extends Card
 			String imageLocation = databaseCard.getImageLocation();
 			String imageEdition = databaseCard.getImageEdition();
 			// If there wasn't a valid file in the file system
-			if(imageLocation == null && !downloadedEditions.contains(imageEdition))
+			if(imageLocation == null && !Preferences.downloadedEditions.contains(imageEdition))
 			{
-				downloadedEditions.add(imageEdition);
+				Preferences.downloadedEditions.add(imageEdition);
 				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
 				// Get image pack off kamisasori.net
 				//TODO: Allow preference option to disable automatic download
