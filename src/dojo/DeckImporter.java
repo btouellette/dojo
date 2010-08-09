@@ -57,7 +57,7 @@ class DeckImporter
 				}
 			}
 			// Shuffle decks and load them into the play area
-			TextActionListener.send(Main.userName + " loads a new deck.", "Action");
+			TextActionListener.send(Preferences.userName + " loads a new deck.", "Action");
 			fate.shuffle();
 			dynasty.shuffle();
 		
@@ -70,18 +70,17 @@ class DeckImporter
 		List<String> cards = new ArrayList<String>(100);
 		String line;
 		// Iterate over the entire file
-		while ((line = br.readLine()) != null)
+		while((line = br.readLine()) != null)
 		{
 			// As long as the line isn't blank or commented out
 			if(!line.isEmpty() && line.charAt(0) != '#')
 			{
-				int count = 0;
-				int num = 0;
+				int count = 0, num = 0;
 				// First grab the number of cards
 				while(Character.isDigit(line.charAt(count)))
 				{
 					num *= 10;
-					num += Character.getNumericValue(line.charAt(count));;
+					num += Character.getNumericValue(line.charAt(count));
 					count++;
 				}
 				// Then the card itself

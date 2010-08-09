@@ -52,20 +52,20 @@ class MenuListener implements ActionListener
 			Random gen = new Random();
 			if(gen.nextBoolean())
 			{
-				TextActionListener.send(Main.userName + " flips a coin and it comes up heads.", "Action");
+				TextActionListener.send(Preferences.userName + " flips a coin and it comes up heads.", "Action");
 			}
 			else
 			{
-				TextActionListener.send(Main.userName + " flips a coin and it comes up tails.", "Action");
+				TextActionListener.send(Preferences.userName + " flips a coin and it comes up tails.", "Action");
 			}
 		}
 		else if(name.equals("Drop Random Fate Card"))
 		{
-			TextActionListener.send(Main.userName + " drops a random fate card.", "Action");
+			TextActionListener.send(Preferences.userName + " drops a random fate card.", "Action");
 		}
 		else if(name.equals("Reveal Hand"))
 		{
-			TextActionListener.send(Main.userName + " reveals " + Main.gender + " hand.", "Action");
+			TextActionListener.send(Preferences.userName + " reveals " + Preferences.gender + " hand.", "Action");
 		}
 		else if(name.equals("About Dojo"))
 		{

@@ -178,12 +178,12 @@ class GameInfoBox extends JPanel implements ActionListener
 		if(e.getActionCommand().equals("up"))
 		{
 			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) + 1));
-			TextActionListener.send(Main.userName + " increases honor to " + yHonor.getText() + "." , "Action");
+			TextActionListener.send(Preferences.userName + " increases honor to " + yHonor.getText() + "." , "Action");
 		}
 		else if(e.getActionCommand().equals("down"))
 		{
 			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) - 1));
-			TextActionListener.send(Main.userName + " decreases honor to " + yHonor.getText() + "." , "Action");
+			TextActionListener.send(Preferences.userName + " decreases honor to " + yHonor.getText() + "." , "Action");
 		}
 	}
 }
