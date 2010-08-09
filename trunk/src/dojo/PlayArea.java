@@ -47,13 +47,13 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private int numProvClicked;
 	// Context (right-click) menus
 	private JPopupMenu popupCard, popupAttachment, popupProv, popupDeck, popupDiscard;
-	// Provinces (left to right from 0->max)
-	private List<Province> provinces;
 	// Number of provinces
 	private int oppNumProv = 4;
 	
 	static Deck dynastyDeck, fateDeck;
 	static Discard dynastyDiscard, fateDiscard;
+	// Provinces (left to right from 0->max)
+	static List<Province> provinces;
 	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
 	static List<PlayableCard> displayedCards;
 	// Current size of a single card
@@ -191,17 +191,38 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		g.setColor(Color.BLACK);
 		g.fillRect(startHand-2, 0, 2, height);
 
-		// Create your provinces
+		// Create your provinces and draw the cards in them
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
 		int yourNumProv = provinces.size();
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
+		BufferedImage currentImage;
+		List<PlayableCard> attachments;
+		Province currentProvince;
+		int location[] = new int[2];
 		for(int i = 1; i < yourNumProv+1; i++)
 		{
+			// Location of the card in the province
+			location[0] = leftBorder + i*distanceBetween - cardWidth/2 + 4;
+			location[1] = height - (cardHeight+2); 
+			currentProvince = provinces.get(i-1);
+			// Draw province attachments
+			attachments = currentProvince.getAttachments();
+			for(int j = attachments.size() - 1; j >= 0; j--)
+			{
+				g.drawImage(attachments.get(j).getImage(), location[0], location[1] - (int)(cardHeight*attachmentHeight*(j+1)) - 4, cardWidth, cardHeight, null);
+			}
+			// Draw province outline
 			g.setColor(Color.BLACK);
-			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, height - (cardHeight+6), cardWidth+12, cardHeight+6);
+			g.fillRect(location[0] - 4, location[1] - 4, cardWidth+8, cardHeight+8);
 			g.setColor(Color.LIGHT_GRAY);
-			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+			g.fillRect(location[0] - 2, location[1] - 2, cardWidth+4, cardHeight+4);
+			// Draw cards in provinces
+			currentImage = currentProvince.getImage();
+			if(currentImage != null)
+			{
+				g.drawImage(currentImage, location[0], location[1], cardWidth, cardHeight, null);
+			}
 		}
 
 		// Create opponents provinces
@@ -223,7 +244,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		
 		// Draw fate and dynasty decks and discards
-		BufferedImage currentImage = dynastyDeck.getImage();
+		currentImage = dynastyDeck.getImage();
 		if(currentImage != null)
 		{
 			g.drawImage(currentImage, cardWidth+10, height - (cardHeight+4), cardWidth, cardHeight, null);
@@ -324,21 +345,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			deckClicked = true;
 		}
 		
-		// Check to see if click was inside one of your provinces
-		int leftBorder = 2*(cardWidth+8)-2;
-		int rightBorder = startHand - (2*(cardWidth+8)-2);
-		int yourNumProv = provinces.size();
-		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
-		for(int i = 1; i < yourNumProv+1; i++)
-		{
-			area = new Rectangle(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
-			if(area.contains(clickPoint))
-			{
-				provClicked = true;
-				numProvClicked = i;
-			}
-		}
-		
 		// Now launch the right menu at the click location
 		if(attachmentClicked)
 		{
@@ -434,11 +440,36 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					Main.cardBox.setCard(Main.databaseID.get(clickedAttachment.getID()));
 				}
 			}
-			if(attachingCard != null && attachingCard != clickedCard)
+		}
+		// Check to see if click was inside one of your provinces
+		int leftBorder = 2*(cardWidth+8)-2;
+		int startHand = width - (int)(cardWidth*1.5);
+		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		int yourNumProv = provinces.size();
+		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
+		Rectangle area;
+		for(int i = 1; i < yourNumProv+1; i++)
+		{
+			area = new Rectangle(leftBorder + i*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				provClicked = true;
+				numProvClicked = i-1;
+			}
+		}
+		if(attachingCard != null)
+		{
+			if(cardClicked && attachingCard != clickedCard)
 			{
 				clickedCard.attach(attachingCard);
-				attachingCard = null;
+				repaint();
 			}
+			else if(provClicked)
+			{
+				provinces.get(numProvClicked).attach(attachingCard);
+				repaint();
+			}
+			attachingCard = null;
 		}
 		if(e.isPopupTrigger())
 		{
@@ -448,6 +479,17 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseReleased(MouseEvent e)
 	{
+		// Check if card was dragged into a discard
+		if(cardClicked)
+		{
+			int[] location = clickedCard.getLocation();
+			int startHand = width - (int)(cardWidth*1.5);
+			if(location[1] == height - (cardHeight+4) && (location[0] == 4 || location[0] == startHand - (cardWidth+4)))
+			{
+				clickedCard.destroy();
+				repaint();
+			}
+		}
 		if(e.isPopupTrigger())
 		{
 			showPopup(e);
@@ -486,7 +528,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			{
 				newY = getHeight() - 10;
 			}
-
+			// Detect if dragged into dynasty discard
+			Rectangle area = new Rectangle(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				newX = 4;
+				newY = height - (cardHeight+4);
+			}
+			// Detect if dragged into fate discard
+			int startHand = width - (int)(cardWidth*1.5);
+			area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				newX = startHand - (cardWidth+4);
+				newY = height - (cardHeight+4);
+			}
+			
 			clickedCard.setLocation(newX, newY);
 			repaint();
 		}
@@ -533,12 +590,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			if(dynastyClicked)
 			{
 				dynastyDeck.shuffle();
-				TextActionListener.send(Main.userName + " shuffles " + Main.gender + " dynasty deck.", "Action");
+				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " dynasty deck.", "Action");
 			}
 			else if(fateClicked)
 			{
 				fateDeck.shuffle();
-				TextActionListener.send(Main.userName + " shuffles " + Main.gender + " fate deck.", "Action");
+				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " fate deck.", "Action");
 			}
 		}
 		else if(name.equals("Search"))

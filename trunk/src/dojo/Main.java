@@ -38,9 +38,14 @@ class Main
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Preferences.importPreferences();
+		int width = Preferences.width;
+		int height = Preferences.height;
 
 		// Create the play area
 		playArea = createPlayArea(width, height);
+
+		// Load in various images used in the program
+		StoredImages.loadImages();
 
 		// Create the info area (card box, chat box, game info box)
 		JSplitPane infoArea = createInfoArea(width, height);
@@ -138,6 +143,7 @@ class Main
 		//TODO: More intelligent max/min for the slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
 		sizeSlider.addChangeListener(new SliderListener());
+		sizeSlider.setValue(Preferences.sliderValue);
 		sizeSlider.setPreferredSize(new Dimension(100, 25));
 		sizeSlider.setMaximumSize(sizeSlider.getPreferredSize());
 		// Make it so the menu background color shows through behind the slider

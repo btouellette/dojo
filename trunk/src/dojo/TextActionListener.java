@@ -47,7 +47,7 @@ class TextActionListener implements ActionListener
 	{
 		JTextField textBox = (JTextField)e.getSource();
 		//Send the input text to the display
-		send(Main.userName + ": " + textBox.getText(), "You");
+		send(Preferences.userName + ": " + textBox.getText(), "You");
 		//Clear the text box
 		textBox.setText("");
 	}
