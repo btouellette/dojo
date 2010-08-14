@@ -17,44 +17,35 @@ class SliderListener implements ChangeListener
 		PlayArea.cardHeight = Preferences.sliderValue*PlayArea.baseCardHeight/50;
 		PlayArea.cardWidth = (int)(PlayArea.cardHeight*(2.5/3.5));
 
-		//TODO: This can be optimized much better. It does file i/o on every tick at the moment.
-		//      Potentially store unaltered image in PlayableCard when loading in and work from that.
-		//      Might need to work around RAM usage if doing so.
 		//TOOD: Update opponents cards too
-		// Remove images for every card in play
+		// Rescale images for all cards in units in play
 		ListIterator<PlayableCard> iterator = PlayArea.displayedCards.listIterator();
 		while(iterator.hasNext())
 		{
 			PlayableCard element = iterator.next();
-			element.setImage(null);
+			element.rescale();
 			element.updateAttachmentLocations();
 			List<PlayableCard> attachments = element.getAllAttachments();
 			for(int i = 0; i < attachments.size(); i++)
 			{
-				attachments.get(i).setImage(null);
+				attachments.get(i).rescale();
 			}
 		}
-		// Remove images from cards contained in provinces and province attachments
+		// Rescale images from cards contained in provinces and province attachments
 		Province currentProvince;
 		for(int i = 0; i < PlayArea.provinces.size(); i++)
 		{
 			currentProvince = PlayArea.provinces.get(i);
-			currentProvince.setImage(null);
+			currentProvince.rescale();
 			List<PlayableCard> attachments = currentProvince.getAttachments();
 			for(int j = 0; j < attachments.size(); j++)
 			{
-				attachments.get(j).setImage(null);
+				attachments.get(j).rescale();
 			}
 		}
-		// Remove images for all the decks/discards
-		PlayArea.dynastyDeck.setImage(null);
-		PlayArea.fateDeck.setImage(null);
-		PlayArea.dynastyDiscard.setImage(null);
-		PlayArea.fateDiscard.setImage(null);
 		// Reload images used in multiple places
-		StoredImages.loadImages();
+		StoredImages.rescale();
 		// Repaint the whole area
-		// This will force the reloading and resizing of all images
 		Main.playArea.repaint();
 	}
 }

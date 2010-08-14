@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +28,8 @@ class PlayableCard extends Card
 	private String type;
 	private List<PlayableCard> attachments;
 	private int[] location;
-	private BufferedImage cardImage;
+	private BufferedImage originalImage, cardImage, cardImageBowed;
+	private boolean faceUp, bowed;
 
 	public PlayableCard(String id)
 	{
@@ -36,7 +39,7 @@ class PlayableCard extends Card
 		location[0] = 0;
 		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
-
+		faceUp = false;
 		type = Main.databaseID.get(id).getType();
 		
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
@@ -55,6 +58,16 @@ class PlayableCard extends Card
 	public PlayableCard(StoredCard card)
 	{
 		this(card.getID());
+	}
+
+	public boolean isFaceUp()
+	{
+		return faceUp;
+	}
+
+	public void setFaceUp()
+	{
+		faceUp = true;
 	}
 
 	public void setLocation(int x, int y)
@@ -128,6 +141,19 @@ class PlayableCard extends Card
 		}
 	}
 
+	public void doubleClicked()
+	{
+		if(!faceUp)
+		{
+			faceUp = true;
+		}
+		else
+		{
+			bowed = !bowed;
+		}
+		Main.playArea.repaint();
+	}
+
 	public void updateAttachmentLocations()
 	{
 		// Set all attachment locations to move upwards a fixed percent of cardHeight per attachment
@@ -158,11 +184,32 @@ class PlayableCard extends Card
 		return recursedAttachments;
 	}
 
+	//TODO: Display bowed images
 	public BufferedImage getImage()
 	{
+		// If the card isn't faceup return the default back images
+		if(!faceUp)
+		{
+			if(isDynasty && !bowed)
+			{
+				return StoredImages.dynasty;
+			}
+			else if(isDynasty && bowed)
+			{
+				return StoredImages.dynastyBowed;
+			}
+			else if(!bowed)
+			{
+				return StoredImages.fate;
+			}
+			else
+			{
+				return StoredImages.fateBowed;
+			}
+		}
 		// Load in the image from the class, the file, or kamisasori.net
 		// If we have't loaded in an image for this yet
-		if(cardImage == null)
+		if(originalImage == null)
 		{
 			// Go to the database to find out where the image should be located
 			StoredCard databaseCard = Main.databaseID.get(id);
@@ -225,7 +272,6 @@ class PlayableCard extends Card
 					{
 						f.delete();
 					}
-					createImage();
 				}
 			}
 			// We should either have loaded in a valid image or have generated a placeholder one
@@ -234,50 +280,57 @@ class PlayableCard extends Card
 			{
 				// We read in and resize the image once, after that it is stored in PlayableCard
 				// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
-				BufferedImage tempImage;
 				if(imageLocation != null)
 				{
-					tempImage = ImageIO.read(new File(imageLocation));
-				}
-				else if(cardImage == null)
-				{
-					tempImage = createImage();
+					originalImage = ImageIO.read(new File(imageLocation));
 				}
 				else
 				{
-					tempImage = cardImage;
+					originalImage = createImage();
 				}
-				BufferedImage newImage = new BufferedImage(PlayArea.cardWidth, PlayArea.cardHeight, tempImage.getType());
-				Graphics2D g = newImage.createGraphics();
-
-				// If downsizing image
-				if(tempImage.getHeight() >= PlayArea.cardHeight)
-				{
-					Image cardImage2 = tempImage.getScaledInstance(PlayArea.cardWidth, PlayArea.cardHeight, Image.SCALE_AREA_AVERAGING);
-					g.drawImage(cardImage2, 0, 0, null);
-					g.dispose();
-				}
-				// If enlarging image
-				else
-				{
-					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-					g.drawImage(tempImage, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
-					g.dispose();
-				}
-				cardImage = newImage;
+				rescale();
 			} catch(IOException io) {
 				System.err.println(io);
 			}
 		}
+		if(bowed)
+		{
+			return cardImageBowed;
+		}
 		return cardImage;
-
-		// A good fast high-quality image downscaling algorithm hasn't been implemented yet
-		// in Graphics2D. There is a helper method to avoid using the old .getScaledInstance
-		// which rescales the image multiple times using the standard Bilinear interpolation.
-		// It was written by Chris Campbell and found here:
-		// http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
 	}
-	
+
+	public void rescale()
+	{
+		if(originalImage != null)
+		{
+			// Scale image
+			// AffineTransform looks horrible when downscaling high res images. Using getScaledInstance instead
+			cardImage = new BufferedImage(PlayArea.cardWidth, PlayArea.cardHeight, originalImage.getType());
+			Graphics2D g = cardImage.createGraphics();
+			// If downsizing image
+			if(originalImage.getHeight() >= PlayArea.cardHeight)
+			{
+				
+				g.drawImage(originalImage.getScaledInstance(PlayArea.cardWidth, PlayArea.cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
+				g.dispose();
+			}
+			// If enlarging image
+			else
+			{
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.drawImage(originalImage, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
+				g.dispose();
+			}
+
+			// Rotate it to get a bowed version
+			AffineTransform tx = AffineTransform.getTranslateInstance(0,-cardImage.getHeight());
+			tx.quadrantRotate(1, 0, cardImage.getHeight());
+			AffineTransformOp rotate = new AffineTransformOp(tx, null);
+			cardImageBowed = rotate.filter(cardImage, null);
+		}
+	}
+		
 	public BufferedImage createImage()
 	{
 		// 306x428 is size of high res images provided by Alderac
@@ -289,14 +342,13 @@ class PlayableCard extends Card
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(10, 10, 286, 408);
 		//TODO: Handle long names well
-		//TODO: Consider using templates that are type appropriate
+		//TODO: Use templates that are type appropriate (get F/C and display)
 		String name = Main.databaseID.get(id).getName();
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
 	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
 		g.setColor(Color.BLACK);  
 		g.drawString(name, x, 50);
-		cardImage = image;
 		return image;
 	}
 

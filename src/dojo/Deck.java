@@ -18,6 +18,37 @@ class Deck extends CardHolder
 		super();
 		this.isDynasty = isDynasty;
 	}
+
+	public void doubleClicked()
+	{
+		boolean refilled = false;
+		if(isDynasty)
+		{
+			// Go through all the provinces looking for any that are empty and refilling
+			for(int i = 0; i < PlayArea.provinces.size(); i++)
+			{
+				if(PlayArea.provinces.get(i).isEmpty())
+				{
+					PlayableCard card = remove();
+					if(card != null)
+					{
+						PlayArea.provinces.get(i).add(card);
+						refilled = true;
+					}
+				}
+			}
+		}
+		// If the deck is a fate deck or no province got refilled put a card on the table
+		if(!isDynasty || !refilled)
+		{
+			PlayableCard card = remove();
+			if(card != null)
+			{
+				PlayArea.displayedCards.add(card);
+				//TODO: Set location appropriately
+			}
+		}
+	}
 		
 	public BufferedImage getImage()
 	{

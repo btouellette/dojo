@@ -88,7 +88,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		provinces.add(new Province());
 		provinces.add(new Province());
 		provinces.add(new Province());
-		
+
 		// Interaction is handled within the class
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -210,7 +210,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			attachments = currentProvince.getAttachments();
 			for(int j = attachments.size() - 1; j >= 0; j--)
 			{
-				g.drawImage(attachments.get(j).getImage(), location[0], location[1] - (int)(cardHeight*attachmentHeight*(j+1)) - 4, cardWidth, cardHeight, null);
+				g.drawImage(attachments.get(j).getImage(), location[0], location[1] - (int)(cardHeight*attachmentHeight*(j+1)) - 4, null);
 			}
 			// Draw province outline
 			g.setColor(Color.BLACK);
@@ -221,7 +221,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			currentImage = currentProvince.getImage();
 			if(currentImage != null)
 			{
-				g.drawImage(currentImage, location[0], location[1], cardWidth, cardHeight, null);
+				g.drawImage(currentImage, location[0], location[1], null);
 			}
 		}
 
@@ -247,22 +247,22 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		currentImage = dynastyDeck.getImage();
 		if(currentImage != null)
 		{
-			g.drawImage(currentImage, cardWidth+10, height - (cardHeight+4), cardWidth, cardHeight, null);
+			g.drawImage(currentImage, cardWidth+10, height - (cardHeight+4), null);
 		}
 		currentImage = dynastyDiscard.getImage();
 		if(currentImage != null)
 		{
-			g.drawImage(currentImage, 4, height - (cardHeight+4), cardWidth, cardHeight, null);
+			g.drawImage(currentImage, 4, height - (cardHeight+4), null);
 		}
 		currentImage = fateDeck.getImage();
 		if(currentImage != null)
 		{
-			g.drawImage(currentImage, startHand - 2*(cardWidth+5), height - (cardHeight+4), cardWidth, cardHeight, null);
+			g.drawImage(currentImage, startHand - 2*(cardWidth+5), height - (cardHeight+4), null);
 		}
 		currentImage = fateDiscard.getImage();
 		if(currentImage != null)
 		{
-			g.drawImage(currentImage, startHand - (cardWidth+4), height - (cardHeight+4), cardWidth, cardHeight, null);
+			g.drawImage(currentImage, startHand - (cardWidth+4), height - (cardHeight+4), null);
 		}
 	}
 
@@ -292,7 +292,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		{
 			location[1] = 10 - cardHeight;
 		}
-		g.drawImage(card.getImage(), location[0], location[1], cardWidth, cardHeight, null);
+		g.drawImage(card.getImage(), location[0], location[1], null);
 	}
 	
 	//TODO: Resolve the public/static nonsense going on in this class
@@ -370,6 +370,48 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	
 	public void mouseClicked(MouseEvent e)
 	{
+		if(e.getClickCount() == 2)
+		{
+			if(deckClicked)
+			{
+				if(dynastyClicked)
+				{
+					dynastyDeck.doubleClicked();
+				}
+				else
+				{
+					fateDeck.doubleClicked();
+				}
+			}
+			else if(discardClicked)
+			{
+				if(dynastyClicked)
+				{
+					dynastyDiscard.doubleClicked();
+				}
+				else
+				{
+					fateDiscard.doubleClicked();
+				}
+			}
+			else if(attachmentClicked)
+			{
+				clickedAttachment.doubleClicked();
+			}
+			else if(cardClicked)
+			{
+				clickedCard.doubleClicked();
+			}
+			else if(provClicked)
+			{
+				provinces.get(numProvClicked).doubleClicked();
+			}
+		}
+		cardClicked = false;
+		attachmentClicked = false;
+		deckClicked = false;
+		provClicked = false;
+		discardClicked = false;
 	}
 
 	public void mouseEntered(MouseEvent e)
@@ -494,11 +536,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		{
 			showPopup(e);
 		}
-		cardClicked = false;
-		attachmentClicked = false;
-		deckClicked = false;
-		provClicked = false;
-		discardClicked = false;
 	}
 
 	public void mouseDragged(MouseEvent e)
