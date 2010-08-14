@@ -336,9 +336,15 @@ class Main
 
 	public static void main(String[] args)
 	{
-		//Read in cards.xml
+		// Read in cards.xml
 		importDatabase();
 
+		// Add shutdown hook for writing out preferences
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				Preferences.writePreferences();
+			}
+		});
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable()

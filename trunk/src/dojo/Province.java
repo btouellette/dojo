@@ -19,6 +19,24 @@ class Province extends CardHolder
 		super(1);
 		attachments = new ArrayList<PlayableCard>();
 	}
+
+	public void doubleClicked()
+	{
+		if(!cards.get(0).isFaceUp())
+		{
+			cards.get(0).setFaceUp();
+		}
+		else
+		{
+			PlayArea.displayedCards.add(remove());
+			//TODO: Set location appropriately
+		}
+	}
+
+	public boolean isEmpty()
+	{
+		return cards.isEmpty();
+	}
 		
 	public ArrayList<PlayableCard> getAttachments()
 	{
@@ -38,11 +56,15 @@ class Province extends CardHolder
 		{
 			return null;
 		}
-		if(faceUp)
+		return cards.get(0).getImage();
+	}
+
+	public void rescale()
+	{
+		for(int i = 0; i < cards.size(); i++)
 		{
-			return cards.get(0).getImage();
+			cards.get(i).rescale();
 		}
-		return StoredImages.dynasty;
 	}
 	
 	public void destroy()

@@ -32,34 +32,15 @@ class Preferences
 				{
 					if(line.startsWith("width "))
 					{
-						//TODO: Change this to a single substring/str2num call
-						int count = 6, num = 0;
-						while(Character.isDigit(line.charAt(count)))
-						{
-							num *=10;
-							num += Character.getNumericValue(line.charAt(count));
-						}
-						width = num;
+						width = Integer.parseInt(line.substring(6));
 					}
 					else if(line.startsWith("height "))
 					{
-						int count = 7, num = 0;
-						while(Character.isDigit(line.charAt(count)))
-						{
-							num *=10;
-							num += Character.getNumericValue(line.charAt(count));
-						}
-						height = num;
+						height = Integer.parseInt(line.substring(7));
 					}
 					else if(line.startsWith("sliderValue "))
 					{
-						int count = 12, num = 0;
-						while(Character.isDigit(line.charAt(count)))
-						{
-							num *=10;
-							num += Character.getNumericValue(line.charAt(count));
-						}
-						sliderValue = num;
+						sliderValue = Integer.parseInt(line.substring(12));
 					}
 					else if(line.startsWith("downloaded "))
 					{
@@ -73,10 +54,16 @@ class Preferences
 					{
 						gender = line.substring(7);
 					}
+					else
+					{
+						// Invalid line detected in config file
+						throw new IOException();
+					}
 				}
 			}
 		} catch(IOException e) {
 			System.err.println("** Couldn't find config file. Using defaults.");
+			defaultPreferences();
 		}
 	}
 
@@ -91,5 +78,9 @@ class Preferences
 		downloadedEditions.clear();
 		userName = "New Player";
 		gender = "his";
+	}
+	
+	public static void writePreferences()
+	{
 	}
 }
