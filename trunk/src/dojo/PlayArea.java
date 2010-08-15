@@ -98,7 +98,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		//TODO: Allow for custom backgrounds
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		background = new BufferedImage((int)screenSize.getWidth(), (int)screenSize.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		background = new BufferedImage((int)screenSize.getWidth(), (int)screenSize.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		redrawBackground();
 
 		// Interaction is handled within the class
@@ -156,45 +156,43 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// In case of resize we'll get the new height and width parameters
 		height = getHeight();
 		width = getWidth();
+		// if the parameters changed since last repaint update the preferences and recreate the background
 		if(height != Preferences.height || width != Preferences.width)
 		{
 			Preferences.height = height;
 			Preferences.width = width;
 			redrawBackground();
 		}
-
-		g.drawImage(background, 0, 0, null);
 		
-		// Create your provinces and draw the cards in them
-		int sizeHand = (int)(cardWidth*1.5);
-		int startHand = width - sizeHand;
-		int leftBorder = 2*(cardWidth+8)-2;
-		int rightBorder = startHand - (2*(cardWidth+8)-2);
-		int yourNumProv = provinces.size();
-		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
-		BufferedImage currentImage;
-		List<PlayableCard> attachments;
-		Province currentProvince;
-		int location[] = new int[2];
-		for(int i = 1; i < yourNumProv+1; i++)
+		// Draw province attachments before background so they show up behind provinces
+		for(Province currentProvince : provinces)
 		{
-			// Location of the card in the province
-			location[0] = leftBorder + i*distanceBetween - cardWidth/2 + 4;
-			location[1] = height - (cardHeight+2); 
-			currentProvince = provinces.get(i-1);
-			// Draw province attachments
-			attachments = currentProvince.getAttachments();
+			List<PlayableCard> attachments = currentProvince.getAttachments();
 			for(int j = attachments.size() - 1; j >= 0; j--)
 			{
-				g.drawImage(attachments.get(j).getImage(), location[0], location[1] - (int)(cardHeight*attachmentHeight*(j+1)) - 4, null);
+				PlayableCard currentCard = attachments.get(j);
+				int[] location = currentCard.getLocation();
+				g.drawImage(currentCard.getImage(), location[0], location[1], null);
 			}
-			// Draw cards in provinces
+		}
+
+		// Draw background image (hand/deck/discard/province areas)
+		g.drawImage(background, 0, 0, null);
+		
+		// Draw cards in provinces
+		BufferedImage currentImage;
+		for(Province currentProvince : provinces)
+		{
+			// Location of the card in the province
+			int[] location = currentProvince.getLocation();
 			currentImage = currentProvince.getImage();
 			if(currentImage != null)
 			{
 				g.drawImage(currentImage, location[0], location[1], null);
 			}
 		}
+
+		int startHand = width - (int)(cardWidth*1.5);
 
 		// Draw fate and dynasty decks and discards
 		currentImage = dynastyDeck.getImage();
@@ -228,13 +226,13 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	public void redrawBackground()
 	{
 		Graphics2D g = background.createGraphics();
+		// Clear out the last background drawn onto this image
+		g.setBackground(new Color(255, 255, 255, 0));
+		g.clearRect(0, 0, background.getWidth(), background.getHeight());
 		// Create an area for you to keep your hand
 		int sizeHand = (int)(cardWidth*1.5);
 		int startHand = width - sizeHand;
 		int location[] = new int[2];
-
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, Preferences.width, Preferences.height);
 
 		// Create fate discard
 		location[0] = startHand - (cardWidth+4);
@@ -326,24 +324,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		{
 			displayCard(attachments.get(i), g);
 		}
-
+		// Now draw the base card in the unit
 		int[] location = card.getLocation();
-		if(location[0] > getWidth() - 10)
-		{
-			location[0] = getWidth() - 10;
-		}
-		else if(location[0] < 10 - cardWidth)
-		{
-			location[0] = 10 - cardWidth;
-		}
-		if(location[1] > getHeight() - 10)
-		{
-			location[1] = getHeight() - 10;
-		}
-		else if(location[1] < 10 - cardHeight)
-		{
-			location[1] = 10 - cardHeight;
-		}
 		g.drawImage(card.getImage(), location[0], location[1], null);
 	}
 	
@@ -559,14 +541,44 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			int rightBorder = startHand - (2*(cardWidth+8)-2);
 			int yourNumProv = provinces.size();
 			int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
-			Rectangle area;
+			Rectangle area = new Rectangle();
 			for(int k = 1; k < yourNumProv+1; k++)
 			{
-				area = new Rectangle(leftBorder + k*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4), cardWidth+8, cardHeight+4);
+				area.setLocation(leftBorder + k*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4));
+				area.setSize(cardWidth+8, cardHeight+4);
 				if(area.contains(clickPoint))
 				{
 					provClicked = true;
 					numProvClicked = k-1;
+				}
+				else
+				{
+					// Also check if any of the provinces attachments were clicked
+					List<PlayableCard> attachments = provinces.get(k-1).getAttachments();
+					int j = 0;
+					while(!attachmentClicked && j < attachments.size())
+					{
+						clickedAttachment = attachments.get(j);
+						int[] cardLocation = clickedAttachment.getLocation();	
+						area.setLocation(cardLocation[0], cardLocation[1]);
+						if(clickedAttachment.isBowed())
+						{
+							area.setSize(cardHeight, cardWidth);
+						}
+						else
+						{
+							area.setSize(cardWidth, cardHeight);			
+						}
+						if(area.contains(clickPoint))
+						{
+							attachmentClicked = true;
+							if(e.getButton() == MouseEvent.BUTTON1 && clickedAttachment.isFaceUp())
+							{
+								Main.cardBox.setCard(Main.databaseID.get(clickedAttachment.getID()));
+							}
+						}
+						j++;
+					}
 				}
 			}
 		}
@@ -586,7 +598,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			attachingCard = null;
 		}
 		// If something was attached to a province or a card was clicked (and the draw stack reordered) we'll need to repaint
-		if(cardClicked || (attachingCard != null && provClicked))
+		if(cardClicked || provClicked)
 		{
 			repaint();
 		}

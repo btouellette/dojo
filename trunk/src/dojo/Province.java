@@ -49,8 +49,14 @@ class Province extends CardHolder
 	public void attach(PlayableCard card)
 	{
 		PlayArea.displayedCards.remove(card);
+		// Add card and any attachments of it to the province's attachments
 		attachments.add(card);
 		attachments.addAll(card.getAllAttachments());
+		// Update all attachment locations
+		for(int i = 0; i < attachments.size(); i++)
+		{
+			attachments.get(i).setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight*(i+1)) - 4);
+		}
 	}
 
 	public BufferedImage getImage()
