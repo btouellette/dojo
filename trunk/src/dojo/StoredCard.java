@@ -2,15 +2,13 @@ package dojo;
 // StoredCard.java
 // Written by Brian Ouellette
 // Format in which cards are stored in the database after being read in from XML.
-// Only to be used in database interactions.
-// Use PlayableCard for anything outside the database to keep object size down.
+// Use PlayableCard for anything outside the database and decks
 
 import java.util.ArrayList;
 import java.io.File;
 
 class StoredCard extends Card
 {
-	//Info
 	private String type;
 	private String name;
 	private ArrayList<String> imageLocation, imageEdition;
@@ -33,7 +31,7 @@ class StoredCard extends Card
 	public void setType(String type)
 	{
 		this.type = type;
-		
+		// Set appropriate dynasty field
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
 		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
 		   type.equals("rings")     || type.equals("senseis")   || type.equals("winds"))
@@ -146,15 +144,15 @@ class StoredCard extends Card
 		String cardImageLoc;
 		int count = 0;
 
-		//Find the first valid image location
+		// Find the first valid image location
 		while(count < imageLocation.size())
 		{
 			cardImageLoc = imageLocation.get(count);
+			// Only return it if the file exists
 			if((new File(cardImageLoc)).exists())
 				return cardImageLoc;
 			count++;
 		}
-
 		return null;
 	}
 
@@ -165,7 +163,6 @@ class StoredCard extends Card
 			// Just return the MRP edition
 			return imageEdition.get(0);
 		}
-
 		return null;
 	}
 

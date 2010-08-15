@@ -25,14 +25,16 @@ class Deck extends CardHolder
 		if(isDynasty)
 		{
 			// Go through all the provinces looking for any that are empty and refilling
-			for(Province province : PlayArea.provinces)
+			for(Province province : Main.state.getProvinces())
 			{
 				if(province.isEmpty())
 				{
 					PlayableCard card = remove();
+					// Make sure there was a card to pull from the deck still
 					if(card != null)
 					{
 						province.add(card);
+						// Mark that we refilled a province so we don't also put a card on the table
 						refilled = true;
 					}
 				}
@@ -48,8 +50,8 @@ class Deck extends CardHolder
 		
 	public BufferedImage getImage()
 	{
-		// If we have't loaded in an image for this yet
-		if(image == null && !cards.isEmpty())
+		// If there is a card in the deck display the appropriate image
+		if(!cards.isEmpty())
 		{
 			if(isDynasty)
 			{
@@ -60,10 +62,7 @@ class Deck extends CardHolder
 				return StoredImages.fate;
 			}
 		}
-		else if(cards.isEmpty())
-		{
-			return null;
-		}
-		return image;
+		// Otherwise display nothing
+		return null;
 	}
 }

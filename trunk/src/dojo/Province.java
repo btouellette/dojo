@@ -16,6 +16,7 @@ class Province extends CardHolder
 	
 	public Province()
 	{
+		// Only allocate space for 1 card
 		super(1);
 		attachments = new ArrayList<PlayableCard>();
 	}
@@ -24,13 +25,14 @@ class Province extends CardHolder
 	{
 		if(!cards.isEmpty())
 		{
+			// Turn the card in the province over on double click
 			if(!cards.get(0).isFaceUp())
 			{
 				cards.get(0).setFaceUp();
 			}
+			// Or do default (put card on table)
 			else
 			{
-				// Do default (put card on table)
 				super.doubleClicked();
 			}
 		}
@@ -48,15 +50,37 @@ class Province extends CardHolder
 
 	public void attach(PlayableCard card)
 	{
-		PlayArea.displayedCards.remove(card);
+		Main.state.removeDisplayedCard(card);
 		// Add card and any attachments of it to the province's attachments
 		attachments.add(card);
 		attachments.addAll(card.getAllAttachments());
+		updateAttachmentLocations();
+	}
+
+	private void updateAttachmentLocations()
+	{
 		// Update all attachment locations
 		for(int i = 0; i < attachments.size(); i++)
 		{
-			attachments.get(i).setLocationSimple(location[0], location[1] - (int)(PlayArea.cardHeight*PlayArea.attachmentHeight*(i+1)) - 4);
+			attachments.get(i).setLocationSimple(location[0], location[1] - (int)(Main.playArea.getCardHeight()*Main.playArea.getAttachmentHeight()*(i+1)) - 4);
 		}
+	}
+	
+	public void unattach(PlayableCard card)
+	{
+		// Move card from attachments to the play table
+		if(attachments.remove(card))
+		{
+			Main.state.addDisplayedCard(card);
+			// Unattach any cards attached to the card from the province as well
+			for(PlayableCard attachment : card.getAllAttachments())
+			{
+				attachments.remove(attachment);
+			}
+			card.setLocation(location[0], location[1] - (Main.playArea.getCardHeight()+8));
+			updateAttachmentLocations();
+		}
+
 	}
 
 	public BufferedImage getImage()
@@ -70,21 +94,30 @@ class Province extends CardHolder
 
 	public void rescale()
 	{
+		// Rescale all cards in the province
 		for(PlayableCard card : cards)
 		{
 			card.rescale();
 		}
+		// And all cards attached to the province
+		for(PlayableCard attachment : attachments)
+		{
+			attachment.rescale();
+		}
+		updateAttachmentLocations();
 	}
 	
 	public void destroy()
 	{
-		while(!attachments.isEmpty())
+		// Destroy all attachments
+		for(PlayableCard attachment : attachments)
 		{
-			attachments.remove(0).destroy();
+			attachment.destroy();
 		}
-		while(!cards.isEmpty())
+		// And the cards in the province
+		for(PlayableCard card : cards)
 		{
-			cards.remove(0).destroy();
+			card.destroy();
 		}
 	}
 }

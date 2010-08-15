@@ -5,7 +5,9 @@ package dojo;
 
 public abstract class Card
 {
+	// The ID of the card in the XML database
 	protected final String id;
+	// Whether the card is dynasty or fate
 	protected boolean isDynasty;
 	
 	public Card(String id)

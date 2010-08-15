@@ -15,11 +15,14 @@ class DeckImporter
 {
 	public static void importDeck(File file)
 	{
+		// Grab the file path
 		String path = file.getAbsolutePath();
-		// Grab the file extension
+		// So we can grab the file extension
 		String fileType = path.substring(path.length()-4);
+		// Default storage for 100 cards (includes both decks and stronghold/wind)
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		try {
+			// Egg decks use *.l5d and Game and Gempukku decks use *.dck file extension
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			if(fileType.equals(".l5d"))
 			{
@@ -33,35 +36,42 @@ class DeckImporter
 			TextActionListener.send("Failed to read in deck.\n", "Error");
 			err.printStackTrace();
 		}
-		// If import was successful create decks
+		// If import was successful and we now have cards to work with create decks
 		if(cards != null && !cards.isEmpty())
 		{
+			// Make two new decks to sort into
 			Deck dynasty = new Deck(true);
 			Deck fate = new Deck(false);
+			// Treat strongholds and winds specially
 			PlayableCard wind = null, stronghold = null;
+			// For every card we imported
 			for(StoredCard currentCard : cards)
 			{
+				// Check the type
 				String type = currentCard.getType();
+				// If the card is a wind put it on the table instead of in a deck and if there is a stronghold on the table attach the wind to it
 				if(type.equals("winds"))
 				{
 					wind = new PlayableCard(currentCard);
-					PlayArea.displayedCards.add(wind);
+					Main.state.addDisplayedCard(wind);
 					if(stronghold != null)
 					{
 						stronghold.attach(wind);
 					}
 				}
-				if(type.equals("strongholds"))
+				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
+				else if(type.equals("strongholds"))
 				{
 					stronghold = new PlayableCard(currentCard);
-					PlayArea.displayedCards.add(stronghold);
-					stronghold.setLocationSimple(PlayArea.cardWidth, PlayArea.height - PlayArea.cardHeight - 10);
+					Main.state.addDisplayedCard(stronghold);
+					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - Main.playArea.getCardHeight() - 10);
 					if(wind != null)
 					{
 						stronghold.attach(wind);
 					}
 					//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
 				}
+				// If it isn't a special type of card just add it to the appropriate deck
 				else if(currentCard.isDynasty())
 				{
 					dynasty.add(currentCard);
@@ -71,12 +81,12 @@ class DeckImporter
 					fate.add(currentCard);
 				}
 			}
-			// Shuffle decks and load them into the play area
+			// Shuffle decks and load them into the current game state
 			TextActionListener.send(Preferences.userName + " loads a new deck.", "Action");
 			fate.shuffle();
 			dynasty.shuffle();
 		
-			Main.playArea.clearArea(dynasty, fate);
+			Main.state.resetState(dynasty, fate);
 			Main.playArea.repaint();
 		}
 	}
@@ -114,6 +124,8 @@ class DeckImporter
 
 	private static List<StoredCard> importGameStyle(BufferedReader br) throws IOException
 	{
+		// Game-style decks are only one line of card ID's separated by '|'s
+		// Pull the string in and tokenize it
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String deck = br.readLine();
 		StringTokenizer st = new StringTokenizer(deck, "|");

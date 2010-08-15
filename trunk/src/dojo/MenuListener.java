@@ -21,10 +21,12 @@ class MenuListener implements ActionListener
 		//TODO: Set so it filters out .l5d and .dck files
 		else if(name.equals("Load Deck"))
 		{
+			// Launch file chooser to let user pick deck file
 			final JFileChooser fc = new JFileChooser("decks");
 			int returnVal = fc.showOpenDialog(Main.frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
+				// And import the deck if they picked one
 				DeckImporter.importDeck(fc.getSelectedFile());
 	        }
 		}
@@ -36,6 +38,7 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Deckbuilder"))
 		{
+			// Make DeckBuilder visible
 			Deckbuilder.frame.pack();
 			Deckbuilder.frame.setVisible(true);
 		}
@@ -44,11 +47,12 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Exit"))
 		{
-			//Add in a prompt if there are cards on the table
+			//TODO: Add in a prompt if there are cards on the table
 			System.exit(0);
 		}
 		else if(name.equals("Flip Coin"))
 		{
+			// Generate a random boolean for use as a coin flip and send it to the chat box
 			Random gen = new Random();
 			if(gen.nextBoolean())
 			{
@@ -61,10 +65,12 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Drop Random Fate Card"))
 		{
+			//TODO: Move random card from hand to table
 			TextActionListener.send(Preferences.userName + " drops a random fate card.", "Action");
 		}
 		else if(name.equals("Reveal Hand"))
 		{
+			//TODO: Show cards in hand to opponent
 			TextActionListener.send(Preferences.userName + " reveals " + Preferences.gender + " hand.", "Action");
 		}
 		else if(name.equals("About Dojo"))

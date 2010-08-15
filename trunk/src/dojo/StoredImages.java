@@ -30,31 +30,36 @@ class StoredImages
 
 	public static void rescale()
 	{
-		dynasty = new BufferedImage(PlayArea.cardWidth, PlayArea.cardHeight, originalDynasty.getType());
-		fate = new BufferedImage(PlayArea.cardWidth, PlayArea.cardHeight, originalFate.getType());
+		// Recreate appropriately sized cards from original image
+		int cardWidth = Main.playArea.getCardWidth();
+		int cardHeight = Main.playArea.getCardHeight();
+
+		dynasty = new BufferedImage(cardWidth, cardHeight, originalDynasty.getType());
+		fate = new BufferedImage(cardWidth, cardHeight, originalFate.getType());
 
 		Graphics2D gDynasty = dynasty.createGraphics();
 		Graphics2D gFate = fate.createGraphics();
 
 		// If downsizing image
-		if(originalDynasty.getHeight() >= PlayArea.cardHeight)
+		if(originalDynasty.getHeight() >= cardHeight)
 		{
-			gDynasty.drawImage(originalDynasty.getScaledInstance(PlayArea.cardWidth, PlayArea.cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
+			gDynasty.drawImage(originalDynasty.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
 			gDynasty.dispose();
-			gFate.drawImage(originalFate.getScaledInstance(PlayArea.cardWidth, PlayArea.cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
+			gFate.drawImage(originalFate.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
 			gFate.dispose();
 		}
 		// If enlarging image
 		else
 		{
 			gDynasty.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			gDynasty.drawImage(originalDynasty, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
+			gDynasty.drawImage(originalDynasty, 0, 0, cardWidth, cardHeight, null);
 			gDynasty.dispose();
 			gFate.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			gFate.drawImage(originalFate, 0, 0, PlayArea.cardWidth, PlayArea.cardHeight, null);
+			gFate.drawImage(originalFate, 0, 0, cardWidth, cardHeight, null);
 			gFate.dispose();
 		}
 		// Rotate it to get a bowed version
+		// Translate as well so image is still at origin of BufferedImage
 		AffineTransform tx = AffineTransform.getTranslateInstance(0,-dynasty.getHeight());
 		tx.quadrantRotate(1, 0, dynasty.getHeight());
 		AffineTransformOp rotate = new AffineTransformOp(tx, null);
