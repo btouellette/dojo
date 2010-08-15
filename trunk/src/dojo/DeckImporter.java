@@ -87,6 +87,7 @@ class DeckImporter
 			dynasty.shuffle();
 		
 			Main.state.resetState(dynasty, fate);
+			Main.playArea.redrawBackground();
 			Main.playArea.repaint();
 		}
 	}

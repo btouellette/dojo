@@ -66,6 +66,11 @@ class GameState {
 		// Reset decks to new decks
 		dynastyDeck = dynasty;
 		fateDeck = fate;
+		provinces.clear();
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
+		provinces.add(new Province());
 	}
 
 	public List<Province> getProvinces()

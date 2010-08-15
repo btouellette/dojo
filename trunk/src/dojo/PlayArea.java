@@ -35,13 +35,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	// If clickedAttachment != null then clickedCard is the base card of the unit
 	private PlayableCard clickedCard, clickedAttachment, attachingCard;
 	// Tests used for launching context menus correctly
-	private boolean cardClicked = false;
-	private boolean attachmentClicked = false;
-	private boolean provClicked = false;
-	private boolean deckClicked = false;
-	private boolean discardClicked = false;
-	private boolean dynastyClicked = false;
-	private boolean fateClicked = false;
+	private boolean cardClicked, attachmentClicked, provClicked;
+	private boolean deckClicked, discardClicked;
+	private boolean dynastyClicked, fateClicked;
 	// Background of the play area (province/deck/hand outlines)
 	private BufferedImage background;
 	// Which of your provinces was clicked (left to right)
@@ -308,7 +304,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		//TODO: Update opponents cards too
 		// Update background image
 		redrawBackground();
-		repaint();
 	}
 
 	private void displayCard(PlayableCard card, Graphics2D g)
@@ -321,6 +316,23 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		// Now draw the base card in the unit
 		int[] location = card.getLocation();
+		// Window resize can move a card off the table if we don't keep it on the play area here
+		if(location[0] > getWidth() - 10)		
+		{		
+			location[0] = getWidth() - 10;		
+		}		
+		else if(location[0] < 10 - cardWidth)		
+		{		
+			location[0] = 10 - cardWidth;		
+		}		
+		if(location[1] > getHeight() - 10)		
+		{		
+			location[1] = getHeight() - 10;		
+		}		
+		else if(location[1] < 10 - cardHeight)		
+		{		
+			location[1] = 10 - cardHeight;		
+		}	
 		g.drawImage(card.getImage(), location[0], location[1], null);
 	}
 
@@ -343,40 +355,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private void showPopup(MouseEvent e)
 	{
 		Point clickPoint = e.getPoint();
-		int sizeHand = (int)(cardWidth*1.5);
-		int startHand = width - sizeHand;
-
-		// Check to see if click was inside fate discard
-		Rectangle area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
-		if(area.contains(clickPoint))
-		{
-			fateClicked = true;
-			discardClicked = true;
-		}
-
-		// Check to see if click was inside fate deck
-		area = new Rectangle(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
-		if(area.contains(clickPoint))
-		{
-			fateClicked = true;
-			deckClicked = true;
-		}
-
-		// Check to see if click was inside dynasty discard
-		area = new Rectangle(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
-		if(area.contains(clickPoint))
-		{
-			dynastyClicked = true;
-			discardClicked = true;
-		}
-
-		// Check to see if click was inside dynasty deck
-		area = new Rectangle(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
-		if(area.contains(clickPoint))
-		{
-			dynastyClicked = true;
-			deckClicked = true;
-		}
 		
 		// Now launch the right menu at the click location
 		if(attachmentClicked)
@@ -459,6 +437,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		cardClicked = false;
 		attachmentClicked = false;
 		deckClicked = false;
+		dynastyClicked = false;
+		fateClicked = false;
 		provClicked = false;
 		discardClicked = false;
 		Rectangle cardArea = new Rectangle();
@@ -592,6 +572,44 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						j++;
 					}
 				}
+			}
+		}
+		// If nothing has been detected as clicked yet check for deck clicks
+		if(!cardClicked && !attachmentClicked && !provClicked)
+		{
+			int sizeHand = (int)(cardWidth*1.5);
+			int startHand = width - sizeHand;
+
+			// Check to see if click was inside fate discard
+			Rectangle area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				fateClicked = true;
+				discardClicked = true;
+			}
+
+			// Check to see if click was inside fate deck
+			area = new Rectangle(startHand - 2*(cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				fateClicked = true;
+				deckClicked = true;
+			}
+
+			// Check to see if click was inside dynasty discard
+			area = new Rectangle(2, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				dynastyClicked = true;
+				discardClicked = true;
+			}
+
+			// Check to see if click was inside dynasty deck
+			area = new Rectangle(cardWidth+8, height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			if(area.contains(clickPoint))
+			{
+				dynastyClicked = true;
+				deckClicked = true;
 			}
 		}
 		// If there was a card queued up to attach see if we can attach it to whatever was clicked
