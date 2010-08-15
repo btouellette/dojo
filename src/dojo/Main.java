@@ -16,14 +16,18 @@ import org.xml.sax.*;
 
 class Main
 {
-	// ID maps to card
+	// Database of all cards in XML, ID or name maps to card
 	static HashMap<String, StoredCard> databaseID, databaseName;
 	//TODO: It'd be nice to be able to set the font size of these elements in preferences somewhere
+	// Box for displaying chat messages
 	static JTextPane chatBox;
+	// Box for displaying clicked card info
 	static CardInfoBox cardBox;
+	// Main playing surface
 	static PlayArea playArea;
+	// Object representing current game state
+	static GameState state;
 	static Deckbuilder deckBuilder;
-	static boolean highRes;
 	static JFrame frame;
 
 	/**
@@ -37,12 +41,16 @@ class Main
 		frame = new JFrame("Dojo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		// Attempt to import preferences from config file
 		Preferences.importPreferences();
 		int width = Preferences.width;
 		int height = Preferences.height;
 
-		// Create the play area
-		playArea = new PlayArea(width, height);
+		// Initialize a fresh game state
+		state = new GameState();
+
+		// Create the play area associated with this game state
+		playArea = new PlayArea(state, width, height);
 		playArea.setOpaque(true);
 
 		// Load in various images used in the program
@@ -86,6 +94,7 @@ class Main
 		JMenu game = new JMenu("Game");
 		// Prevent the menu button from being occluded if the layout is condensed
 		game.setMinimumSize(game.getPreferredSize());
+		// Add buttons and associate listener with them
 		MenuListener menuListener = new MenuListener();
 		JMenuItem connect = new JMenuItem("Connect");
 		connect.addActionListener(menuListener);
@@ -118,6 +127,7 @@ class Main
 		JMenu action = new JMenu("Action");
 		// Prevent the menu button from being occluded if the layout is condensed
 		action.setMinimumSize(action.getPreferredSize());
+		// Add buttons and associate listener with them
 		JMenuItem flipCoin = new JMenuItem("Flip Coin");
 		flipCoin.addActionListener(menuListener);
 		JMenuItem randomCard = new JMenuItem("Drop Random Fate Card");
@@ -209,6 +219,7 @@ class Main
 		JTextField chatSend = new JTextField();
 		chatBox.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(chatBox);
+		// Always display a scroll bar
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		chatSend.addActionListener(new TextActionListener());
 
@@ -220,6 +231,7 @@ class Main
 		cardBox.setPreferredSize(new Dimension(width/4, 175));
 		JScrollPane cardBoxScrollPane = new JScrollPane(cardBox);
 
+		// Create the game info box
 		GameInfoBox gameInfo = new GameInfoBox();
 		gameInfo.setPreferredSize(new Dimension(width/4, 175));
 
@@ -267,12 +279,15 @@ class Main
 		} catch (IOException io) {
 			//TODO: Make this more transparent (popup with cancel button)
 			System.out.print("failed\n** Card database missing. Attempting to get from kamisasori.net: ");
-			// Get database off kamisasori.net
+			// Database not present so try to get database off kamisasori.net
+			//TODO: Also do this if someone you connect to has a newer database
 			try {	
+				// Create an input stream to the appropriate card file
 				URL url = new URL("http://kamisasori.net/files/cards-gamepukku.zip");
 				url.openConnection();
 				InputStream is = url.openStream();
 				FileOutputStream fos = new FileOutputStream("cards-gempukku.zip");
+				// And read the input stream in
 				for (int c = is.read(); c != -1; c = is.read()) {
 					fos.write(c);
 				}
@@ -289,9 +304,11 @@ class Main
 				ZipInputStream zis = new ZipInputStream(fis);
 				ZipEntry ze;
 				FileOutputStream fos;
+				// Unzip everything inside the file (should just be cards.xml)
 				while ((ze = zis.getNextEntry()) != null) {
 					System.out.print("** Unzipping " + ze.getName() + ": ");
 					fos = new FileOutputStream(ze.getName());
+					// And write unzipped data out to the file
 					for (int c = zis.read(); c != -1; c = zis.read()) {
 						fos.write(c);
 					}
@@ -301,15 +318,18 @@ class Main
 				}
 				zis.close();
 
+				// Cleanup temp files downloaded
 				System.out.print("** Deleting zip file after extraction: ");
 				File f = new File("cards-gempukku.zip");
 				f.delete();
 				System.out.println("success!");
+				// Successfully got database so read it in again
 				System.out.println("** Reattempting database import");
 				importDatabase();
 			} catch (IOException io_e) {
 				System.err.println("failed\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
 				io_e.printStackTrace();
+				// Clean up on failure so we don't leave temporary files around
 				File f = new File("cards-gempukku.zip");
 				if(f.exists())
 					f.delete();

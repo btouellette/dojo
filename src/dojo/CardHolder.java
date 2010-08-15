@@ -9,20 +9,24 @@ import java.util.Collections;
 
 public abstract class CardHolder
 {
+	// Image to display on table
 	protected BufferedImage image;
 	// 0 is top card
 	protected ArrayList<PlayableCard> cards;
+	// Location inside the PlayArea
 	protected int location[];
 
 	public CardHolder()
 	{
 		location = new int[2];
+		// If no size is stated use the biggest and assume deck-sized holder
 		cards = new ArrayList<PlayableCard>(45);
 	}
 	
 	public CardHolder(int listSize)
 	{
 		location = new int[2];
+		// If size is stated use less memory
 		cards = new ArrayList<PlayableCard>(listSize);
 	}
 	
@@ -40,6 +44,8 @@ public abstract class CardHolder
 
 	public PlayableCard remove()
 	{
+		// Remove and return the top card if there is one
+		// Return null if there isn't
 		PlayableCard returnedCard = null;
 		if(!cards.isEmpty())
 		{
@@ -50,6 +56,8 @@ public abstract class CardHolder
 	
 	public PlayableCard remove(StoredCard card)
 	{
+		// Remove the specific card if it is present and return a PlayableCard to be put on the table
+		// Return null if it isn't
 		PlayableCard returnedCard = null;
 		if(cards.remove(card))
 		{
@@ -69,33 +77,39 @@ public abstract class CardHolder
 		if(!cards.isEmpty())
 		{
 			PlayableCard card = remove();
-			PlayArea.displayedCards.add(card);
-			card.setLocationSimple(location[0], location[1] - (PlayArea.cardHeight+8));
+			// No need to check for null here since we know there was a card to retrieve
+			// Put the removed card on the table and set its location to above the holder it used to be in
+			Main.state.addDisplayedCard(card);
+			card.setLocationSimple(location[0], location[1] - (Main.playArea.getCardHeight()+8));
 		}
 	}
 
 	public int[] getLocation()
 	{
+		// Return clone of location to prevent change by reference
 		return location.clone();
 	}
 
 	public void setLocation(int[] location)
 	{
+		// Clone in the array to prevent change by reference
 		this.location = location.clone();
 	}
 
 	public int numCards()
 	{
+		// Return the number of cards present in the CardHolder
 		return cards.size();
 	}
 	
 	public void shuffle()
 	{
+		// Randomly distributes the cards in the list
 		Collections.shuffle(cards);
 	}
 	
 	public void setImage(BufferedImage image)
-	{
+	{ 
 		this.image = image;
 	}
 }

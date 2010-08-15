@@ -3,10 +3,9 @@ package dojo;
 // Written by Brian Ouellette
 // Box for showing the current selected cards information.
 
-//TODO: Add a JPopUpMenu for detaching the panel
-
 import javax.swing.*;
 
+//TODO: Add a JPopUpMenu for detaching the panel
 //TODO: Try to get this to handle resizing better (redraw table or use CSS to set width dynamically)
 class CardInfoBox extends JEditorPane
 {
@@ -16,21 +15,26 @@ class CardInfoBox extends JEditorPane
 	public CardInfoBox()
 	{
 		super();
+		// Don't allow user to edit info box
 		setEditable(false);
+		// Using html tables to display card so set appropriate type
 		setContentType("text/html");
 	}
 
 	public CardInfoBox(StoredCard card)
 	{
+		// Creates the info box with a card already loaded into it
 		this();
 		setCard(card);
 	}
 
 	public void setCard(StoredCard card)
 	{
-		if(this.card == null || this.card != card)
+		// Only recreate table if card changes
+		if(this.card != card)
 		{
 			this.card = card;
+			// cardHTML split only for easier editability, concatenated together at end
 			String cardHTML1, cardHTML2, cardHTML3, cardHTML4;
 			
 			/* Commented out until it's determined whether images should be present in the info box
@@ -45,12 +49,14 @@ class CardInfoBox extends JEditorPane
 			}
 			*/
 	
+			// Initialize so that if not all are used they can still all be concatenated
 			cardHTML1 = "";
 			cardHTML2 = "";
 			cardHTML3 = "";
 			cardHTML4 = "";
 	
 			int width = getWidth() - 30;
+			// HTML tables created differently for different types of cards
 			if(card.getType().equals("actions") || card.getType().equals("kihos") || card.getType().equals("spells"))
 			{
 				//The card text in the window is created as an html table

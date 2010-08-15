@@ -19,7 +19,7 @@ class TextActionListener implements ActionListener
 
 	public TextActionListener()
 	{
-		//Receives the textfield to which the ActionListener outputs
+		// Receives the textfield to which the ActionListener outputs
 		this.chatBox = Main.chatBox;
 		addStyles();
 		chatBox.setText("Welcome to Dojo!");
@@ -27,6 +27,7 @@ class TextActionListener implements ActionListener
 
 	private void addStyles()
 	{
+		// Use different colors for different classes of messages
 		//TODO: Make customizable
 		Style style = chatBox.addStyle("Default", null);
 

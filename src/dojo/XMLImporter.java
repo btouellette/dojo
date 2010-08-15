@@ -12,7 +12,7 @@ class XMLImporter extends DefaultHandler
 	//private Writer out;
 	//private String version;
 	private String eName;
-	// ID maps to card
+	// Database to map ID or name to card
 	private HashMap<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
@@ -28,8 +28,8 @@ class XMLImporter extends DefaultHandler
 			t.printStackTrace();
 		} */
 		
-		//Create a new HashMap with an initial capacity of 1500
-		//This value might need to be tweaked
+		// Create a new HashMap with an initial capacity of 1500
+		// This value might need to be tweaked
 		databaseID = new HashMap<String, StoredCard>(1500);
 		databaseName = new HashMap<String, StoredCard>(1500);
 	}
@@ -162,18 +162,18 @@ class XMLImporter extends DefaultHandler
 		emit("</"+sName+">");
 	}*/
 
-	//Function called when the parser encounters a block of characters
+	// Function called when the parser encounters a block of characters
 	public void characters(char buf[], int offset, int len)	throws SAXException
 	{
 		//nl();
 		//emit("CHARS:   ");
 		String s = new String(buf, offset, len);
-		//The if statement makes sure it isn't just useless white space
+		// The if statement makes sure it isn't just useless white space
 		if(!s.trim().equals(""))
 		{
 			//emit(s);
 
-			//NOTE: Java switch statements don't operate on String
+			// Note: Java switch statements don't operate on String
 			if(eName.equals("name"))
 			{
 				currentCard.setName(s);

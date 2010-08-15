@@ -7,10 +7,9 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
-//TODO: Write out pref file (either on change or on destructor)
 class Preferences
 {
-	// Width and height of the play area
+	// Width and height stored in the config file
 	static int width, height;
 	// Represents card size
 	static int sliderValue;
@@ -26,6 +25,7 @@ class Preferences
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("prefs.cfg"));
 			String line;
+			// Read in every line of the config file
 			while((line = br.readLine()) != null)
 			{
 				if(!line.isEmpty() && line.charAt(0) != '#')
@@ -87,12 +87,13 @@ class Preferences
 	
 	public static void writePreferences()
 	{
+		// Called on shutdown, save current values for use next startup
 		try {
 			FileWriter fw = new FileWriter("prefs.cfg");
 			fw.write("# Dojo config file\n");
 			fw.write("# Size to start program window (in pixels)\n");
-			fw.write("width " + width + "\n");
-			fw.write("height " + height + "\n");
+			fw.write("width " + Main.playArea.getWidth() + "\n");
+			fw.write("height " + Main.playArea.getHeight() + "\n");
 			fw.write("# Size of cards at start (1-100, 50 is default)\n");
 			fw.write("sliderValue " + sliderValue + "\n");
 			fw.write("# Image editions gotten from (or not present on) kamisasori.net\n");

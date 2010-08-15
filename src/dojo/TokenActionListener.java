@@ -28,6 +28,7 @@ class TokenActionListener implements ActionListener, MouseListener
 		{
 			// String has been entered and the user wants to make a token
 			TextActionListener.send(Preferences.userName + " makes a token.", "Action");
+			// Update the list of token names
 			for(int i = 0; i < comboBox.getItemCount(); i++)
 			{
 				if(text.equals(comboBox.getItemAt(i)))
@@ -44,13 +45,13 @@ class TokenActionListener implements ActionListener, MouseListener
 
 	public void mouseClicked(MouseEvent e)
 	{
-		//This is implementing a tip style combobox (light gray text until clicked in)
+		// This is implementing a tip style combobox (light gray text until clicked in)
 		JComboBox comboBox = (JComboBox)e.getComponent();
 		if(comboBox.isEditable() == false)
 		{
 			comboBox.setEnabled(true);
 			comboBox.setEditable(true);
-			//Bias the text five pixels from the edge of the combo box
+			// Bias the text five pixels from the edge of the combo box
 			JTextField textField = ((JTextField)comboBox.getEditor().getEditorComponent());
 			textField.setBorder(BorderFactory.createCompoundBorder(textField.getBorder(), BorderFactory.createEmptyBorder(0,3,0,0)));
 			comboBox.removeAllItems();

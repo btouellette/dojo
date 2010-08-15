@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-//TODO: Split logic and display into separate classes (potentially menu stuff too)
 class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
 {
 	private static final long serialVersionUID = 1L;
@@ -51,28 +50,25 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private JPopupMenu popupCard, popupAttachment, popupProv, popupDeck, popupDiscard;
 	// Number of provinces
 	private int oppNumProv = 4;
-	
-	static Deck dynastyDeck, fateDeck;
-	static Discard dynastyDiscard, fateDiscard;
-	// Provinces (left to right from 0->max)
-	static List<Province> provinces;
-	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
-	static List<PlayableCard> displayedCards;
-	// Current size of a single card
-	static int cardWidth, cardHeight;
-	// Reference height (height that the card is initially)
-	static int baseCardHeight;
-	// The percent of a card that attachments show above their base card
-	static double attachmentHeight = .2;
 	// Size of PlayArea in pixels
-	static int height, width;
-
-	public PlayArea(int width, int height)
+	private int height, width;
+	// Current size of a single card
+	private int cardWidth, cardHeight;
+	// Reference height (height that the card is initially)
+	private int baseCardHeight;
+	// The percent of a card that attachments show above their base card
+	private float attachmentHeight = 0.2f;
+	// State of the game (decks/cards on table/provinces/etc)
+	private GameState state;
+	
+	public PlayArea(GameState state, int width, int height)
 	{
 		super();
 		setPreferredSize(new Dimension(width, height));
 		this.width = width;
 		this.height = height;
+		this.state = state;
+
 		// Setting the default height as a fifth of the PlayArea height
 		// This allows for vertically: two sets of provinces and two units with a few attachments
 		cardHeight = height/5;
@@ -80,23 +76,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		cardWidth = (int)(cardHeight*(2.5/3.5));
 		baseCardHeight = cardHeight;
 
-		// Create a new ArrayList to hold the cards to display
-		displayedCards = new ArrayList<PlayableCard>(30);
-
-		// Create decks, discards, and provinces
-		dynastyDeck = new Deck(true);
-		fateDeck = new Deck(false);
-		dynastyDiscard = new Discard();
-		fateDiscard = new Discard();
-
-		//TODO: Support Ratling/Spirit or other starting sizes
-		provinces = new ArrayList<Province>(4);
-		provinces.add(new Province());
-		provinces.add(new Province());
-		provinces.add(new Province());
-		provinces.add(new Province());
-
 		//TODO: Allow for custom backgrounds
+		// Set up background image
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		background = new BufferedImage((int)screenSize.getWidth(), (int)screenSize.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		redrawBackground();
@@ -110,6 +91,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	
 	private void createMenu()
 	{
+		// Creates the context menus used in the application
 		//TODO: Flesh out context menus		
 		popupCard = new JPopupMenu();
 		popupAttachment = new JPopupMenu();
@@ -153,17 +135,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	{
 		super.paintComponent(g);
 
-		// In case of resize we'll get the new height and width parameters
-		height = getHeight();
-		width = getWidth();
 		// if the parameters changed since last repaint update the preferences and recreate the background
-		if(height != Preferences.height || width != Preferences.width)
+		if(height != getHeight() || width != getWidth())
 		{
-			Preferences.height = height;
-			Preferences.width = width;
+			height = getHeight();
+			width = getWidth();
 			redrawBackground();
 		}
 		
+		List<Province> provinces = state.getProvinces();
 		// Draw province attachments before background so they show up behind provinces
 		for(Province currentProvince : provinces)
 		{
@@ -194,29 +174,30 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		int startHand = width - (int)(cardWidth*1.5);
 
-		// Draw fate and dynasty decks and discards
-		currentImage = dynastyDeck.getImage();
+		// Draw fate and dynasty decks and discards if they have an image
+		currentImage = state.getDynastyDeck().getImage();
 		if(currentImage != null)
 		{
 			g.drawImage(currentImage, cardWidth+10, height - (cardHeight+4), null);
 		}
-		currentImage = dynastyDiscard.getImage();
+		currentImage = state.getDynastyDiscard().getImage();
 		if(currentImage != null)
 		{
 			g.drawImage(currentImage, 4, height - (cardHeight+4), null);
 		}
-		currentImage = fateDeck.getImage();
+		currentImage = state.getFateDeck().getImage();
 		if(currentImage != null)
 		{
 			g.drawImage(currentImage, startHand - 2*(cardWidth+5), height - (cardHeight+4), null);
 		}
-		currentImage = fateDiscard.getImage();
+		currentImage = state.getFateDiscard().getImage();
 		if(currentImage != null)
 		{
 			g.drawImage(currentImage, startHand - (cardWidth+4), height - (cardHeight+4), null);
 		}
 
 		// Now that we've drawn all the play surface draw all the cards
+		List<PlayableCard> displayedCards = state.getDisplayedCards();
 		for(PlayableCard card : displayedCards)
 		{
 			displayCard(card, (Graphics2D)g);
@@ -225,8 +206,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void redrawBackground()
 	{
+		// Recreate background image with deck/province/hand/discard holders
 		Graphics2D g = background.createGraphics();
-		// Clear out the last background drawn onto this image
+		// Clear out the last background drawn onto this image with a transparent color
 		g.setBackground(new Color(255, 255, 255, 0));
 		g.clearRect(0, 0, background.getWidth(), background.getHeight());
 		// Create an area for you to keep your hand
@@ -238,7 +220,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		location[0] = startHand - (cardWidth+4);
 		// location[1] remains same throughout since all decks/provinces are on same level
 		location[1] = height - (cardHeight+4);
-		fateDiscard.setLocation(location);
+		state.getFateDiscard().setLocation(location);
 		g.setColor(Color.BLACK);
 		g.fillRect(location[0] - (cardWidth+10), location[1] - 4, 2*(cardWidth+8), cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
@@ -246,12 +228,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		// Create fate deck
 		location[0] = startHand - 2*(cardWidth+5);
-		fateDeck.setLocation(location);
+		state.getFateDeck().setLocation(location);
 		g.fillRect(location[0] - 2, location[1] - 2, cardWidth+4, cardHeight+4);
 
 		// Create dynasty discard
 		location[0] = 4;
-		dynastyDiscard.setLocation(location);
+		state.getDynastyDiscard().setLocation(location);
 		g.setColor(Color.BLACK);
 		g.fillRect(location[0] - 4, location[1] - 4, 2*(cardWidth+8)-2, cardHeight+8);
 		g.setColor(Color.LIGHT_GRAY);
@@ -259,7 +241,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		// Create dynasty deck
 		location[0] = cardWidth+10;
-		dynastyDeck.setLocation(location);
+		state.getDynastyDeck().setLocation(location);
 		g.fillRect(location[0] - 2, location[1] - 2, cardWidth+4, cardHeight+4);
 
 		// Create opponent's fate discard
@@ -289,6 +271,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Create your provinces and draw the cards in them
 		int leftBorder = 2*(cardWidth+8)-2;
 		int rightBorder = startHand - (2*(cardWidth+8)-2);
+		List<Province> provinces = state.getProvinces();
 		int yourNumProv = provinces.size();
 		int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
 		for(int i = 1; i < yourNumProv+1; i++)
@@ -316,9 +299,21 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		g.dispose();
 	}
 
+	public void rescale()
+	{
+		// Rescale the PlayArea appropriately on card size change
+		// Update card height and width
+		cardHeight = Preferences.sliderValue*baseCardHeight/50;
+		cardWidth = (int)(cardHeight*(2.5/3.5));
+		//TODO: Update opponents cards too
+		// Update background image
+		redrawBackground();
+		repaint();
+	}
+
 	private void displayCard(PlayableCard card, Graphics2D g)
 	{
-		// Display all the attachments first. This will draw the top attachment first and at the farthest back
+		// Display all the attachments first. This will draw the top attachment first which will be the farthest back on the draw stack
 		List<PlayableCard> attachments = card.getAttachments();
 		for(int i = attachments.size()-1; i >= 0; i--)
 		{
@@ -328,16 +323,20 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		int[] location = card.getLocation();
 		g.drawImage(card.getImage(), location[0], location[1], null);
 	}
-	
-	//TODO: Resolve static/non-static nonsense
-	public void clearArea(Deck dynasty, Deck fate)
+
+	public int getCardHeight()
 	{
-		displayedCards.clear();
-		fateDiscard.removeAll();
-		dynastyDiscard.removeAll();
-		dynastyDeck = dynasty;
-		fateDeck = fate;
-		repaint();
+		return cardHeight;
+	}
+
+	public int getCardWidth()
+	{
+		return cardWidth;
+	}
+
+	public float getAttachmentHeight()
+	{
+		return attachmentHeight;
 	}
 
 	// Pop up the correct context menu
@@ -404,28 +403,29 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	
 	public void mouseClicked(MouseEvent e)
 	{
+		// On a double click launch correct doubleClicked method
 		if(e.getClickCount() == 2)
 		{
 			if(deckClicked)
 			{
 				if(dynastyClicked)
 				{
-					dynastyDeck.doubleClicked();
+					state.getDynastyDeck().doubleClicked();
 				}
 				else
 				{
-					fateDeck.doubleClicked();
+					state.getFateDeck().doubleClicked();
 				}
 			}
 			else if(discardClicked)
 			{
 				if(dynastyClicked)
 				{
-					dynastyDiscard.doubleClicked();
+					state.getDynastyDiscard().doubleClicked();
 				}
 				else
 				{
-					fateDiscard.doubleClicked();
+					state.getFateDiscard().doubleClicked();
 				}
 			}
 			else if(attachmentClicked)
@@ -438,7 +438,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			}
 			else if(provClicked)
 			{
-				provinces.get(numProvClicked).doubleClicked();
+				state.getProvinces().get(numProvClicked).doubleClicked();
 			}
 			// Something probably changed so repaint
 			repaint();
@@ -453,9 +453,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	{
 	}
 
-	// On mouse click check to see if anything relevant was clicked
 	public void mousePressed(MouseEvent e)
 	{		
+		// On mouse click check to see if anything relevant was clicked
 		cardClicked = false;
 		attachmentClicked = false;
 		deckClicked = false;
@@ -464,6 +464,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 		
+		List<PlayableCard> displayedCards = state.getDisplayedCards();
+		List<Province> provinces = state.getProvinces();
+
 		int i = displayedCards.size();
 		// Search first to see if any cards displayed on the JPanel were clicked
 		// This is in reverse order so topmost drawn cards are picked up first
@@ -490,17 +493,20 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				// Redraw the clicked card on top of the draw stack
 				displayedCards.remove(clickedCard);
 				displayedCards.add(clickedCard);
+				// Store the distance between the click and the root of the card to update location on drag correctly
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
+				// Update the card box if we clicked a card
 				if(e.getButton() == MouseEvent.BUTTON1 && clickedCard.isFaceUp())
 				{
 					Main.cardBox.setCard(Main.databaseID.get(clickedCard.getID()));
 				}
 			}
+			// If not check its attachments
 			else
 			{
-				// If not check its attachments
 				List<PlayableCard> attachments = clickedCard.getAllAttachments();
+				// Look through all the attachments in order
 				int j = 0;
 				while(!attachmentClicked && j < attachments.size())
 				{
@@ -522,8 +528,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						// Redraw the clicked card on top of the draw stack
 						displayedCards.remove(clickedCard);
 						displayedCards.add(clickedCard);
+						// Store the distance between the click and the root of the card to update location on drag correctly
 						distanceX = (int)clickPoint.getX() - cardLocation[0];
 						distanceY = (int)clickPoint.getY() - cardLocation[1];
+						// Update the card box if we clicked a card
 						if(e.getButton() == MouseEvent.BUTTON1 && clickedAttachment.isFaceUp())
 						{
 							Main.cardBox.setCard(Main.databaseID.get(clickedAttachment.getID()));
@@ -542,6 +550,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			int yourNumProv = provinces.size();
 			int distanceBetween = (rightBorder - leftBorder)/(yourNumProv+1);
 			Rectangle area = new Rectangle();
+			// Check each of the provinces
 			for(int k = 1; k < yourNumProv+1; k++)
 			{
 				area.setLocation(leftBorder + k*distanceBetween - cardWidth/2 + 2, height - (cardHeight+4));
@@ -551,10 +560,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					provClicked = true;
 					numProvClicked = k-1;
 				}
+				// If the province wasn't clicked check if any of the province's attachments were clicked
 				else
 				{
-					// Also check if any of the provinces attachments were clicked
 					List<PlayableCard> attachments = provinces.get(k-1).getAttachments();
+					// Go through all the attachments in order
 					int j = 0;
 					while(!attachmentClicked && j < attachments.size())
 					{
@@ -572,6 +582,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						if(area.contains(clickPoint))
 						{
 							attachmentClicked = true;
+							numProvClicked = k-1;
+							// Update the card box if we clicked a card
 							if(e.getButton() == MouseEvent.BUTTON1 && clickedAttachment.isFaceUp())
 							{
 								Main.cardBox.setCard(Main.databaseID.get(clickedAttachment.getID()));
@@ -682,7 +694,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseMoved(MouseEvent e)
 	{
-		if(displayedCards.isEmpty() && dynastyDeck.numCards() == 0)
+		List<PlayableCard> displayedCards = state.getDisplayedCards();
+		if(displayedCards.isEmpty() && state.getDynastyDeck().numCards() == 0)
 		{
 			//TODO: Remove these lines once testing is done
 			displayedCards.add(0, new PlayableCard("CoB009"));;
@@ -699,6 +712,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	public void actionPerformed(ActionEvent e)
 	{
 		String name = ((AbstractButton)e.getSource()).getText();
+		List<Province> provinces = state.getProvinces();
 		//TODO: Fill out rest of context menu and actions
 		/********** Province Menu Items **********/
 		if(name.equals("Destroy"))
@@ -724,14 +738,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		/********** Deck Menu Items **********/
 		else if(name.equals("Shuffle"))
 		{
+			// Shuffle deck and notify chat box
 			if(dynastyClicked)
 			{
-				dynastyDeck.shuffle();
+				state.getDynastyDeck().shuffle();
 				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " dynasty deck.", "Action");
 			}
 			else if(fateClicked)
 			{
-				fateDeck.shuffle();
+				state.getFateDeck().shuffle();
 				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " fate deck.", "Action");
 			}
 		}
@@ -742,7 +757,14 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		/********** Card Menu Items **********/
 		else if(name.equals("Unattach"))
 		{
-			clickedCard.unattach(clickedAttachment);
+			if(cardClicked)
+			{
+				clickedCard.unattach(clickedAttachment);
+			}
+			else
+			{
+				provinces.get(numProvClicked).unattach(clickedAttachment);
+			}
 			repaint();
 		}
 		else if(name.equals("Attach"))
