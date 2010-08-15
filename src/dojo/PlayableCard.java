@@ -13,6 +13,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -282,7 +283,15 @@ class PlayableCard extends Card
 					System.out.println("success!");
 					// Successfully got the files so we should have a valid imageLocation now
 					imageLocation = databaseCard.getImageLocation();
-				} catch (Throwable t) {
+				} catch (FileNotFoundException t) {
+					System.err.println("failed. Error unzipping downloaded file.");
+					// If we failed clean up leftover temporary files
+					File f = new File("tmp-imagepack.zip");
+					if(f.exists())
+					{
+						f.delete();
+					}
+				} catch (IOException t) {
 					System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
 					// If we failed clean up leftover temporary files
 					File f = new File("tmp-imagepack.zip");
