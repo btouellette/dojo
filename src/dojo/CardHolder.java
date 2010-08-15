@@ -12,14 +12,17 @@ public abstract class CardHolder
 	protected BufferedImage image;
 	// 0 is top card
 	protected ArrayList<PlayableCard> cards;
+	protected int location[];
 
 	public CardHolder()
 	{
+		location = new int[2];
 		cards = new ArrayList<PlayableCard>(45);
 	}
 	
 	public CardHolder(int listSize)
 	{
+		location = new int[2];
 		cards = new ArrayList<PlayableCard>(listSize);
 	}
 	
@@ -58,6 +61,27 @@ public abstract class CardHolder
 	public void removeAll()
 	{
 		cards.clear();
+	}
+
+	public void doubleClicked()
+	{
+		// If we have a card to put on the table do so
+		if(!cards.isEmpty())
+		{
+			PlayableCard card = remove();
+			PlayArea.displayedCards.add(card);
+			card.setLocationSimple(location[0], location[1] - (PlayArea.cardHeight+8));
+		}
+	}
+
+	public int[] getLocation()
+	{
+		return location.clone();
+	}
+
+	public void setLocation(int[] location)
+	{
+		this.location = location.clone();
 	}
 
 	public int numCards()

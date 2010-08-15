@@ -22,14 +22,17 @@ class Province extends CardHolder
 
 	public void doubleClicked()
 	{
-		if(!cards.get(0).isFaceUp())
+		if(!cards.isEmpty())
 		{
-			cards.get(0).setFaceUp();
-		}
-		else
-		{
-			PlayArea.displayedCards.add(remove());
-			//TODO: Set location appropriately
+			if(!cards.get(0).isFaceUp())
+			{
+				cards.get(0).setFaceUp();
+			}
+			else
+			{
+				// Do default (put card on table)
+				super.doubleClicked();
+			}
 		}
 	}
 
@@ -61,9 +64,9 @@ class Province extends CardHolder
 
 	public void rescale()
 	{
-		for(int i = 0; i < cards.size(); i++)
+		for(PlayableCard card : cards)
 		{
-			cards.get(i).rescale();
+			card.rescale();
 		}
 	}
 	

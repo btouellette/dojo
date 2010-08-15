@@ -42,7 +42,8 @@ class Main
 		int height = Preferences.height;
 
 		// Create the play area
-		playArea = createPlayArea(width, height);
+		playArea = new PlayArea(width, height);
+		playArea.setOpaque(true);
 
 		// Load in various images used in the program
 		StoredImages.loadImages();
@@ -189,19 +190,6 @@ class Main
 		menuBar.add(Box.createHorizontalStrut(3));
 
 		return menuBar;
-	}
-
-	private static PlayArea createPlayArea(int width, int height)
-	{
-		// Create the main play area
-		PlayArea playAreaPanel = new PlayArea(width, height);
-		playAreaPanel.setOpaque(true);
-		//TODO: Allow for custom backgrounds
-		playAreaPanel.setBackground(Color.WHITE);
-		//TODO: Save the last used size and load it here
-		playAreaPanel.setPreferredSize(new Dimension(width, height));
-
-		return playAreaPanel;
 	}
 
 	private static JSplitPane createInfoArea(int width, int height)
