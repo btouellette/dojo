@@ -19,33 +19,28 @@ class SliderListener implements ChangeListener
 
 		//TOOD: Update opponents cards too
 		// Rescale images for all cards in units in play
-		ListIterator<PlayableCard> iterator = PlayArea.displayedCards.listIterator();
-		while(iterator.hasNext())
+		for(PlayableCard card : PlayArea.displayedCards)
 		{
-			PlayableCard element = iterator.next();
-			element.rescale();
-			element.updateAttachmentLocations();
-			List<PlayableCard> attachments = element.getAllAttachments();
-			for(int i = 0; i < attachments.size(); i++)
+			card.rescale();
+			card.updateAttachmentLocations();
+			for(PlayableCard attachment : card.getAllAttachments())
 			{
-				attachments.get(i).rescale();
+				attachment.rescale();
 			}
 		}
 		// Rescale images from cards contained in provinces and province attachments
-		Province currentProvince;
-		for(int i = 0; i < PlayArea.provinces.size(); i++)
+		for(Province province : PlayArea.provinces)
 		{
-			currentProvince = PlayArea.provinces.get(i);
-			currentProvince.rescale();
-			List<PlayableCard> attachments = currentProvince.getAttachments();
-			for(int j = 0; j < attachments.size(); j++)
+			province.rescale();
+			for(PlayableCard attachment : province.getAttachments())
 			{
-				attachments.get(j).rescale();
+				attachment.rescale();
 			}
 		}
 		// Reload images used in multiple places
 		StoredImages.rescale();
-		// Repaint the whole area
+		// Rescale the PlayArea appropriately
+		Main.playArea.redrawBackground();
 		Main.playArea.repaint();
 	}
 }

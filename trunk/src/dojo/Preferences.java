@@ -41,6 +41,11 @@ class Preferences
 					else if(line.startsWith("sliderValue "))
 					{
 						sliderValue = Integer.parseInt(line.substring(12));
+						// Reset sliderValue if it is outside allowed range
+						if(sliderValue < 1 || sliderValue > 100) 
+						{
+							sliderValue = 50;
+						}
 					}
 					else if(line.startsWith("downloaded "))
 					{
@@ -82,5 +87,27 @@ class Preferences
 	
 	public static void writePreferences()
 	{
+		try {
+			FileWriter fw = new FileWriter("prefs.cfg");
+			fw.write("# Dojo config file\n");
+			fw.write("# Size to start program window (in pixels)\n");
+			fw.write("width " + width + "\n");
+			fw.write("height " + height + "\n");
+			fw.write("# Size of cards at start (1-100, 50 is default)\n");
+			fw.write("sliderValue " + sliderValue + "\n");
+			fw.write("# Image editions gotten from (or not present on) kamisasori.net\n");
+			for(String s : downloadedEditions)
+			{
+				fw.write("downloaded " + s + "\n");
+			}
+			fw.write("# User name to be used in chat box\n");
+			fw.write("userName " + userName + "\n");
+			fw.write("# Used for gender specific personalization (his or her)\n");
+			fw.write("gender " + gender + "\n");
+			fw.close();
+		} catch(IOException e) {
+			System.err.println("** Failed writing out config file");
+			System.err.println(e);
+		}
 	}
 }

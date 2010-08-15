@@ -37,7 +37,7 @@ class PlayableCard extends Card
 		
 		location = new int[2];
 		location[0] = 0;
-		location[1] = 0;
+		location[1] = 0;	
 		attachments = new ArrayList<PlayableCard>();
 		faceUp = false;
 		type = Main.databaseID.get(id).getType();
@@ -70,6 +70,11 @@ class PlayableCard extends Card
 		faceUp = true;
 	}
 
+	public boolean isBowed()
+	{
+		return bowed;
+	}
+
 	public void setLocation(int x, int y)
 	{
 		location[0] = x;
@@ -94,7 +99,6 @@ class PlayableCard extends Card
 		attachments.add(attachingCard);
 		PlayArea.displayedCards.remove(attachingCard);
 		updateAttachmentLocations();
-		Main.playArea.repaint();
 	}
 
 	public boolean unattach(PlayableCard unattachingCard)
@@ -104,7 +108,7 @@ class PlayableCard extends Card
 		// Found attached to this card
 		if(removed)
 		{
-			// Move the card into its own unit, update locations, and repaint
+			// Move the card into its own unit and update locations
 			int[] location = unattachingCard.getLocation();
 			unattachingCard.setLocation(location[0]+PlayArea.cardWidth, location[1]);
 			PlayArea.displayedCards.add(unattachingCard);
@@ -117,7 +121,6 @@ class PlayableCard extends Card
 			index++;
 		}
 		updateAttachmentLocations();
-		Main.playArea.repaint();
 		return removed;
 	}
 	
@@ -130,6 +133,8 @@ class PlayableCard extends Card
 		}
 		// Make sure we aren't being displayed on the field anymore
 		PlayArea.displayedCards.remove(this);
+		// Going into discard pile where everything is face up
+		faceUp = true;
 		// And put in appropriate discard
 		if(isDynasty())
 		{
@@ -151,7 +156,6 @@ class PlayableCard extends Card
 		{
 			bowed = !bowed;
 		}
-		Main.playArea.repaint();
 	}
 
 	public void updateAttachmentLocations()
@@ -174,17 +178,16 @@ class PlayableCard extends Card
 	public List<PlayableCard> getAllAttachments()
 	{
 		List<PlayableCard> recursedAttachments = new ArrayList<PlayableCard>();
-		for(int i = 0; i < attachments.size(); i++)
+		for(PlayableCard attachment : attachments)
 		{
 			// Put all the current attachments in the list
-			recursedAttachments.add(attachments.get(i));
+			recursedAttachments.add(attachment);
 			// And all the attachments attachments
-			recursedAttachments.addAll(attachments.get(i).getAllAttachments());
+			recursedAttachments.addAll(attachment.getAllAttachments());
 		}
 		return recursedAttachments;
 	}
 
-	//TODO: Display bowed images
 	public BufferedImage getImage()
 	{
 		// If the card isn't faceup return the default back images
@@ -226,7 +229,7 @@ class PlayableCard extends Card
 				try {
 					// Download image pack as zip via http
 					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
-					url.openConnection();
+					url.openConnection().setConnectTimeout(500);
 					InputStream is = url.openStream();
 					FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
 					for (int c = is.read(); c != -1; c = is.read())
@@ -275,11 +278,9 @@ class PlayableCard extends Card
 				}
 			}
 			// We should either have loaded in a valid image or have generated a placeholder one
-			//TODO: Check to see if there are performance increases that can be done here
 			try
 			{
 				// We read in and resize the image once, after that it is stored in PlayableCard
-				// Use GraphicsConfiguration.createCompatibleImage(w, h) if image isn't compatible
 				if(imageLocation != null)
 				{
 					originalImage = ImageIO.read(new File(imageLocation));
@@ -290,7 +291,8 @@ class PlayableCard extends Card
 				}
 				rescale();
 			} catch(IOException io) {
-				System.err.println(io);
+				System.err.println("** Failed to read in image from disk");
+				io.printStackTrace();
 			}
 		}
 		if(bowed)
@@ -335,8 +337,7 @@ class PlayableCard extends Card
 	{
 		// 306x428 is size of high res images provided by Alderac
 		BufferedImage image = new BufferedImage(306, 428, BufferedImage.TYPE_BYTE_GRAY);
-		image.createGraphics();
-		Graphics2D g = (Graphics2D)image.getGraphics();
+		Graphics2D g = image.createGraphics();
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, 306, 428);
 		g.setColor(Color.LIGHT_GRAY);

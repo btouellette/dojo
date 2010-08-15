@@ -3,9 +3,13 @@ package dojo;
 // Written by Brian Ouellette
 // Imports both The Game/Gempukku style decks as well as Egg style
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 class DeckImporter
 {
@@ -14,7 +18,7 @@ class DeckImporter
 		String path = file.getAbsolutePath();
 		// Grab the file extension
 		String fileType = path.substring(path.length()-4);
-		List<String> cards = new ArrayList<String>(100);
+		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			if(fileType.equals(".l5d"))
@@ -34,18 +38,29 @@ class DeckImporter
 		{
 			Deck dynasty = new Deck(true);
 			Deck fate = new Deck(false);
-
-			//TODO: See about replacing this with a legit iterator
-			for(int i = 0; i < cards.size(); i++)
+			PlayableCard wind = null, stronghold = null;
+			for(StoredCard currentCard : cards)
 			{
-				StoredCard currentCard = Main.databaseName.get(cards.get(i));
 				String type = currentCard.getType();
-				if(type.equals("winds") || type.equals("strongholds"))
+				if(type.equals("winds"))
 				{
-					//TODO: Set location appropriately
-					PlayArea.displayedCards.add(new PlayableCard(currentCard));
-					//TODO: Decide whether to handle multiple strongholds/winds in a deck specially or not
-					//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction), attach wind to stronghold in this same check
+					wind = new PlayableCard(currentCard);
+					PlayArea.displayedCards.add(wind);
+					if(stronghold != null)
+					{
+						stronghold.attach(wind);
+					}
+				}
+				if(type.equals("strongholds"))
+				{
+					stronghold = new PlayableCard(currentCard);
+					PlayArea.displayedCards.add(stronghold);
+					stronghold.setLocationSimple(PlayArea.cardWidth, PlayArea.height - PlayArea.cardHeight - 10);
+					if(wind != null)
+					{
+						stronghold.attach(wind);
+					}
+					//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
 				}
 				else if(currentCard.isDynasty())
 				{
@@ -62,12 +77,13 @@ class DeckImporter
 			dynasty.shuffle();
 		
 			Main.playArea.clearArea(dynasty, fate);
+			Main.playArea.repaint();
 		}
 	}
 
-	private static List<String> importEggStyle(BufferedReader br) throws IOException
+	private static List<StoredCard> importEggStyle(BufferedReader br) throws IOException
 	{
-		List<String> cards = new ArrayList<String>(100);
+		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String line;
 		// Iterate over the entire file
 		while((line = br.readLine()) != null)
@@ -86,18 +102,25 @@ class DeckImporter
 				// Then the card itself
 				String cardName = line.substring(count+1);
 				// And add the correct number of copies
+				StoredCard currentCard = Main.databaseName.get(cardName);
 				for(int i = 0; i < num; i++)
 				{
-					cards.add(cardName);
+					cards.add(currentCard);
 				}
 			}
 		}
 		return cards;
 	}
 
-	private static List<String> importGameStyle(BufferedReader br) throws IOException
+	private static List<StoredCard> importGameStyle(BufferedReader br) throws IOException
 	{
-		List<String> cards = new ArrayList<String>(100);
+		List<StoredCard> cards = new ArrayList<StoredCard>(100);
+		String deck = br.readLine();
+		StringTokenizer st = new StringTokenizer(deck, "|");
+		while(st.hasMoreTokens())
+		{
+			cards.add(Main.databaseID.get(st.nextToken()));
+		}
 		return cards;
 	}
 }

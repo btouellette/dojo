@@ -23,13 +23,6 @@ class Discard extends CardHolder
 		return returnedCard;
 	}
 
-	//TODO: Move this into CardHolder once there is a better way to update the location
-	public void doubleClicked()
-	{
-		PlayArea.displayedCards.add(remove());
-		//TODO: Set location
-	}
-
 	public void add(PlayableCard card)
 	{
 		super.add(card);
