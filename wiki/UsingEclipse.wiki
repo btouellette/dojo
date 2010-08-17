@@ -1,0 +1,14 @@
+#summary Using Eclipse with the project
+
+= Introduction =
+
+svn:ignore should be set up throughout the repo properly already to ignore anything Eclipse will make.
+
+Checkout a copy of the repo locally however you want. Start Eclipse and create a new project. Name it something and point it at the dojo root directory. 
+
+Now adjust so Eclipse doesn't explode on the hidden files in the checkout
+http://www.damonkohler.com/2009/07/make-eclipse-ignore-svn-directories.html
+
+At this point Eclipse has probably totally f*cked up your repo. Run svn up and then svn status. If you see "? (directory)" just delete the directory and svn up again until svn status doesn't print anything.
+
+Now you get to fight with Subversion instead of Eclipse! It probably won't restore the deleted directories correctly. Just make a completely fresh checkout somewhere else and copy it over top of the original checkout. Now do an svn up and svn status and hopefully everything is working. Create a Run Configuration that calls dojo.Main and go for it.
