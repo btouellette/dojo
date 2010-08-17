@@ -16,9 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -353,9 +351,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	// Pop up the correct context menu
 	private void showPopup(MouseEvent e)
-	{
-		Point clickPoint = e.getPoint();
-		
+	{		
 		// Now launch the right menu at the click location
 		if(attachmentClicked)
 		{

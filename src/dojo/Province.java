@@ -11,8 +11,6 @@ import java.awt.image.BufferedImage;
 class Province extends CardHolder
 {
 	private ArrayList<PlayableCard> attachments;
-	// Whether the cards in the province are face-up or not
-	private boolean faceUp;
 	
 	public Province()
 	{
