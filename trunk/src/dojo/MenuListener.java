@@ -4,8 +4,6 @@ package dojo;
 // Listener for all the menus at the top of the panel.
 
 import java.awt.event.*;
-import java.io.*;
-
 import javax.swing.*;
 import java.util.Random;
 

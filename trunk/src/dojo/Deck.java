@@ -3,9 +3,6 @@ package dojo;
 // Written by Brian Ouellette
 // Used for your dynasty and fate decks
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 //TODO: Add peek functionality
