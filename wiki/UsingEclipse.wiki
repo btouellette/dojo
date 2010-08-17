@@ -11,4 +11,4 @@ http://www.damonkohler.com/2009/07/make-eclipse-ignore-svn-directories.html
 
 At this point Eclipse has probably totally f*cked up your repo. Run svn up and then svn status. If you see "? (directory)" just delete the directory and svn up again until svn status doesn't print anything.
 
-Now you get to fight with Subversion instead of Eclipse! It probably won't restore the deleted directories correctly. Just make a completely fresh checkout somewhere else and copy it over top of the original checkout. Now do an svn up and svn status and hopefully everything is working. Create a Run Configuration that calls dojo.Main and go for it.
+Now you get to fight with Subversion instead of Eclipse! It probably won't restore the deleted directories correctly. If you deleted a directory and a base svn up isn't restoring it (I had to delete classes) then do a "svn up (directory)" to restore it directly.
