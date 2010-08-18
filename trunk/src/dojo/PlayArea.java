@@ -86,7 +86,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private void createMenu()
 	{
 		// Creates the context menus used in the application
-		//TODO: Flesh out context menus		
+		//TODO: Flesh out context menus
+		//TODO: Generate dynamically depending on what is clicked (add certain items for attached cards/dishonored cards/etc)
 		popupCard = new JPopupMenu();
 		popupAttachment = new JPopupMenu();
 		popupProv = new JPopupMenu();
@@ -719,6 +720,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			test.attach(new PlayableCard("IE094"));
 			test.attach(new PlayableCard("TH142"));
 			test.attach(new PlayableCard("IE095"));
+			displayedCards.get(0).dishonor();
 			repaint();
 		}
 	}

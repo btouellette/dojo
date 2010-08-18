@@ -32,9 +32,10 @@ class PlayableCard extends Card
 	// Location on the play area
 	private int[] location;
 	// Images to display, original kept for rescaling purposes
-	private BufferedImage originalImage, cardImage, cardImageBowed;
-	// Whether the card is visible or bowed
-	private boolean faceUp, bowed;
+	// Keeping these separate increases memory cost but saves CPU
+	private BufferedImage originalImage, cardImage, cardImageBowed, cardImageDishonored, cardImageBowedDishonored;
+	// Whether the card is visible, bowed, or dishonored
+	private boolean faceUp, bowed, dishonored;
 
 	public PlayableCard(String id)
 	{
@@ -44,8 +45,10 @@ class PlayableCard extends Card
 		location[0] = 0;
 		location[1] = 0;	
 		attachments = new ArrayList<PlayableCard>();
-		// Default to face down
+		// Default to face down, unbowed, and not dishonored
 		faceUp = false;
+		bowed = false;
+		dishonored = false;
 		// Pull type out of database and use it to determine whether the card is a dynasty or fate card
 		type = Main.databaseID.get(id).getType();
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
@@ -84,6 +87,16 @@ class PlayableCard extends Card
 	public void unbow()
 	{
 		bowed = false;
+	}
+	
+	public void dishonor()
+	{
+		dishonored = true;
+	}
+	
+	public void rehonor()
+	{
+		dishonored = false;
 	}
 
 	public void setLocation(int x, int y)
@@ -148,8 +161,9 @@ class PlayableCard extends Card
 		{
 			attachments.remove(0).destroy();
 		}
-		// Going into discard pile where everything is face up
+		// Going into discard pile where everything is face up and unbowed
 		faceUp = true;
+		bowed = false;
 		// And put in appropriate discard
 		Main.state.addToDiscard(this);
 	}
@@ -322,9 +336,17 @@ class PlayableCard extends Card
 			}
 		}
 		// Return the bowed image if bowed, otherwise return the default image
-		if(bowed)
+		if(bowed && dishonored)
+		{
+			return cardImageBowedDishonored;
+		}
+		else if(bowed)
 		{
 			return cardImageBowed;
+		}
+		else if(dishonored)
+		{
+			return cardImageDishonored;
 		}
 		return cardImage;
 	}
@@ -343,7 +365,6 @@ class PlayableCard extends Card
 			// If downsizing image
 			if(originalImage.getHeight() >= cardHeight)
 			{
-				
 				g.drawImage(originalImage.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
 				g.dispose();
 			}
@@ -359,8 +380,24 @@ class PlayableCard extends Card
 			// Translate as well so it ends up at the origin of the BufferedImage
 			AffineTransform tx = AffineTransform.getTranslateInstance(0,-cardImage.getHeight());
 			tx.quadrantRotate(1, 0, cardImage.getHeight());
-			AffineTransformOp rotate = new AffineTransformOp(tx, null);
-			cardImageBowed = rotate.filter(cardImage, null);
+			AffineTransformOp op = new AffineTransformOp(tx, null);
+			cardImageBowed = op.filter(cardImage, null);
+			
+			// Only create dishonored images for personalities
+			if(type.equals("personalities"))
+			{
+				// Flip regular image vertically
+				tx = AffineTransform.getScaleInstance(1, -1);
+				tx.translate(0, -cardImage.getHeight());
+				op = new AffineTransformOp(tx, null);
+				cardImageDishonored = op.filter(cardImage, null);
+				
+				// Flip bowed image horizontally
+				tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-cardImageBowed.getWidth(), 0);
+				op = new AffineTransformOp(tx, null);
+				cardImageBowedDishonored = op.filter(cardImageBowed, null);
+			}
 		}
 	}
 		

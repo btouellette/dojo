@@ -92,8 +92,15 @@ class Preferences
 			FileWriter fw = new FileWriter("prefs.cfg");
 			fw.write("# Dojo config file\n");
 			fw.write("# Size to start program window (in pixels)\n");
-			fw.write("width " + Main.playArea.getWidth() + "\n");
-			fw.write("height " + Main.playArea.getHeight() + "\n");
+			//TODO: Find out why these occasionally return 0 on a fresh checkout
+			if(Main.playArea.getWidth() > 0)
+			{
+				fw.write("width " + Main.playArea.getWidth() + "\n");
+			}
+			if(Main.playArea.getWidth() > 0)
+			{
+				fw.write("height " + Main.playArea.getHeight() + "\n");
+			}
 			fw.write("# Size of cards at start (1-100, 50 is default)\n");
 			fw.write("sliderValue " + sliderValue + "\n");
 			fw.write("# Image editions gotten from (or not present on) kamisasori.net\n");
