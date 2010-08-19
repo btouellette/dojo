@@ -16,7 +16,7 @@ Now you get to fight with Subversion instead of Eclipse! It probably won't resto
 Also occasionally other people's commits will bug out Eclipse and it'll tell you that it can't resolve Card/StoredCard and things to a type. DON'T PANIC! Find your towel and take a few deep breaths. Just edit any file and resave it to trigger a rebuild and it should be fine.
 
 STEP BY STEP
-
+{{{
 govtpiggy: then checkout a fresh version
 SolusAeternum: from which point
 SolusAeternum: in the directory
@@ -51,3 +51,4 @@ govtpiggy: now Finish
 govtpiggy: hit the big Run play button
 govtpiggy: select Java Application
 govtpiggy: and it should work
+}}}
