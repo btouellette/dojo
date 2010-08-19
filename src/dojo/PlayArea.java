@@ -727,17 +727,18 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	public void mouseMoved(MouseEvent e)
 	{
 		//TODO: Remove these lines once testing is done
-		List<PlayableCard> displayedCards = state.getAllCards();
-		if(displayedCards.isEmpty() && state.getDynastyDeck().numCards() == 0)
+		List<PlayableCard> cards = state.getAllCards();
+		if(cards.isEmpty() && state.getDynastyDeck().numCards() == 0)
 		{
-			displayedCards.add(0, new PlayableCard("CoB009"));
+			PlayableCard takuji = new PlayableCard("CoB009");
+			state.addDisplayedCard(takuji);
 			PlayableCard test = new PlayableCard("CoB069");
-			displayedCards.get(0).attach(test);
-			displayedCards.get(0).attach(new PlayableCard("DJH047"));
+			takuji.attach(test);
+			takuji.attach(new PlayableCard("DJH047"));
 			test.attach(new PlayableCard("IE094"));
 			test.attach(new PlayableCard("TH142"));
 			test.attach(new PlayableCard("IE095"));
-			displayedCards.get(0).dishonor();
+			takuji.dishonor();
 			repaint();
 		}
 	}
