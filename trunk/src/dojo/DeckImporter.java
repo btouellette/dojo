@@ -62,6 +62,7 @@ class DeckImporter
 				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
 				else if(type.equals("strongholds"))
 				{
+					System.out.println("test");
 					stronghold = new PlayableCard(currentCard);
 					Main.state.addDisplayedCard(stronghold);
 					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - Main.playArea.getCardHeight() - 10);

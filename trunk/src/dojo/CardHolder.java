@@ -4,6 +4,7 @@ package dojo;
 // Abstract class representing any game element which can hold cards in it
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -12,7 +13,7 @@ public abstract class CardHolder
 	// Image to display on table
 	protected BufferedImage image;
 	// 0 is top card
-	protected ArrayList<PlayableCard> cards;
+	protected List<PlayableCard> cards;
 	// Location inside the PlayArea
 	protected int location[];
 
@@ -79,7 +80,6 @@ public abstract class CardHolder
 			PlayableCard card = remove();
 			// No need to check for null here since we know there was a card to retrieve
 			// Put the removed card on the table and set its location to above the holder it used to be in
-			System.out.println(location[0]);
 			card.setLocationSimple(location[0], location[1] - (Main.playArea.getCardHeight()+8));
 			Main.state.addDisplayedCard(card);
 		}

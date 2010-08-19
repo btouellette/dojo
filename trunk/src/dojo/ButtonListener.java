@@ -13,24 +13,7 @@ class ButtonListener implements ActionListener
 		String name = ((AbstractButton)e.getSource()).getText();
 		if(name.equals("Unbow All"))
 		{
-			// Unbow all cards on the table
-			for(PlayableCard card : Main.state.getDisplayedCards())
-			{
-				card.unbow();
-				// And all cards attached to them
-				for(PlayableCard attachment : card.getAllAttachments())
-				{
-					attachment.unbow();
-				}
-			}
-			// And all cards attached to provinces
-			for(Province province : Main.state.getProvinces())
-			{
-				for(PlayableCard attachment : province.getAttachments())
-				{
-					attachment.unbow();
-				}
-			}
+			Main.state.unbowAll();
 			// And repaint so the unbowing is reflected in the display
 			Main.playArea.repaint();
 			// Send a message to the chatbox

@@ -6,7 +6,7 @@ package dojo;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -17,7 +17,7 @@ import org.xml.sax.*;
 class Main
 {
 	// Database of all cards in XML, ID or name maps to card
-	static HashMap<String, StoredCard> databaseID, databaseName;
+	static Map<String, StoredCard> databaseID, databaseName;
 	//TODO: It'd be nice to be able to set the font size of these elements in preferences somewhere
 	// Box for displaying chat messages
 	static JTextPane chatBox;
@@ -57,7 +57,7 @@ class Main
 		StoredImages.loadImages();
 
 		// Create the info area (card box, chat box, game info box)
-		JSplitPane infoArea = createInfoArea(width, height);
+		JSplitPane infoArea = createInfoArea(width);
 
 		// Create a split panel so that the relative size of the areas can be user controlled
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, playArea, infoArea);
@@ -202,7 +202,7 @@ class Main
 		return menuBar;
 	}
 
-	private static JSplitPane createInfoArea(int width, int height)
+	private static JSplitPane createInfoArea(int width)
 	{
 		// Create the chat/info area
 		JPanel infoArea = new JPanel();
@@ -332,10 +332,16 @@ class Main
 				// Clean up on failure so we don't leave temporary files around
 				File f = new File("cards-gempukku.zip");
 				if(f.exists())
+				{
 					f.delete();
+				}
 				System.exit(1);
 			}
-		} catch (Throwable t) {
+		} catch (ParserConfigurationException t) {
+			System.err.println("\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
+			t.printStackTrace();
+			System.exit(1);
+		} catch (SAXException t) {
 			System.err.println("\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
 			t.printStackTrace();
 			System.exit(1);

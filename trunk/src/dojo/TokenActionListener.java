@@ -47,7 +47,7 @@ class TokenActionListener implements ActionListener, MouseListener
 	{
 		// This is implementing a tip style combobox (light gray text until clicked in)
 		JComboBox comboBox = (JComboBox)e.getComponent();
-		if(comboBox.isEditable() == false)
+		if(!comboBox.isEditable())
 		{
 			comboBox.setEnabled(true);
 			comboBox.setEditable(true);

@@ -191,9 +191,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			g.drawImage(currentImage, startHand - (cardWidth+4), height - (cardHeight+4), null);
 		}
 
-		// Now that we've drawn all the play surface draw all the cards
-		List<PlayableCard> displayedCards = state.getDisplayedCards();
-		for(PlayableCard card : displayedCards)
+		// Now that we've drawn all the play surface draw all the cards on the table
+		List<PlayableCard> cards = state.getAllCards();
+		for(PlayableCard card : cards)
 		{
 			displayCard(card, (Graphics2D)g);
 		}
@@ -441,16 +441,16 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 		
-		List<PlayableCard> displayedCards = state.getDisplayedCards();
+		List<PlayableCard> cards = state.getAllCards();
 		List<Province> provinces = state.getProvinces();
 
-		int i = displayedCards.size();
+		int i = cards.size();
 		// Search first to see if any cards displayed on the JPanel were clicked
 		// This is in reverse order so topmost drawn cards are picked up first
 		while(!cardClicked && i > 0)
 		{
 			i--;
-			clickedCard = displayedCards.get(i);
+			clickedCard = cards.get(i);
 			int[] cardLocation = clickedCard.getLocation();	
 			cardArea.setLocation(cardLocation[0], cardLocation[1]);
 			if(clickedCard.isBowed())
@@ -468,8 +468,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				cardClicked = true;
 				attachmentClicked = false;
 				// Redraw the clicked card on top of the draw stack
-				displayedCards.remove(clickedCard);
-				displayedCards.add(clickedCard);
+				cards.remove(clickedCard);
+				cards.add(clickedCard);
 				// Store the distance between the click and the root of the card to update location on drag correctly
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
@@ -503,8 +503,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						cardClicked = true;
 						attachmentClicked = true;
 						// Redraw the clicked card on top of the draw stack
-						displayedCards.remove(clickedCard);
-						displayedCards.add(clickedCard);
+						cards.remove(clickedCard);
+						cards.add(clickedCard);
 						// Store the distance between the click and the root of the card to update location on drag correctly
 						distanceX = (int)clickPoint.getX() - cardLocation[0];
 						distanceY = (int)clickPoint.getY() - cardLocation[1];
@@ -638,9 +638,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseReleased(MouseEvent e)
 	{
-		// Check if card was dragged into a discard
 		if(cardClicked)
 		{
+			// Check if card was dragged into a discard
 			int[] location = clickedCard.getLocation();
 			int startHand = width - (int)(cardWidth*1.5);
 			// This location corresponds to the snap (and display) points for cards in the discard
@@ -649,6 +649,23 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				clickedCard.destroy();
 				// Discard image has changed so repaint
 				repaint();
+			}
+			
+			// Check if card was dragged into hand
+			if(location[0] >= startHand && !state.handContains(clickedCard))
+			{
+				if(state.removeDisplayedCard(clickedCard))
+				{
+					state.addToHand(clickedCard);
+				}
+			}
+			// Check if card was dragged out of hand
+			else if(location[0] < startHand && state.handContains(clickedCard))
+			{
+				if(state.removeFromHand(clickedCard))
+				{
+					state.addDisplayedCard(clickedCard);
+				}
 			}
 		}
 		// Show appropriate right-click menus (has to be here as well as mousePressed for cross-platform compatibility
@@ -709,11 +726,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseMoved(MouseEvent e)
 	{
-		List<PlayableCard> displayedCards = state.getDisplayedCards();
+		//TODO: Remove these lines once testing is done
+		List<PlayableCard> displayedCards = state.getAllCards();
 		if(displayedCards.isEmpty() && state.getDynastyDeck().numCards() == 0)
 		{
-			//TODO: Remove these lines once testing is done
-			displayedCards.add(0, new PlayableCard("CoB009"));;
+			displayedCards.add(0, new PlayableCard("CoB009"));
 			PlayableCard test = new PlayableCard("CoB069");
 			displayedCards.get(0).attach(test);
 			displayedCards.get(0).attach(new PlayableCard("DJH047"));
