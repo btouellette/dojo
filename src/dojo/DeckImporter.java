@@ -47,13 +47,14 @@ class DeckImporter
 			// For every card we imported
 			for(StoredCard currentCard : cards)
 			{
+				//TODO: Wind/stronghold placement doesn't work, debug
 				// Check the type
 				String type = currentCard.getType();
 				// If the card is a wind put it on the table instead of in a deck and if there is a stronghold on the table attach the wind to it
 				if(type.equals("winds"))
 				{
 					wind = new PlayableCard(currentCard);
-					Main.state.addDisplayedCard(wind);
+					Main.state.addToTable(wind);
 					if(stronghold != null)
 					{
 						stronghold.attach(wind);
@@ -62,9 +63,8 @@ class DeckImporter
 				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
 				else if(type.equals("strongholds"))
 				{
-					System.out.println("test");
 					stronghold = new PlayableCard(currentCard);
-					Main.state.addDisplayedCard(stronghold);
+					Main.state.addToTable(stronghold);
 					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - Main.playArea.getCardHeight() - 10);
 					if(wind != null)
 					{

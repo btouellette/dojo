@@ -650,23 +650,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				// Discard image has changed so repaint
 				repaint();
 			}
-			
-			// Check if card was dragged into hand
-			if(location[0] >= startHand && !state.handContains(clickedCard))
-			{
-				if(state.removeDisplayedCard(clickedCard))
-				{
-					state.addToHand(clickedCard);
-				}
-			}
-			// Check if card was dragged out of hand
-			else if(location[0] < startHand && state.handContains(clickedCard))
-			{
-				if(state.removeFromHand(clickedCard))
-				{
-					state.addDisplayedCard(clickedCard);
-				}
-			}
 		}
 		// Show appropriate right-click menus (has to be here as well as mousePressed for cross-platform compatibility
 		if(e.isPopupTrigger())
@@ -684,7 +667,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			int newX = (int)clickPoint.getX() - distanceX;
 			int newY = (int)clickPoint.getY() - distanceY;
 			
-			// TODO: modify for dragging into/out of hand when implemented
 			// TODO: Snap into decks and empty provinces as well
 			// Don't let them drag cards off the playing field entirely, apply a 10 pixel boundary to all sides
 			if(newX < 10 - cardWidth)
@@ -718,7 +700,38 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				newX = startHand - (cardWidth+4);
 				newY = height - (cardHeight+4);
 			}
-			// Update location and repaint since card has probably been moved
+			
+			// Detect if dragged near hand border and stall so it is obvious which the card is in
+			if(newX < startHand && newX > startHand - cardWidth)
+			{
+				if(!state.handContains(clickedCard))
+				{
+					newX = startHand - cardWidth;
+				}
+				else
+				{
+					newX = startHand;
+				}
+			}
+
+			// Check if card was dragged into hand
+			if(newX >= startHand && !state.handContains(clickedCard))
+			{
+				if(state.removeFromTable(clickedCard))
+				{
+					state.addToHand(clickedCard);
+				}
+			}
+			// Check if card was dragged out of hand
+			else if(newX < startHand && state.handContains(clickedCard))
+			{
+				if(state.removeFromHand(clickedCard))
+				{
+					state.addToTable(clickedCard);
+				}
+			}
+			
+			// Update location and repaint since card has been moved
 			clickedCard.setLocation(newX, newY);
 			repaint();
 		}
@@ -731,7 +744,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		if(cards.isEmpty() && state.getDynastyDeck().numCards() == 0)
 		{
 			PlayableCard takuji = new PlayableCard("CoB009");
-			state.addDisplayedCard(takuji);
+			state.addToTable(takuji);
 			PlayableCard test = new PlayableCard("CoB069");
 			takuji.attach(test);
 			takuji.attach(new PlayableCard("DJH047"));
