@@ -13,7 +13,8 @@ class GameState {
 	// Provinces (left to right from 0->max)
 	private List<Province> provinces;
 	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
-	private List<PlayableCard> displayedCards;
+	// This is done so that attachments will always be drawn behind units
+	private List<PlayableCard> table;
 	// Cards present in the players hand
 	private List<PlayableCard> hand;
 	// All cards visible to player, to keep necessary logic during repaint down
@@ -36,7 +37,7 @@ class GameState {
 		fateDiscard = new Discard();
 
 		// Create a new ArrayList to hold the cards to display
-		displayedCards = new ArrayList<PlayableCard>(12);
+		table = new ArrayList<PlayableCard>(12);
 		hand = new ArrayList<PlayableCard>(8);
 		allCards = new ArrayList<PlayableCard>(20);
 	}
@@ -44,7 +45,7 @@ class GameState {
 	public void rescale()
 	{
 		// Rescale images for all cards in units in play
-		for(PlayableCard card : displayedCards)
+		for(PlayableCard card : table)
 		{
 			card.rescale();
 			card.updateAttachmentLocations();
@@ -65,7 +66,9 @@ class GameState {
 	{
 		// Used when loading a new deck or clearing the field
 		// Remove all cards from play
-		displayedCards.clear();
+		table.clear();
+		hand.clear();
+		allCards.clear();
 		// Remove all cards from discards
 		fateDiscard.removeAll();
 		dynastyDiscard.removeAll();
@@ -108,7 +111,7 @@ class GameState {
 	public void addToDiscard(PlayableCard card)
 	{
 		// Takes a card from displayedCards and puts it in the appropriate discard
-		displayedCards.remove(card);
+		table.remove(card);
 		if(card.isDynasty())
 		{
 			dynastyDiscard.add(card);
@@ -122,7 +125,7 @@ class GameState {
 	public void unbowAll()
 	{
 		// Unbow all cards on the table
-		for(PlayableCard card : displayedCards)
+		for(PlayableCard card : table)
 		{
 			card.unbow();
 			// And all cards attached to them
@@ -146,21 +149,27 @@ class GameState {
 		return allCards;
 	}
 
-	public boolean addDisplayedCard(PlayableCard card)
+	public boolean addToTable(PlayableCard card)
 	{
 		// If we successfully add it then also add to all cards and indicate success
-		if(displayedCards.add(card))
+		if(table.add(card))
 		{
 			allCards.add(card);
 			return true;
 		}
 		return false;
 	}
+	
+	// Remove from either the table or the hand, wherever it is
+	public boolean removeCard(PlayableCard card)
+	{
+		return removeFromTable(card) || removeFromHand(card);
+	}
 
-	public boolean removeDisplayedCard(PlayableCard card)
+	public boolean removeFromTable(PlayableCard card)
 	{
 		// If we successfully remove it then also remove from all cards and indicate success
-		if(displayedCards.remove(card))
+		if(table.remove(card))
 		{
 			allCards.remove(card);
 			return true;
@@ -192,6 +201,20 @@ class GameState {
 	
 	public boolean handContains(PlayableCard card)
 	{
-		return hand.contains(card);
+		// See if the card is directly contained in the hand
+		if(hand.contains(card))
+		{
+			return true;
+		}
+		// If not see if it is attached to something in the hand
+		for(PlayableCard base : hand)
+		{
+			if(base.getAllAttachments().contains(card))
+			{
+				return true;
+			}
+		}
+		// Failed all tests. Must not be in hand
+		return false;
 	}
 }

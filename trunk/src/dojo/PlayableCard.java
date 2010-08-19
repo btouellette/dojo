@@ -124,7 +124,8 @@ class PlayableCard extends Card
 	{
 		// Attach the card and then remove it from the list of units
 		attachments.add(attachingCard);
-		Main.state.removeDisplayedCard(attachingCard);
+		// Remove it from the table or the hand appropriately
+		Main.state.removeCard(attachingCard);
 		// Attachment locations need to be updated since the cards have changed
 		updateAttachmentLocations();
 	}
@@ -137,8 +138,16 @@ class PlayableCard extends Card
 		{
 			// Move the card into its own unit and update locations
 			int[] location = unattachingCard.getLocation();
-			unattachingCard.setLocation(location[0]+Main.playArea.getCardWidth(), location[1]);
-			Main.state.addDisplayedCard(unattachingCard);
+			//TODO: Do this movement better (move right unless it would put it in a different hand/table position)
+			unattachingCard.setLocation(location[0], location[1] - Main.playArea.getCardHeight());
+			if(Main.state.handContains(this))
+			{
+				Main.state.addToHand(unattachingCard);
+			}
+			else
+			{
+				Main.state.addToTable(unattachingCard);
+			}
 		}
 		// We didn't find it attached to the base card in the unit.
 		// Recurse through attachments of attachments
