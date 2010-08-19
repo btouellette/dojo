@@ -384,6 +384,7 @@ class PlayableCard extends Card
 			cardImageBowed = op.filter(cardImage, null);
 			
 			// Only create dishonored images for personalities
+			//TODO: Visually inspect these at high and low res to ensure no loss of quality
 			if(type.equals("personalities"))
 			{
 				// Flip regular image vertically

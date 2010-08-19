@@ -5,6 +5,7 @@ package dojo;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
+import java.util.Map;
 import java.util.HashMap;
 
 class XMLImporter extends DefaultHandler
@@ -13,7 +14,7 @@ class XMLImporter extends DefaultHandler
 	//private String version;
 	private String eName;
 	// Database to map ID or name to card
-	private HashMap<String, StoredCard> databaseID, databaseName;
+	private Map<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
 	public XMLImporter()
@@ -34,12 +35,12 @@ class XMLImporter extends DefaultHandler
 		databaseName = new HashMap<String, StoredCard>(1500);
 	}
 
-	public HashMap<String, StoredCard> getIDDatabase()
+	public Map<String, StoredCard> getIDDatabase()
 	{
 		return databaseID;
 	}
 	
-	public HashMap<String, StoredCard> getNameDatabase()
+	public Map<String, StoredCard> getNameDatabase()
 	{
 		return databaseName;
 	}

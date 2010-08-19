@@ -14,6 +14,10 @@ class GameState {
 	private List<Province> provinces;
 	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
 	private List<PlayableCard> displayedCards;
+	// Cards present in the players hand
+	private List<PlayableCard> hand;
+	// All cards visible to player, to keep necessary logic during repaint down
+	private List<PlayableCard> allCards;
 
 	public GameState()
 	{
@@ -32,7 +36,8 @@ class GameState {
 		fateDiscard = new Discard();
 
 		// Create a new ArrayList to hold the cards to display
-		displayedCards = new ArrayList<PlayableCard>(30);
+		displayedCards = new ArrayList<PlayableCard>(10);
+		hand = new ArrayList<PlayableCard>(8);
 	}
 
 	public void rescale()
@@ -73,6 +78,7 @@ class GameState {
 		provinces.add(new Province());
 	}
 
+	//TODO: Move logic from random classes into GameState, these getters should all be gone eventually ideally
 	public List<Province> getProvinces()
 	{
 		return provinces;
@@ -111,19 +117,80 @@ class GameState {
 			fateDiscard.add(card);
 		}
 	}
-
-	public List<PlayableCard> getDisplayedCards()
+	
+	public void unbowAll()
 	{
-		return displayedCards;
+		// Unbow all cards on the table
+		for(PlayableCard card : displayedCards)
+		{
+			card.unbow();
+			// And all cards attached to them
+			for(PlayableCard attachment : card.getAllAttachments())
+			{
+				attachment.unbow();
+			}
+		}
+		// And all cards attached to provinces
+		for(Province province : provinces)
+		{
+			for(PlayableCard attachment : province.getAttachments())
+			{
+				attachment.unbow();
+			}
+		}
+	}
+	
+	public List<PlayableCard> getAllCards()
+	{
+		return allCards;
 	}
 
-	public void addDisplayedCard(PlayableCard card)
+	public boolean addDisplayedCard(PlayableCard card)
 	{
-		displayedCards.add(card);
+		// If we successfully add it then also add to all cards and indicate success
+		if(displayedCards.add(card))
+		{
+			allCards.add(card);
+			return true;
+		}
+		return false;
 	}
 
-	public void removeDisplayedCard(PlayableCard card)
+	public boolean removeDisplayedCard(PlayableCard card)
 	{
-		displayedCards.remove(card);
+		// If we successfully remove it then also remove from all cards and indicate success
+		if(displayedCards.remove(card))
+		{
+			allCards.remove(card);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean addToHand(PlayableCard card)
+	{
+		// If we successfully add it then also add to all cards and indicate success
+		if(hand.add(card))
+		{
+			allCards.add(card);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean removeFromHand(PlayableCard card)
+	{
+		// If we successfully remove it then also remove from all cards and indicate success
+		if(hand.remove(card))
+		{
+			allCards.remove(card);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean handContains(PlayableCard card)
+	{
+		return hand.contains(card);
 	}
 }

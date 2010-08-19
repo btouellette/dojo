@@ -3,6 +3,7 @@ package dojo;
 // Written by Brian Ouellette
 // Used for representing your provinces
 
+import java.util.List;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 
@@ -10,7 +11,7 @@ import java.awt.image.BufferedImage;
 //TODO: Add support for provinces which don't refill
 class Province extends CardHolder
 {
-	private ArrayList<PlayableCard> attachments;
+	private List<PlayableCard> attachments;
 	
 	public Province()
 	{
@@ -41,7 +42,7 @@ class Province extends CardHolder
 		return cards.isEmpty();
 	}
 		
-	public ArrayList<PlayableCard> getAttachments()
+	public List<PlayableCard> getAttachments()
 	{
 		return attachments;
 	}

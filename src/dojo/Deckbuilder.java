@@ -3,18 +3,39 @@ package dojo;
 // Written by James Spencer
 // Deck building interface and logic
 
-import java.awt.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+
 
 class Deckbuilder
 {
-	private static ArrayList<String> legalChoices = new ArrayList<String>();
+	private static List<String> legalChoices = new ArrayList<String>();
 	private static String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
 	                         "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
 	                         "Focus Value: "};
-	private static ArrayList<String> types = new ArrayList<String>();
-	private static ArrayList<String> clans = new ArrayList<String>();
+	private static List<String> types = new ArrayList<String>();
+	private static List<String> clans = new ArrayList<String>();
 	private static JLabel[] c = new JLabel[11];
 	private static JScrollPane listScroller;
 
@@ -46,7 +67,7 @@ class Deckbuilder
 			StoredCard currentCard = Main.databaseID.get(p[i]);
 			vect.add(Main.databaseID.get(p[i]));
 
-			ArrayList<String> currentCardLegal = currentCard.getLegal();
+			List<String> currentCardLegal = currentCard.getLegal();
 			for(int k = 0; k < currentCardLegal.size(); k++)
 			{
 				if(!legalChoices.contains(currentCardLegal.get(k)))
@@ -61,7 +82,7 @@ class Deckbuilder
 				types.add(currentCardType);
 			}
 
-			ArrayList<String> currentCardClan = currentCard.getClan();
+			List<String> currentCardClan = currentCard.getClan();
 			for(int k = 0; k < currentCardClan.size(); k++)
 			{
 				if(!clans.contains(currentCardClan.get(k)))

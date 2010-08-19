@@ -4,6 +4,7 @@ package dojo;
 // Format in which cards are stored in the database after being read in from XML.
 // Use PlayableCard for anything outside the database and decks
 
+import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
@@ -11,8 +12,8 @@ class StoredCard extends Card
 {
 	private String type;
 	private String name;
-	private ArrayList<String> imageLocation, imageEdition;
-	private ArrayList<String> legal, clan;
+	private List<String> imageLocation, imageEdition;
+	private List<String> legal, clan;
 	private String edition, text, cost, focus;
 	private String provinceStrength, goldProduction, startingHonor;
 	private String force, chi, personalHonor, honorReq;
@@ -150,7 +151,9 @@ class StoredCard extends Card
 			cardImageLoc = imageLocation.get(count);
 			// Only return it if the file exists
 			if((new File(cardImageLoc)).exists())
+			{
 				return cardImageLoc;
+			}
 			count++;
 		}
 		return null;
@@ -186,7 +189,7 @@ class StoredCard extends Card
 		return focus;
 	}
 
-	public ArrayList<String> getClan()
+	public List<String> getClan()
 	{
 		return clan;
 	}
@@ -231,7 +234,7 @@ class StoredCard extends Card
 		return name;
 	}
 	
-	public ArrayList<String> getLegal()
+	public List<String> getLegal()
 	{
 		return legal;
 	}
