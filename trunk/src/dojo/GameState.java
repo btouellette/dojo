@@ -36,8 +36,9 @@ class GameState {
 		fateDiscard = new Discard();
 
 		// Create a new ArrayList to hold the cards to display
-		displayedCards = new ArrayList<PlayableCard>(10);
+		displayedCards = new ArrayList<PlayableCard>(12);
 		hand = new ArrayList<PlayableCard>(8);
+		allCards = new ArrayList<PlayableCard>(20);
 	}
 
 	public void rescale()

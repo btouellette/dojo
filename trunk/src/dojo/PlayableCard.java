@@ -43,7 +43,7 @@ class PlayableCard extends Card
 		
 		location = new int[2];
 		location[0] = 0;
-		location[1] = 0;	
+		location[1] = 0;
 		attachments = new ArrayList<PlayableCard>();
 		// Default to face down, unbowed, and not dishonored
 		faceUp = false;
