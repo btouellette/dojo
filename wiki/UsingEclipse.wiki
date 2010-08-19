@@ -17,11 +17,10 @@ Also occasionally other people's commits will bug out Eclipse and it'll tell you
 
 STEP BY STEP
 {{{
-govtpiggy: then checkout a fresh version
+govtpiggy: checkout a fresh version
 SolusAeternum: from which point
 SolusAeternum: in the directory
 govtpiggy: from google code
-govtpiggy: deleted the whole thing
 SolusAeternum: yeah
 SolusAeternum: checkout to where though
 govtpiggy: and checkout from /trunk/
