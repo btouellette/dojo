@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -119,7 +118,7 @@ class Deckbuilder
 		Collections.sort(clans);
 	}
 
-	public static void showGUI(int width, int height)
+	public void showGUI(int width, int height)
 	{
 		frame = new JFrame("DeckBuilder");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -133,7 +132,7 @@ class Deckbuilder
         width+=12;
         height+=187;
 
-		JPanel panel1 = createSearch(width,height);
+		JPanel panel1 = createSearch(width);
 		panel1.setMaximumSize(panel1.getPreferredSize());
 
 		JPanel resPanel = resultPanel();
@@ -151,24 +150,6 @@ class Deckbuilder
 
 		frame.pack();
         frame.setVisible(true);
-	}
-
-	private static JPanel createBar()
-	{
-		JPanel panel = new JPanel();
-		min = new JTextField(3);
-		min.getDocument().addDocumentListener(new MyDocumentListener());
-		max = new JTextField(3);
-		max.getDocument().addDocumentListener(new MyDocumentListener());
-		JLabel to = new JLabel(" to ");
-		to.setMaximumSize(new Dimension(20,20));
-		to.setFont(new Font("Serif", Font.PLAIN, 12));
-		panel.setMaximumSize(new Dimension(140,20));
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.add(min);
-		panel.add(to);
-		panel.add(max);
-		return (panel);
 	}
 
 	private static JMenuBar createMenuBar(int width)
@@ -217,7 +198,7 @@ class Deckbuilder
 		return(menuBar);
 	}
 
-	private static JPanel createSearch(int width, int height)
+	private static JPanel createSearch(int width)
 	{
 		ActionListener pewp = new ActionListener()
 		{
