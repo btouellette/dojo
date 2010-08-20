@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
@@ -352,7 +353,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	// Pop up the correct context menu
 	private void showPopup(MouseEvent e)
-	{		
+	{
 		// Now launch the right menu at the click location
 		if(attachmentClicked)
 		{
@@ -643,12 +644,36 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			// Check if card was dragged into a discard
 			int[] location = clickedCard.getLocation();
 			int startHand = width - (int)(cardWidth*1.5);
-			// This location corresponds to the snap (and display) points for cards in the discard
-			if(location[1] == height - (cardHeight+4) && (location[0] == 4 || location[0] == startHand - (cardWidth+4)))
+			// Detect if a card was dragged into a discard or deck
+			if(location[1] == height - (cardHeight+4))
 			{
-				clickedCard.destroy();
-				// Discard image has changed so repaint
-				repaint();
+				// This location corresponds to the snap (and display) points for cards in the discard
+				if(location[0] == 4 || location[0] == startHand - (cardWidth+4))
+				{
+					clickedCard.destroy();
+					// Discard image has changed so repaint
+					repaint();
+				}
+				// This location corresponds to the snap (and display) points for cards in the decks
+				else if((location[0] == cardWidth+10 || location[0] == startHand - 2*(cardWidth+5)))
+				{
+					clickedCard.moveToDeck();
+					// Discard image has changed so repaint
+					repaint();
+				}
+			}
+			// Now check provinces and only move into a province if they are dragging a single dynasty card into it
+			if(clickedCard.isDynasty() && clickedCard.getAllAttachments().isEmpty())
+			{
+				for(Province province : state.getProvinces())
+				{
+					// And then only if the province is empty
+					if(province.isEmpty() && Arrays.equals(location, province.getLocation()))
+					{
+						clickedCard.moveToProvince(province);
+						repaint();
+					}
+				}
 			}
 		}
 		// Show appropriate right-click menus (has to be here as well as mousePressed for cross-platform compatibility
@@ -694,11 +719,36 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			}
 			// Detect if dragged into fate discard and update location if so
 			int startHand = width - (int)(cardWidth*1.5);
-			area = new Rectangle(startHand - (cardWidth+6), height - (cardHeight+6), cardWidth+4, cardHeight+4);
+			area.setLocation(startHand - (cardWidth+6), height - (cardHeight+6));
 			if(area.contains(clickPoint))
 			{
 				newX = startHand - (cardWidth+4);
 				newY = height - (cardHeight+4);
+			}
+			// Detect if dragged into dynasty deck
+			area.setLocation(cardWidth+8, height - (cardHeight+6));
+			if(area.contains(clickPoint))
+			{
+				newX = cardWidth+10;
+				newY = height - (cardHeight+4);
+			}
+			// Detect if dragged into fate deck
+			area.setLocation(startHand - 2*(cardWidth+4), height - (cardHeight+6));
+			if(area.contains(clickPoint))
+			{
+				newX = startHand - 2*(cardWidth+5);
+				newY = height - (cardHeight+4);
+			}
+			// Detect if dragged into a province and a valid target to be put in one
+			for(Province province : state.getProvinces())
+			{
+				int[] location = province.getLocation();
+				area.setLocation(location[0]-2, location[1]-2);
+				if(area.contains(clickPoint) && clickedCard.getAllAttachments().isEmpty() && clickedCard.isDynasty())
+				{
+					newX = location[0];
+					newY = location[1];					
+				}
 			}
 			
 			// Detect if dragged near hand border and stall so it is obvious which the card is in

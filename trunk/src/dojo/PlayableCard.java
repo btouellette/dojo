@@ -165,7 +165,7 @@ class PlayableCard extends Card
 	
 	public void destroy()
 	{
-		// Destroy all our attachments firsts
+		// Destroy all our attachments first
 		while(!attachments.isEmpty())
 		{
 			attachments.remove(0).destroy();
@@ -175,6 +175,36 @@ class PlayableCard extends Card
 		bowed = false;
 		// And put in appropriate discard
 		Main.state.addToDiscard(this);
+	}
+
+	public void moveToDeck()
+	{
+		// Move all our attachments first
+		while(!attachments.isEmpty())
+		{
+			attachments.remove(0).moveToDeck();
+		}
+		// Going into deck where everything is face down, unbowed, and honorable
+		faceUp = false;
+		bowed = false;
+		dishonored = false;
+		// And put in appropriate deck
+		Main.state.addToDeck(this);
+	}
+
+	public void moveToProvince(Province province)
+	{
+		// Don't go if we have attachments
+		if(!attachments.isEmpty())
+		{
+			return;
+		}
+		// Going into a province where everything is unbowed and honorable
+		bowed = false;
+		dishonored = false;
+		// And put in appropriate province
+		Main.state.removeFromTable(this);
+		province.add(this);
 	}
 
 	public void doubleClicked()

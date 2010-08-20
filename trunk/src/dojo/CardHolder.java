@@ -108,9 +108,4 @@ public abstract class CardHolder
 		// Randomly distributes the cards in the list
 		Collections.shuffle(cards);
 	}
-	
-	public void setImage(BufferedImage image)
-	{ 
-		this.image = image;
-	}
 }

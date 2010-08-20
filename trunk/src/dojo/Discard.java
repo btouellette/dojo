@@ -17,15 +17,21 @@ class Discard extends CardHolder
 			// If the discard is now empty set the image to null, otherwise update it
 			if(cards.isEmpty())
 			{
-				setImage(null);
+				image = null;
 			}
 			else
 			{
 				// Top card has changed so update image
-				setImage(cards.get(0).getImage());
+				image = cards.get(0).getImage();
 			}
 		}
 		return returnedCard;
+	}
+
+	public void removeAll()
+	{
+		super.removeAll();
+		image = null;
 	}
 
 	//TOOD: implement public PlayableCard remove(PlayableCard card) for use in search
@@ -34,7 +40,7 @@ class Discard extends CardHolder
 	{
 		super.add(card);
 		// Top card has changed so update image
-		setImage(card.getImage());
+		image = card.getImage();
 	}
 	
 	public BufferedImage getImage()
