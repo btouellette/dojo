@@ -54,23 +54,14 @@ class DeckImporter
 				if(type.equals("winds"))
 				{
 					wind = new PlayableCard(currentCard);
-					Main.state.addToTable(wind);
-					if(stronghold != null)
-					{
-						stronghold.attach(wind);
-					}
+					wind.setFaceUp();
 				}
 				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
 				else if(type.equals("strongholds"))
 				{
 					stronghold = new PlayableCard(currentCard);
-					Main.state.addToTable(stronghold);
-					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - Main.playArea.getCardHeight() - 10);
-					if(wind != null)
-					{
-						stronghold.attach(wind);
-					}
-					//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
+					stronghold.setFaceUp();
+					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - 2*Main.playArea.getCardHeight() - 20);	
 				}
 				// If it isn't a special type of card just add it to the appropriate deck
 				else if(currentCard.isDynasty())
@@ -88,6 +79,16 @@ class DeckImporter
 			dynasty.shuffle();
 		
 			Main.state.resetState(dynasty, fate);
+			// After clearing the table put out the stronghold and wind
+			if(stronghold != null)
+			{
+				Main.state.addToTable(stronghold);
+				if(wind != null)
+				{
+					stronghold.attach(wind);
+				}
+				//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
+			}
 			Main.playArea.redrawBackground();
 			Main.playArea.repaint();
 		}
