@@ -110,8 +110,9 @@ class GameState {
 
 	public void addToDiscard(PlayableCard card)
 	{
-		// Takes a card from displayedCards and puts it in the appropriate discard
+		// Takes a card from table and puts it in the appropriate discard
 		table.remove(card);
+		allCards.remove(card);
 		if(card.isDynasty())
 		{
 			dynastyDiscard.add(card);
@@ -119,6 +120,21 @@ class GameState {
 		else
 		{
 			fateDiscard.add(card);
+		}
+	}
+
+	public void addToDeck(PlayableCard card)
+	{
+		// Takes a card from table and puts it in the appropriate deck
+		table.remove(card);
+		allCards.remove(card);
+		if(card.isDynasty())
+		{
+			dynastyDeck.add(card);
+		}
+		else
+		{
+			fateDeck.add(card);
 		}
 	}
 	
