@@ -74,7 +74,7 @@ class Main
 		// Display the window
 		frame.pack();
 
-		deckBuilder = new Deckbuilder();
+		//deckBuilder = new Deckbuilder(frame.getWidth(),frame.getHeight());
 		//Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
 
 		frame.setVisible(true);
