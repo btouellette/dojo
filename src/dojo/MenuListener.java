@@ -36,8 +36,7 @@ class MenuListener implements ActionListener
 		}
 		else if(name.equals("Deckbuilder"))
 		{
-			Deckbuilder deck = new Deckbuilder();
-			deck.showGUI(Main.frame.getWidth(),Main.frame.getHeight());
+			Deckbuilder.showGUI(Main.frame.getWidth(),Main.frame.getHeight());
 		}
 		else if(name.equals("Preferences"))
 		{

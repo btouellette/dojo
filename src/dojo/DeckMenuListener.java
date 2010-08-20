@@ -172,7 +172,7 @@ class DeckMenuListener implements ActionListener
 					{
 						if (Main.databaseID.get(p[i]).getName().equals(val))
 						{
-							if(Main.databaseID.get(p[i]).isDyn())
+							if(Main.databaseID.get(p[i]).isDynasty())
 								Deckbuilder.dyn.add(Main.databaseID.get(p[i]));
 							else
 								Deckbuilder.fate.add(Main.databaseID.get(p[i]));
