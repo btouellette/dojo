@@ -238,14 +238,4 @@ class StoredCard extends Card
 	{
 		return legal;
 	}
-	public boolean isDyn()
-	{
-		if(type.equals("strongholds")||
-			type.equals("events")||
-				type.equals("holdings")||
-					type.equals("personalities")||
-     					type.equals("regions"))
-     		return true;
-     	return false;
-	}
 }

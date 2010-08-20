@@ -15,7 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -587,10 +586,9 @@ class Deckbuilder
 	}
 	public static void Display()
     {
-		int max,y, gmin;
+		int max,y;
 		String type="", clan, legal;
 		String titleVal, textVal;
-		Vector<StoredCard> stor = new Vector<StoredCard>(vect.size());
 
 		RESET();
 
@@ -717,7 +715,6 @@ class Deckbuilder
 		Object[] p = Main.databaseID.keySet().toArray();
 		for(int i = 0; i < p.length; i++)
 		{
-			StoredCard currentCard = Main.databaseID.get(p[i]);
 			vect.add(Main.databaseID.get(p[i]));
 		}
 	}
@@ -748,7 +745,7 @@ class Deckbuilder
 	public static DefaultListModel formatDB(Vector<StoredCard> v)
 	{
 		DefaultListModel arr = new DefaultListModel();
-		int x=0, i=1, index=0;
+		int x=0, i=1;
 		alphasort(v);
 
 		do
