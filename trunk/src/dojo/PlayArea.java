@@ -484,7 +484,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				distanceX = (int)clickPoint.getX() - cardLocation[0];
 				distanceY = (int)clickPoint.getY() - cardLocation[1];
 				// Update the card box if we clicked a card
-				if(e.getButton() == MouseEvent.BUTTON1 && clickedCard.isFaceUp())
+				if(e.getButton() == MouseEvent.BUTTON1 && clickedCard.isFaceUp() && !(clickedCard.isToken()))
 				{
 					Main.cardBox.setCard(Main.databaseID.get(clickedCard.getID()));
 				}
@@ -664,7 +664,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					repaint();
 				}
 				// This location corresponds to the snap (and display) points for cards in the decks
-				else if((location[0] == cardWidth+10 || location[0] == startHand - 2*(cardWidth+5)))
+				else if((location[0] == cardWidth+10 || location[0] == startHand - 2*(cardWidth+5)) && !clickedCard.isToken())
 				{
 					clickedCard.moveToDeck();
 					// Discard image has changed so repaint
@@ -701,7 +701,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			int newX = (int)clickPoint.getX() - distanceX;
 			int newY = (int)clickPoint.getY() - distanceY;
 			
-			// TODO: Snap into decks and empty provinces as well
 			// Don't let them drag cards off the playing field entirely, apply a 10 pixel boundary to all sides
 			if(newX < 10 - cardWidth)
 			{
@@ -734,29 +733,33 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				newX = startHand - (cardWidth+4);
 				newY = height - (cardHeight+4);
 			}
-			// Detect if dragged into dynasty deck
-			area.setLocation(cardWidth+8, height - (cardHeight+6));
-			if(area.contains(clickPoint))
+			// Don't snap tokens into deck/provinces
+			if(!clickedCard.isToken())
 			{
-				newX = cardWidth+10;
-				newY = height - (cardHeight+4);
-			}
-			// Detect if dragged into fate deck
-			area.setLocation(startHand - 2*(cardWidth+4), height - (cardHeight+6));
-			if(area.contains(clickPoint))
-			{
-				newX = startHand - 2*(cardWidth+5);
-				newY = height - (cardHeight+4);
-			}
-			// Detect if dragged into a province and a valid target to be put in one
-			for(Province province : state.getProvinces())
-			{
-				int[] location = province.getLocation();
-				area.setLocation(location[0]-2, location[1]-2);
-				if(area.contains(clickPoint) && clickedCard.getAllAttachments().isEmpty() && clickedCard.isDynasty())
+				// Detect if dragged into dynasty deck
+				area.setLocation(cardWidth+8, height - (cardHeight+6));
+				if(area.contains(clickPoint))
 				{
-					newX = location[0];
-					newY = location[1];					
+					newX = cardWidth+10;
+					newY = height - (cardHeight+4);
+				}
+				// Detect if dragged into fate deck
+				area.setLocation(startHand - 2*(cardWidth+4), height - (cardHeight+6));
+				if(area.contains(clickPoint))
+				{
+					newX = startHand - 2*(cardWidth+5);
+					newY = height - (cardHeight+4);
+				}
+				// Detect if dragged into a province and a valid target to be put in one
+				for(Province province : state.getProvinces())
+				{
+					int[] location = province.getLocation();
+					area.setLocation(location[0]-2, location[1]-2);
+					if(area.contains(clickPoint) && clickedCard.getAllAttachments().isEmpty() && clickedCard.isDynasty())
+					{
+						newX = location[0];
+						newY = location[1];					
+					}
 				}
 			}
 			

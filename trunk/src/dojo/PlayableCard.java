@@ -36,11 +36,12 @@ class PlayableCard extends Card
 	private BufferedImage originalImage, cardImage, cardImageBowed, cardImageDishonored, cardImageBowedDishonored;
 	// Whether the card is visible, bowed, or dishonored
 	private boolean faceUp, bowed, dishonored;
+	// Whether the card is actually a token
+	private boolean isToken;
 
 	public PlayableCard(String id)
 	{
-		super(id);
-		
+		super(id);		
 		location = new int[2];
 		location[0] = 0;
 		location[1] = 0;
@@ -49,6 +50,7 @@ class PlayableCard extends Card
 		faceUp = false;
 		bowed = false;
 		dishonored = false;
+		isToken = false;
 		// Pull type out of database and use it to determine whether the card is a dynasty or fate card
 		type = Main.databaseID.get(id).getType();
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
@@ -62,6 +64,23 @@ class PlayableCard extends Card
 			// True for: events, regions, holdings, personalities, strongholds
 			isDynasty = true;
 		}
+	}
+	
+	public PlayableCard(String name, boolean isToken)
+	{
+		// Store the token name in the id field
+		super(name);		
+		this.isToken = isToken;
+		location = new int[2];
+		location[0] = 0;
+		location[1] = 0;
+		attachments = new ArrayList<PlayableCard>();
+		// Default to face up, unbowed, and not dishonored
+		faceUp = true;
+		bowed = false;
+		dishonored = false;
+		isDynasty = false;
+		type = id;
 	}
 	
 	public PlayableCard(StoredCard card)
@@ -87,6 +106,11 @@ class PlayableCard extends Card
 	public void unbow()
 	{
 		bowed = false;
+	}
+	
+	public boolean isToken()
+	{
+		return isToken;
 	}
 	
 	public void dishonor()
@@ -173,8 +197,15 @@ class PlayableCard extends Card
 		// Going into discard pile where everything is face up and unbowed
 		faceUp = true;
 		bowed = false;
-		// And put in appropriate discard
-		Main.state.addToDiscard(this);
+		// And put in appropriate discard or out of game
+		if(isToken)
+		{
+			Main.state.removeCard(this);
+		}
+		else
+		{
+			Main.state.addToDiscard(this);
+		}
 	}
 
 	public void moveToDeck()
@@ -280,98 +311,107 @@ class PlayableCard extends Card
 		// If we have't loaded in an image for this yet
 		if(originalImage == null)
 		{
-			// Go to the database to find out where the image should be located
-			StoredCard databaseCard = Main.databaseID.get(id);
-			String imageLocation = databaseCard.getImageLocation();
-			String imageEdition = databaseCard.getImageEdition();
-			// If there wasn't a valid file in the file system
-			if(imageLocation == null && !Preferences.downloadedEditions.contains(imageEdition))
+			if(isToken)
 			{
-				Preferences.downloadedEditions.add(imageEdition);
-				System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
-				// Get image pack off kamisasori.net
-				//TODO: Allow preference option to disable automatic download
-				try {
-					// Download image pack as zip via http
-					URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
-					url.openConnection().setConnectTimeout(500);
-					InputStream is = url.openStream();
-					FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
-					// Write the entire stream out to a temporary file
-					for (int c = is.read(); c != -1; c = is.read())
-					{
-						fos.write(c);
-					}
-					is.close();
-					fos.close();
-					System.err.println("success!");
-
-					// Unzip image pack
-					FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
-					ZipInputStream zis = new ZipInputStream(fis);
-					ZipEntry ze;
-					// Unzip every image in the zip file
-					while((ze = zis.getNextEntry()) != null)
-					{
-						System.out.print("** Unzipping " + ze.getName() + ": ");
-						// Make any directories as needed before unzipping
-						File f = new File("images/cards/" + databaseCard.getImageEdition());
-						f.mkdirs();
-						fos = new FileOutputStream("images/cards/" + ze.getName());
-						// Write the entire unzipped image to the output file
-						for (int c = zis.read(); c != -1; c = zis.read())
+				originalImage = createTokenImage();
+				// Generate appropriately sized images for displaying
+				rescale();
+			}
+			else
+			{
+				// Go to the database to find out where the image should be located
+				StoredCard databaseCard = Main.databaseID.get(id);
+				String imageLocation = databaseCard.getImageLocation();
+				String imageEdition = databaseCard.getImageEdition();
+				// If there wasn't a valid file in the file system
+				if(imageLocation == null && !Preferences.downloadedEditions.contains(imageEdition))
+				{
+					Preferences.downloadedEditions.add(imageEdition);
+					System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
+					// Get image pack off kamisasori.net
+					//TODO: Allow preference option to disable automatic download
+					try {
+						// Download image pack as zip via http
+						URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
+						url.openConnection().setConnectTimeout(500);
+						InputStream is = url.openStream();
+						FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
+						// Write the entire stream out to a temporary file
+						for (int c = is.read(); c != -1; c = is.read())
 						{
 							fos.write(c);
 						}
-						zis.closeEntry();
+						is.close();
 						fos.close();
+						System.err.println("success!");
+	
+						// Unzip image pack
+						FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
+						ZipInputStream zis = new ZipInputStream(fis);
+						ZipEntry ze;
+						// Unzip every image in the zip file
+						while((ze = zis.getNextEntry()) != null)
+						{
+							System.out.print("** Unzipping " + ze.getName() + ": ");
+							// Make any directories as needed before unzipping
+							File f = new File("images/cards/" + databaseCard.getImageEdition());
+							f.mkdirs();
+							fos = new FileOutputStream("images/cards/" + ze.getName());
+							// Write the entire unzipped image to the output file
+							for (int c = zis.read(); c != -1; c = zis.read())
+							{
+								fos.write(c);
+							}
+							zis.closeEntry();
+							fos.close();
+							System.out.println("success!");
+						}
+						zis.close();
+	
+						// Delete leftover zip file
+						System.out.print("** Deleting zip file after extraction: ");
+						File f = new File("tmp-imagepack.zip");
+						f.delete();
 						System.out.println("success!");
-					}
-					zis.close();
-
-					// Delete leftover zip file
-					System.out.print("** Deleting zip file after extraction: ");
-					File f = new File("tmp-imagepack.zip");
-					f.delete();
-					System.out.println("success!");
-					// Successfully got the files so we should have a valid imageLocation now
-					imageLocation = databaseCard.getImageLocation();
-				} catch (FileNotFoundException t) {
-					System.err.println("failed. Error unzipping downloaded file.");
-					// If we failed clean up leftover temporary files
-					File f = new File("tmp-imagepack.zip");
-					if(f.exists())
-					{
-						f.delete();
-					}
-				} catch (IOException t) {
-					System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
-					// If we failed clean up leftover temporary files
-					File f = new File("tmp-imagepack.zip");
-					if(f.exists())
-					{
-						f.delete();
+						// Successfully got the files so we should have a valid imageLocation now
+						imageLocation = databaseCard.getImageLocation();
+					} catch (FileNotFoundException t) {
+						System.err.println("failed. Error unzipping downloaded file.");
+						// If we failed clean up leftover temporary files
+						File f = new File("tmp-imagepack.zip");
+						if(f.exists())
+						{
+							f.delete();
+						}
+					} catch (IOException t) {
+						System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
+						// If we failed clean up leftover temporary files
+						File f = new File("tmp-imagepack.zip");
+						if(f.exists())
+						{
+							f.delete();
+						}
 					}
 				}
-			}
-			// We should either have loaded in a valid image or have generated a placeholder one
-			try
-			{
-				// Read in the image if one is present
-				if(imageLocation != null)
+				// We should either have loaded in a valid image or have generated a placeholder one
+				try
 				{
-					originalImage = ImageIO.read(new File(imageLocation));
+					// Read in the image if one is present
+					if(imageLocation != null)
+					{
+						originalImage = ImageIO.read(new File(imageLocation));
+					}
+					// If not make a default one
+					else
+					{
+						originalImage = createImage();
+					}
+					// Generate appropriately sized images for displaying
+					rescale();
+				} catch(IOException io) {
+					System.err.println("** Failed to read in image from disk");
+					io.printStackTrace();
 				}
-				// If not make a default one
-				else
-				{
-					originalImage = createImage();
-				}
-				// Generate appropriately sized images for displaying
-				rescale();
-			} catch(IOException io) {
-				System.err.println("** Failed to read in image from disk");
-				io.printStackTrace();
 			}
 		}
 		// Return the bowed image if bowed, otherwise return the default image
@@ -444,6 +484,7 @@ class PlayableCard extends Card
 	public BufferedImage createImage()
 	{
 		// 306x428 is size of high res images provided by Alderac
+		//TODO: Research performance implications of different image types
 		BufferedImage image = new BufferedImage(306, 428, BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D g = image.createGraphics();
 		// Draw an outline
@@ -455,6 +496,29 @@ class PlayableCard extends Card
 		//TODO: Handle long names well
 		//TODO: Use templates that are type appropriate (get F/C and display)
 		String name = Main.databaseID.get(id).getName();
+		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
+		g.setFont(font);
+	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
+		// And the card name
+		g.setColor(Color.BLACK);  
+		g.drawString(name, x, 50);
+		return image;
+	}
+	
+	public BufferedImage createTokenImage()
+	{
+		// 306x428 is size of high res images provided by Alderac
+		BufferedImage image = new BufferedImage(306, 428, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = image.createGraphics();
+		// Draw an outline
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, 306, 428);
+		// And the card interior
+		g.setColor(Color.CYAN);
+		g.fillRect(10, 10, 286, 408);
+		//TODO: Handle long names well
+		//TODO: Use templates that are type appropriate (get F/C and display)
+		String name = id;
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
 	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
