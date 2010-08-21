@@ -204,7 +204,7 @@ class Deckbuilder
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				Display();
+				display();
 			}
 		};
 
@@ -565,7 +565,7 @@ class Deckbuilder
 					vex.setElementAt(temp.elementAt(0),x);    //x = temp
 				}
 	}
-	public static void Display()
+	public static void display()
     {
 		int max,y;
 		String type="", clan, legal;
