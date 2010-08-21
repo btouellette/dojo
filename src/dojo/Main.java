@@ -4,6 +4,10 @@ package dojo;
 // Launcher program. Sets up the GUI and sets everything up.
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.*;
 import java.util.Map;
@@ -27,7 +31,6 @@ class Main
 	static PlayArea playArea;
 	// Object representing current game state
 	static GameState state;
-	static Deckbuilder deckBuilder;
 	static JFrame frame;
 
 	/**
@@ -73,9 +76,6 @@ class Main
 
 		// Display the window
 		frame.pack();
-
-		deckBuilder = new Deckbuilder();
-		//Deckbuilder.showGUI(frame.getWidth(),frame.getHeight());
 
 		frame.setVisible(true);
 	}
@@ -209,7 +209,20 @@ class Main
 		infoArea.setOpaque(true);
 		infoArea.setBackground(Color.LIGHT_GRAY);
 		//TODO: Remember the previous size of all these windows
-		infoArea.setPreferredSize(new Dimension(2*width/4, 175));
+		infoArea.setPreferredSize(new Dimension(width/2, 175));
+		if(Preferences.infoAreaHeight != 0)
+		{
+			infoArea.setPreferredSize(new Dimension(width/2, Preferences.infoAreaHeight));
+		}
+		// Register a listener to update the split height in preferences when the user resizes
+		infoArea.addComponentListener(new ComponentListener() {
+			public void componentResized(ComponentEvent e) {
+				Preferences.infoAreaHeight = ((JPanel)e.getComponent()).getHeight();       
+		    }
+			public void componentMoved(ComponentEvent e) {}
+			public void componentShown(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
+		});
 		//Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
@@ -242,9 +255,32 @@ class Main
 		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
 		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea1.setResizeWeight(0);
+		if(Preferences.cardBoxSplitWidth != 0)
+		{
+			// Set the divider to the saved location
+			outerInfoArea1.setDividerLocation(Preferences.cardBoxSplitWidth);
+		}
+		// Register a listener to update the split height in preferences when the user resizes
+		outerInfoArea1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				Preferences.cardBoxSplitWidth = ((Number)e.getNewValue()).intValue();;
+			}
+		});
+		
 		JSplitPane outerInfoArea2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, outerInfoArea1, gameInfo);
 		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea2.setResizeWeight(1);
+		if(Preferences.gameInfoSplitWidth != 0)
+		{
+			// Set the divider to the saved location
+			outerInfoArea2.setDividerLocation(Preferences.gameInfoSplitWidth);
+		}
+		// Register a listener to update the split height in preferences when the user resizes
+		outerInfoArea2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				Preferences.gameInfoSplitWidth = ((Number)e.getNewValue()).intValue();;
+			}
+		});
 
 		outerInfoArea1.setUI(new BasicSplitPaneUI());
 		outerInfoArea1.setDividerSize(5);

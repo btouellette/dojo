@@ -17,7 +17,7 @@ class MyDocumentListener implements DocumentListener
 
     public void updateLog()
     {
-        Deckbuilder.Display();
+        Deckbuilder.display();
     }
 }
 

@@ -11,6 +11,8 @@ class Preferences
 {
 	// Width and height stored in the config file
 	static int width, height;
+	// Used to save width and height of components within the UI
+	static int infoAreaHeight, cardBoxSplitWidth, gameInfoSplitWidth;
 	// Represents card size
 	static int sliderValue;
 	// The editions we've attempted to download
@@ -37,6 +39,18 @@ class Preferences
 					else if(line.startsWith("height "))
 					{
 						height = Integer.parseInt(line.substring(7));
+					}
+					else if(line.startsWith("infoAreaHeight "))
+					{
+						infoAreaHeight = Integer.parseInt(line.substring(15));
+					}
+					else if(line.startsWith("cardBoxSplitWidth "))
+					{
+						cardBoxSplitWidth = Integer.parseInt(line.substring(18));
+					}
+					else if(line.startsWith("gameInfoSplitWidth "))
+					{
+						gameInfoSplitWidth = Integer.parseInt(line.substring(19));
 					}
 					else if(line.startsWith("sliderValue "))
 					{
@@ -79,6 +93,9 @@ class Preferences
 		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		width = 1024;
 		height = 600;
+		infoAreaHeight = 0;
+		cardBoxSplitWidth = 0;
+		gameInfoSplitWidth = 0;
 		sliderValue = 50;
 		downloadedEditions.clear();
 		userName = "New Player";
@@ -95,12 +112,17 @@ class Preferences
 			//TODO: Find out why these occasionally return 0 on a fresh checkout
 			if(Main.playArea.getWidth() > 0)
 			{
-				fw.write("width " + Main.playArea.getWidth() + "\n");
+				// 16 extra pixels of border (at least on Linux)
+				//TODO: Test whether this causes the saved value to shrink/grow over time in Win/Mac
+				fw.write("width " + (Main.playArea.getWidth()-16) + "\n");
 			}
-			if(Main.playArea.getWidth() > 0)
+			if(Main.playArea.getHeight() > 0)
 			{
 				fw.write("height " + Main.playArea.getHeight() + "\n");
 			}
+			fw.write("infoAreaHeight " + infoAreaHeight + "\n");
+			fw.write("cardBoxSplitWidth " + cardBoxSplitWidth + "\n");
+			fw.write("gameInfoSplitWidth " + gameInfoSplitWidth + "\n");
 			fw.write("# Size of cards at start (1-100, 50 is default)\n");
 			fw.write("sliderValue " + sliderValue + "\n");
 			fw.write("# Image editions gotten from (or not present on) kamisasori.net\n");

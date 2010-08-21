@@ -288,9 +288,9 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		for(int i = 1; i < oppNumProv+1; i++)
 		{
 			g.setColor(Color.BLACK);
-			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, 0, cardWidth+12, cardHeight+6);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2, 0, cardWidth+8, cardHeight+6);
 			g.setColor(Color.LIGHT_GRAY);
-			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, 0, cardWidth+8, cardHeight+4);
+			g.fillRect(leftBorder + i*distanceBetween - cardWidth/2 + 2, 0, cardWidth+4, cardHeight+4);
 		}
 		g.dispose();
 	}
@@ -789,21 +789,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 	public void mouseMoved(MouseEvent e)
 	{
-		//TODO: Remove these lines once testing is done
-		List<PlayableCard> cards = state.getAllCards();
-		if(cards.isEmpty() && state.getDynastyDeck().numCards() == 0)
-		{
-			PlayableCard takuji = new PlayableCard("CoB009");
-			state.addToTable(takuji);
-			PlayableCard test = new PlayableCard("CoB069");
-			takuji.attach(test);
-			takuji.attach(new PlayableCard("DJH047"));
-			test.attach(new PlayableCard("IE094"));
-			test.attach(new PlayableCard("TH142"));
-			test.attach(new PlayableCard("IE095"));
-			takuji.dishonor();
-			repaint();
-		}
 	}
 
 	public void actionPerformed(ActionEvent e)
