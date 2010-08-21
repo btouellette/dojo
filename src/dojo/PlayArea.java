@@ -64,9 +64,18 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		this.height = height;
 		this.state = state;
 
-		// Setting the default height as a fifth of the PlayArea height
-		// This allows for vertically: two sets of provinces and two units with a few attachments
-		cardHeight = height/5;
+		if(Preferences.cardHeight != 0)
+		{
+			// Setting the height as the saved height
+			cardHeight = Preferences.cardHeight;
+		}
+		else
+		{
+			// Default to 1/5 of the PlayArea height
+			// This allows for vertically: two sets of provinces and two units with a few attachments
+			cardHeight = height/5;
+		}
+		
 		// Normal sized cards are 2.5" wide and 3.5" tall
 		cardWidth = (int)(cardHeight*(2.5/3.5));
 		baseCardHeight = cardHeight;
