@@ -13,6 +13,8 @@ class Preferences
 	static int width, height;
 	// Used to save width and height of components within the UI
 	static int infoAreaHeight, cardBoxSplitWidth, gameInfoSplitWidth;
+	// Height in pixels of the cards
+	static int cardHeight;
 	// Represents card size
 	static int sliderValue;
 	// The editions we've attempted to download
@@ -51,6 +53,10 @@ class Preferences
 					else if(line.startsWith("gameInfoSplitWidth "))
 					{
 						gameInfoSplitWidth = Integer.parseInt(line.substring(19));
+					}
+					else if(line.startsWith("cardHeight "))
+					{
+						cardHeight = Integer.parseInt(line.substring(11));
 					}
 					else if(line.startsWith("sliderValue "))
 					{
@@ -96,6 +102,7 @@ class Preferences
 		infoAreaHeight = 0;
 		cardBoxSplitWidth = 0;
 		gameInfoSplitWidth = 0;
+		cardHeight = 0;
 		sliderValue = 50;
 		downloadedEditions.clear();
 		userName = "New Player";
@@ -123,6 +130,7 @@ class Preferences
 			fw.write("infoAreaHeight " + infoAreaHeight + "\n");
 			fw.write("cardBoxSplitWidth " + cardBoxSplitWidth + "\n");
 			fw.write("gameInfoSplitWidth " + gameInfoSplitWidth + "\n");
+			fw.write("cardHeight " + Main.playArea.getCardHeight() + "\n");
 			fw.write("# Size of cards at start (1-100, 50 is default)\n");
 			fw.write("sliderValue " + sliderValue + "\n");
 			fw.write("# Image editions gotten from (or not present on) kamisasori.net\n");
