@@ -3,6 +3,8 @@ package dojo;
 // Written by Brian Ouellette
 // Reads in configuration prefences from a file and stores them
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +28,7 @@ class Preferences
 	{
 		// Go ahead and set the preferences to the default and we'll overwrite if we find saved prefs
 		defaultPreferences();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("prefs.cfg"));
 			String line;
@@ -36,11 +39,19 @@ class Preferences
 				{
 					if(line.startsWith("width "))
 					{
-						width = Integer.parseInt(line.substring(6));
+						int newWidth = Integer.parseInt(line.substring(6));
+						if(newWidth <= screenSize.getWidth())
+						{
+							width = newWidth;
+						}
 					}
 					else if(line.startsWith("height "))
 					{
-						height = Integer.parseInt(line.substring(7));
+						int newHeight = Integer.parseInt(line.substring(7));
+						if(newHeight <= screenSize.getHeight())
+						{
+							height = newHeight;
+						}
 					}
 					else if(line.startsWith("infoAreaHeight "))
 					{

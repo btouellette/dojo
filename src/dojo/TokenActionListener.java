@@ -22,7 +22,7 @@ class TokenActionListener implements ActionListener, MouseListener
 		JComboBox comboBox = (JComboBox)e.getSource();
 
 		// Get the text entered
-		Object text = comboBox.getSelectedItem();
+		String text = (String)comboBox.getSelectedItem();
 
 		if ("comboBoxEdited".equals(e.getActionCommand()))
 		{
@@ -40,6 +40,9 @@ class TokenActionListener implements ActionListener, MouseListener
 			{
 				comboBox.insertItemAt(text, 0);
 			}
+			// Make a token and place it on the table
+			Main.state.addToTable(new PlayableCard(text, true));
+			Main.playArea.repaint();
 		}
 	}
 
