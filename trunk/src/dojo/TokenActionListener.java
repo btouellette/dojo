@@ -41,6 +41,7 @@ class TokenActionListener implements ActionListener, MouseListener
 				comboBox.insertItemAt(text, 0);
 			}
 			// Make a token and place it on the table
+			//TODO: Save the top 3 tokens on exit
 			Main.state.addToTable(new PlayableCard(text, true));
 			Main.playArea.repaint();
 		}

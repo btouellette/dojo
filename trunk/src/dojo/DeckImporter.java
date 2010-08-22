@@ -47,7 +47,6 @@ class DeckImporter
 			// For every card we imported
 			for(StoredCard currentCard : cards)
 			{
-				//TODO: Wind/stronghold placement doesn't work, debug
 				// Check the type
 				String type = currentCard.getType();
 				// If the card is a wind put it on the table instead of in a deck and if there is a stronghold on the table attach the wind to it
