@@ -149,6 +149,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		
 		List<Province> provinces = state.getProvinces();
+		BufferedImage currentImage;
 		// Draw province attachments before background so they show up behind provinces
 		for(Province currentProvince : provinces)
 		{
@@ -157,7 +158,11 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			{
 				PlayableCard currentCard = attachments.get(j);
 				int[] location = currentCard.getLocation();
-				g.drawImage(currentCard.getImage(), location[0], location[1], null);
+				currentImage = currentCard.getImage();
+				if(currentImage != null)
+				{
+					g.drawImage(currentImage, location[0], location[1], null);
+				}
 			}
 		}
 
@@ -165,7 +170,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		g.drawImage(background, 0, 0, null);
 		
 		// Draw cards in provinces
-		BufferedImage currentImage;
 		for(Province currentProvince : provinces)
 		{
 			// Location of the card in the province
@@ -341,8 +345,18 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		else if(location[1] < 10 - cardHeight)		
 		{		
 			location[1] = 10 - cardHeight;		
-		}	
-		g.drawImage(card.getImage(), location[0], location[1], null);
+		}
+		BufferedImage currentImage = card.getImage();
+		if(currentImage != null)
+		{
+			g.drawImage(currentImage, location[0], location[1], null);
+		}
+		else
+		{
+			// Draw a temporary box to show the card if we are downloading the image still
+			g.setColor(Color.DARK_GRAY);
+			g.drawRect(location[0], location[1], cardHeight, cardWidth);
+		}
 	}
 
 	public int getCardHeight()

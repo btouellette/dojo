@@ -16,13 +16,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
+import javax.swing.ProgressMonitorInputStream;
 
 class PlayableCard extends Card
 {
@@ -38,6 +40,8 @@ class PlayableCard extends Card
 	private boolean faceUp, bowed, dishonored;
 	// Whether the card is actually a token
 	private boolean isToken;
+	// Whether we are getting the image pack for this. Prevents fetching multiple times
+	private boolean isDownloading;
 
 	public PlayableCard(String id)
 	{
@@ -51,6 +55,7 @@ class PlayableCard extends Card
 		bowed = false;
 		dishonored = false;
 		isToken = false;
+		isDownloading = false;
 		// Pull type out of database and use it to determine whether the card is a dynasty or fate card
 		type = Main.databaseID.get(id).getType();
 		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
@@ -79,6 +84,7 @@ class PlayableCard extends Card
 		faceUp = true;
 		bowed = false;
 		dishonored = false;
+		isDownloading = false;
 		isDynasty = false;
 		type = id;
 	}
@@ -317,101 +323,129 @@ class PlayableCard extends Card
 				// Generate appropriately sized images for displaying
 				rescale();
 			}
-			else
+			else if(Main.databaseID.get(id).getImageLocation() != null)
 			{
-				// Go to the database to find out where the image should be located
-				StoredCard databaseCard = Main.databaseID.get(id);
-				String imageLocation = databaseCard.getImageLocation();
-				String imageEdition = databaseCard.getImageEdition();
-				// If there wasn't a valid file in the file system
-				if(imageLocation == null && !Preferences.downloadedEditions.contains(imageEdition))
-				{
-					Preferences.downloadedEditions.add(imageEdition);
-					System.err.print("** Card image missing. Attempting to get image pack for " + databaseCard.getImageEdition() + " from kamisasori.net: ");
-					// Get image pack off kamisasori.net
-					//TODO: Allow preference option to disable automatic download
-					try {
-						// Download image pack as zip via http
-						URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + databaseCard.getImageEdition() + ".zip");
-						url.openConnection().setConnectTimeout(500);
-						InputStream is = url.openStream();
-						FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
-						// Write the entire stream out to a temporary file
-						for (int c = is.read(); c != -1; c = is.read())
-						{
-							fos.write(c);
-						}
-						is.close();
-						fos.close();
-						System.err.println("success!");
-	
-						// Unzip image pack
-						FileInputStream fis = new FileInputStream("tmp-imagepack.zip");
-						ZipInputStream zis = new ZipInputStream(fis);
-						ZipEntry ze;
-						// Unzip every image in the zip file
-						while((ze = zis.getNextEntry()) != null)
-						{
-							System.out.print("** Unzipping " + ze.getName() + ": ");
-							// Make any directories as needed before unzipping
-							File f = new File("images/cards/" + databaseCard.getImageEdition());
-							f.mkdirs();
-							fos = new FileOutputStream("images/cards/" + ze.getName());
-							// Write the entire unzipped image to the output file
-							for (int c = zis.read(); c != -1; c = zis.read())
-							{
-								fos.write(c);
-							}
-							zis.closeEntry();
-							fos.close();
-							System.out.println("success!");
-						}
-						zis.close();
-	
-						// Delete leftover zip file
-						System.out.print("** Deleting zip file after extraction: ");
-						File f = new File("tmp-imagepack.zip");
-						f.delete();
-						System.out.println("success!");
-						// Successfully got the files so we should have a valid imageLocation now
-						imageLocation = databaseCard.getImageLocation();
-					} catch (FileNotFoundException t) {
-						System.err.println("failed. Error unzipping downloaded file.");
-						// If we failed clean up leftover temporary files
-						File f = new File("tmp-imagepack.zip");
-						if(f.exists())
-						{
-							f.delete();
-						}
-					} catch (IOException t) {
-						System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
-						// If we failed clean up leftover temporary files
-						File f = new File("tmp-imagepack.zip");
-						if(f.exists())
-						{
-							f.delete();
-						}
-					}
-				}
-				// We should either have loaded in a valid image or have generated a placeholder one
-				try
-				{
-					// Read in the image if one is present
-					if(imageLocation != null)
-					{
-						originalImage = ImageIO.read(new File(imageLocation));
-					}
-					// If not make a default one
-					else
-					{
-						originalImage = createImage();
-					}
-					// Generate appropriately sized images for displaying
-					rescale();
-				} catch(IOException io) {
+				try {
+					originalImage = ImageIO.read(new File(Main.databaseID.get(id).getImageLocation()));
+				} catch(IOException io_e) {
 					System.err.println("** Failed to read in image from disk");
-					io.printStackTrace();
+					io_e.printStackTrace();
 				}
+				rescale();
+			}
+			else if(!isDownloading)
+			{
+				isDownloading = true;
+				new Thread() {
+					public void run()
+					{
+						// Go to the database to find out where the image should be located
+						StoredCard databaseCard = Main.databaseID.get(id);
+						String imageLocation = databaseCard.getImageLocation();
+						String imageEdition = databaseCard.getImageEdition();
+						// If there wasn't a valid file in the file system
+						if(imageLocation == null && !Preferences.downloadedEditions.contains(imageEdition))
+						{
+							Preferences.downloadedEditions.add(imageEdition);
+							System.err.print("** Card image missing. Attempting to get image pack for " + imageEdition + " from kamisasori.net: ");
+							// Get image pack off kamisasori.net
+							//TODO: Allow preference option to disable automatic download
+							try {
+								// Download image pack as zip via http
+								URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + imageEdition + ".zip");
+								URLConnection urlC = url.openConnection();
+								urlC.setConnectTimeout(500);
+								int fileSize = urlC.getContentLength();
+								ProgressMonitorInputStream is = new ProgressMonitorInputStream(Main.frame, "Downloading image pack for " + imageEdition + "..." , url.openStream());
+								is.getProgressMonitor().setMaximum(fileSize);
+								FileOutputStream fos = new FileOutputStream("tmp-imagepack.zip");
+								// Write the entire stream out to a temporary file
+								for (int c = is.read(); c != -1; c = is.read())
+								{
+									fos.write(c);
+								}
+								is.close();
+								fos.close();
+								System.err.println("success!");
+			
+								// Unzip image pack
+								ProgressMonitorInputStream fis = new ProgressMonitorInputStream(Main.frame, "Unzipping " + imageEdition + "...", new FileInputStream("tmp-imagepack.zip"));
+								ZipInputStream zis = new ZipInputStream(fis);
+								ZipEntry ze;
+								// Unzip every image in the zip file
+								while((ze = zis.getNextEntry()) != null)
+								{
+									System.out.print("** Unzipping " + ze.getName() + ": ");
+									fis.getProgressMonitor().setNote("Unzipping " + ze.getName() + "...");
+									// Make any directories as needed before unzipping
+									File f = new File("images/cards/" + databaseCard.getImageEdition());
+									f.mkdirs();
+									fos = new FileOutputStream("images/cards/" + ze.getName());
+									// Write the entire unzipped image to the output file
+									for (int c = zis.read(); c != -1; c = zis.read())
+									{
+										fos.write(c);
+									}
+									zis.closeEntry();
+									fos.close();
+									System.out.println("success!");
+								}
+								zis.close();
+			
+								// Delete leftover zip file
+								System.out.print("** Deleting zip file after extraction: ");
+								File f = new File("tmp-imagepack.zip");
+								f.delete();
+								System.out.println("success!");
+								imageLocation = databaseCard.getImageLocation();
+							} catch (InterruptedIOException io_e) {
+								// If we failed clean up leftover temporary files
+								File f = new File("tmp-imagepack.zip");
+								if(f.exists())
+								{
+									f.delete();
+								}
+							} catch (FileNotFoundException t) {
+								System.err.println("failed. Error unzipping downloaded file.");
+								// If we failed clean up leftover temporary files
+								File f = new File("tmp-imagepack.zip");
+								if(f.exists())
+								{
+									f.delete();
+								}
+							} catch (IOException t) {
+								System.err.println("failed. Kamisasori doesn't have pack or no internet connection.");
+								// If we failed clean up leftover temporary files
+								File f = new File("tmp-imagepack.zip");
+								if(f.exists())
+								{
+									f.delete();
+								}
+							}
+						}
+						// We should either have loaded in a valid image or have generated a placeholder one
+						try
+						{
+							// If we got the files we should have a valid imageLocation now
+							// Read in the image if one is present
+							if(imageLocation != null)
+							{
+								originalImage = ImageIO.read(new File(imageLocation));
+							}
+							// If not make a default one
+							else
+							{
+								originalImage = createImage();
+							}
+							// Generate appropriately sized images for displaying
+							rescale();
+							Main.playArea.repaint();
+						} catch(IOException io) {
+							System.err.println("** Failed to read in image from disk");
+							io.printStackTrace();
+						}
+					}
+				}.start();
 			}
 		}
 		// Return the bowed image if bowed, otherwise return the default image

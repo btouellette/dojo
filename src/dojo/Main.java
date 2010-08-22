@@ -78,6 +78,13 @@ class Main
 		frame.pack();
 
 		frame.setVisible(true);
+
+		// Read in cards.xml
+		new Thread() {
+			public void run() {
+				importDatabase();
+			}
+		}.start();
 	}
 
 	private static JMenuBar createMenuBar(int width)
@@ -208,7 +215,6 @@ class Main
 		JPanel infoArea = new JPanel();
 		infoArea.setOpaque(true);
 		infoArea.setBackground(Color.LIGHT_GRAY);
-		//TODO: Remember the previous size of all these windows
 		infoArea.setPreferredSize(new Dimension(width/2, 175));
 		if(Preferences.infoAreaHeight != 0)
 		{
@@ -313,15 +319,15 @@ class Main
 			  + ", uri " + spe.getSystemId());
 		   System.err.println("   " + spe.getMessage() );
 		} catch (IOException io) {
-			//TODO: Make this more transparent (popup with cancel button)
 			System.out.print("failed\n** Card database missing. Attempting to get from kamisasori.net: ");
 			// Database not present so try to get database off kamisasori.net
 			//TODO: Also do this if someone you connect to has a newer database
 			try {	
 				// Create an input stream to the appropriate card file
 				URL url = new URL("http://kamisasori.net/files/cards-gamepukku.zip");
-				url.openConnection();
-				InputStream is = url.openStream();
+				int fileSize = url.openConnection().getContentLength();
+				ProgressMonitorInputStream is = new ProgressMonitorInputStream(frame, "Downloading cards database...", url.openStream());
+				is.getProgressMonitor().setMaximum(fileSize);
 				FileOutputStream fos = new FileOutputStream("cards-gempukku.zip");
 				// And read the input stream in
 				for (int c = is.read(); c != -1; c = is.read()) {
@@ -330,16 +336,11 @@ class Main
 				is.close();
 				fos.close();
 				System.out.println("success!");
-			} catch (IOException io_e) {
-				System.err.println("failed. Check your internet connection.");
-				System.exit(1);
-			}
-			// Unzip database
-			try {
-				FileInputStream fis = new FileInputStream("cards-gempukku.zip");
+				
+				// Unzip database
+				InputStream fis = new ProgressMonitorInputStream(frame, "Unzipping cards database...", new FileInputStream("cards-gempukku.zip"));
 				ZipInputStream zis = new ZipInputStream(fis);
 				ZipEntry ze;
-				FileOutputStream fos;
 				// Unzip everything inside the file (should just be cards.xml)
 				while ((ze = zis.getNextEntry()) != null) {
 					System.out.print("** Unzipping " + ze.getName() + ": ");
@@ -362,14 +363,29 @@ class Main
 				// Successfully got database so read it in again
 				System.out.println("** Reattempting database import");
 				importDatabase();
-			} catch (IOException io_e) {
-				System.err.println("failed\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
-				io_e.printStackTrace();
-				// Clean up on failure so we don't leave temporary files around
-				File f = new File("cards-gempukku.zip");
-				if(f.exists())
+			} catch (InterruptedIOException io_e) {
+		        TextActionListener.send("Card database necessary, please restart Dojo", "Error");
+		        File f1 = new File("cards-gempukku.zip");
+				if(f1.exists())
 				{
-					f.delete();
+					f1.delete();
+				}
+				File f2 = new File("cards.xml");
+				if(f2.exists())
+				{
+					f2.delete();
+				}
+			} catch (IOException io_e) {
+				System.err.println("failed. Check your internet connection.");
+				File f1 = new File("cards-gempukku.zip");
+				if(f1.exists())
+				{
+					f1.delete();
+				}
+				File f2 = new File("cards.xml");
+				if(f2.exists())
+				{
+					f2.delete();
 				}
 				System.exit(1);
 			}
@@ -386,9 +402,6 @@ class Main
 
 	public static void main(String[] args)
 	{
-		// Read in cards.xml
-		importDatabase();
-
 		// Add shutdown hook for writing out preferences
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {

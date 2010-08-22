@@ -3,8 +3,14 @@ package dojo;
 // Written by Brian Ouellette
 // Listener for all the menus at the top of the panel.
 
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.AbstractButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
 import java.util.Random;
 
 class MenuListener implements ActionListener
@@ -16,11 +22,20 @@ class MenuListener implements ActionListener
 		if(name.equals("Connect"))
 		{
 		}
-		//TODO: Set so it filters out .l5d and .dck files
 		else if(name.equals("Load Deck"))
 		{
 			// Launch file chooser to let user pick deck file
-			final JFileChooser fc = new JFileChooser("decks");
+			JFileChooser fc = new JFileChooser("decks");
+			// Add filter so it only shows appropriate files and directories
+			fc.addChoosableFileFilter(new FileFilter() {
+			    public boolean accept(File file) {
+			        String filename = file.getName();
+			        return file.isDirectory() || filename.endsWith(".l5d") || filename.endsWith(".dck");
+			    }
+			    public String getDescription() {
+			        return "Deck Files (*.dck and *.l5d)";
+			    }
+			});
 			int returnVal = fc.showOpenDialog(Main.frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
