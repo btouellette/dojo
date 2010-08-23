@@ -119,6 +119,11 @@ class PlayableCard extends Card
 		return isToken;
 	}
 	
+	public boolean isHonorable()
+	{
+		return !dishonored;
+	}
+	
 	public void dishonor()
 	{
 		dishonored = true;
@@ -127,6 +132,11 @@ class PlayableCard extends Card
 	public void rehonor()
 	{
 		dishonored = false;
+	}
+	
+	public String getType()
+	{
+		return type;
 	}
 
 	public void setLocation(int x, int y)
@@ -319,9 +329,8 @@ class PlayableCard extends Card
 		{
 			if(isToken)
 			{
-				originalImage = createTokenImage();
-				// Generate appropriately sized images for displaying
-				rescale();
+				// Token name is stored in the ID field, make a new image for it
+				createTokenImage(id);
 			}
 			else if(Main.databaseID.get(id).getImageLocation() != null)
 			{
@@ -539,11 +548,11 @@ class PlayableCard extends Card
 		return image;
 	}
 	
-	public BufferedImage createTokenImage()
+	public void createTokenImage(String name)
 	{
 		// 306x428 is size of high res images provided by Alderac
-		BufferedImage image = new BufferedImage(306, 428, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = image.createGraphics();
+		originalImage = new BufferedImage(306, 428, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = originalImage.createGraphics();
 		// Draw an outline
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, 306, 428);
@@ -552,18 +561,12 @@ class PlayableCard extends Card
 		g.fillRect(10, 10, 286, 408);
 		//TODO: Handle long names well
 		//TODO: Use templates that are type appropriate (get F/C and display)
-		String name = id;
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
 	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
 		// And the card name
 		g.setColor(Color.BLACK);  
 		g.drawString(name, x, 50);
-		return image;
-	}
-
-	public void setImage(BufferedImage cardImage)
-	{
-		this.cardImage = cardImage;
+		rescale();
 	}
 }
