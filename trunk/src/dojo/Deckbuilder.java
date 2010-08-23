@@ -776,8 +776,8 @@ class Deckbuilder
 	{
 		String newline = "\n";
 		String tab = "    ";
-		String[] dynTypes = {"Events","Holdings","Personalities","Regions"};
-		String[] fateTypes = {"Actions","Ancestors","Followers","Items","Rings","Senseis","Spells","Winds"};
+		String[] dynTypes = {"Celestial","Event","Holding","Personality","Region"};
+		String[] fateTypes = {"Action","Ancestor","Follower","Item","Ring","Sensei","Spell","Wind"};
 		String shName = "";
 		int counter, a = 1;
 

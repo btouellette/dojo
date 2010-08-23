@@ -58,15 +58,15 @@ class PlayableCard extends Card
 		isDownloading = false;
 		// Pull type out of database and use it to determine whether the card is a dynasty or fate card
 		type = Main.databaseID.get(id).getType();
-		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
-		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
-		   type.equals("rings")     || type.equals("senseis")   || type.equals("winds"))
+		if(type.equals("strategy")   || type.equals("kiho")     || type.equals("spell") ||
+		   type.equals("ancestor")   || type.equals("follower") || type.equals("item")  ||
+		   type.equals("ring")       || type.equals("sensei")   || type.equals("wind"))
 		{
 			isDynasty = false;
 		}
 		else
 		{
-			// True for: events, regions, holdings, personalities, strongholds
+			// True for: celestials, events, regions, holdings, personalities, strongholds
 			isDynasty = true;
 		}
 	}
@@ -498,7 +498,7 @@ class PlayableCard extends Card
 			
 			// Only create dishonored images for personalities
 			//TODO: Visually inspect these at high and low res to ensure no loss of quality
-			if(type.equals("personalities"))
+			if(type.equals("personality"))
 			{
 				// Flip regular image vertically
 				tx = AffineTransform.getScaleInstance(1, -1);

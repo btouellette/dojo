@@ -33,10 +33,7 @@ class CardInfoBox extends JEditorPane
 		// Only recreate table if card changes
 		if(this.card != card)
 		{
-			this.card = card;
-			// cardHTML split only for easier editability, concatenated together at end
-			String cardHTML1, cardHTML2, cardHTML3, cardHTML4;
-			
+			this.card = card;			
 			/* Commented out until it's determined whether images should be present in the info box
 			String cardImageLoc = card.getImageLocation();
 	
@@ -49,74 +46,68 @@ class CardInfoBox extends JEditorPane
 			}
 			*/
 	
-			// Initialize so that if not all are used they can still all be concatenated
-			cardHTML1 = "";
-			cardHTML2 = "";
-			cardHTML3 = "";
-			cardHTML4 = "";
-	
 			int width = getWidth() - 30;
+			String type = card.getType();
+			String cardHTML = "";
 			// HTML tables created differently for different types of cards
-			if(card.getType().equals("actions") || card.getType().equals("kihos") || card.getType().equals("spells"))
+			if(type.equals("strategy") || type.equals("kiho") || type.equals("spell"))
 			{
 				//The card text in the window is created as an html table
 				//Complete sytnax isn't necessary as setText() reformats it
-				cardHTML1 = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>";
-				cardHTML2 = "<tr><td colspan = \"5\" align=center>" + card.getCost() + " G</td><td></td></tr>";
-				cardHTML3 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>";
-				cardHTML4 = "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
+				           "<tr><td colspan = \"5\" align=center>" + card.getCost() + " G</td><td></td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>" +
+				           "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
 			}
-			else if(card.getType().equals("ancestors") || card.getType().equals("followers"))
+			else if(type.equals("ancestor") || type.equals("follower"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td align=center>" + card.getForce() + "F</td><td colspan=\"3\" align=center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>";
-				cardHTML2 = "<tr><td></td><td colspan = \"3\" align=center>" + card.getHonorReq() + " / " + card.getCost() + " / " + card.getPersonalHonor() + "</td><td></td></tr>";
-				cardHTML3 = "<tr><td></td><td colspan = \"3\" align=center>HR / GC / PH</td><td></td></tr>";
-				cardHTML4 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr><tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td align=center>" + card.getForce() + "F</td><td colspan=\"3\" align=center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>" +
+				           "<tr><td></td><td colspan = \"3\" align=center>" + card.getHonorReq() + " / " + card.getCost() + " / " + card.getPersonalHonor() + "</td><td></td></tr>" +
+				           "<tr><td></td><td colspan = \"3\" align=center>HR / GC / PH</td><td></td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr><tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
 			}
-			else if(card.getType().equals("events") || card.getType().equals("regions") || card.getType().equals("winds"))
+			else if(type.equals("celestial") || type.equals("event") || type.equals("region") || type.equals("wind"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>";
-				cardHTML2 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
 			}
-			else if(card.getType().equals("holdings"))
+			else if(type.equals("holding"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>";
-				cardHTML2 = "<tr><td colspan = \"5\" align=center>" + card.getCost() + " G</td><td></td></tr>";
-				cardHTML3 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
-				cardHTML4 = "";
+				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
+				           "<tr><td colspan = \"5\" align=center>" + card.getCost() + " G</td><td></td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
 			}
-			else if(card.getType().equals("items"))
+			else if(type.equals("item"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td><center>" + card.getForce() + "F</center></td><td colspan=\"3\" align=center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>";
-				cardHTML2 = "<tr><td></td><td colspan = \"3\" align=center>" + card.getCost() + " G</td><td></td></tr>";
-				cardHTML3 = "<tr><td></td><td colspan = \"5\">" + card.getText() + "</td><td></td></tr>";
-				cardHTML4 = "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td><center>" + card.getForce() + "F</center></td><td colspan=\"3\" align=center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>" +
+				           "<tr><td></td><td colspan = \"3\" align=center>" + card.getCost() + " G</td><td></td></tr>" +
+				           "<tr><td></td><td colspan = \"5\">" + card.getText() + "</td><td></td></tr>" +
+				           "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
 			}
-			else if(card.getType().equals("personalities"))
+			else if(type.equals("personality"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td align=center>" + card.getForce() + "F</center></td><td colspan=\"3\"><center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>";
-				cardHTML2 = "<tr><td></td><td colspan = \"3\" align=center>" + card.getHonorReq() + " / " + card.getCost() + " / " + card.getPersonalHonor() + "</td><td></td></tr>";
-				cardHTML3 = "<tr><td></td><td colspan = \"3\" align=center>HR / GC / PH</td><td></td></tr>";
-				cardHTML4 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td align=center>" + card.getForce() + "F</center></td><td colspan=\"3\"><center><b>" + card.getName() + "</b></td><td align=center>" + card.getChi() + "C</td></tr>" +
+				           "<tr><td></td><td colspan = \"3\" align=center>" + card.getHonorReq() + " / " + card.getCost() + " / " + card.getPersonalHonor() + "</td><td></td></tr>" +
+				           "<tr><td></td><td colspan = \"3\" align=center>HR / GC / PH</td><td></td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></table></center>";
 			}
-			else if(card.getType().equals("rings"))
+			else if(type.equals("ring"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>";
-				cardHTML2 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>";
-				cardHTML3 = "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
-				cardHTML4 = "";
+				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
+		                   "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>" +
+				           "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
 			}
-			else if(card.getType().equals("senseis") || card.getType().equals("strongholds"))
+			else if(type.equals("sensei") || type.equals("stronghold"))
 			{
-				cardHTML1 = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>";
-				cardHTML2 = "<tr><td colspan = \"4\" align=right>Province Strength: </td><td colspan = \"2\" align=center>" + card.getProvinceStrength() + "</td></tr>";
-				cardHTML3 = "<tr><td colspan = \"4\" align=right>Gold Production: </td><td colspan = \"2\" align=center>" + card.getGoldProduction() + "</td></tr>";
-				cardHTML3 += "<tr><td colspan = \"4\" align=right>Starting Honor: </td><td colspan = \"2\" align=center>" + card.getStartingHonor() + "</td></tr>";
-				cardHTML4 = "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></center>";
+				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
+				           "<tr><td colspan = \"4\" align=right>Province Strength: </td><td colspan = \"2\" align=center>" + card.getProvinceStrength() + "</td></tr>" +
+				           "<tr><td colspan = \"4\" align=right>Gold Production: </td><td colspan = \"2\" align=center>" + card.getGoldProduction() + "</td></tr>" +
+				           "<tr><td colspan = \"4\" align=right>Starting Honor: </td><td colspan = \"2\" align=center>" + card.getStartingHonor() + "</td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr></center>";
 			}
 	
 			//Set the card window to show the html table for the card
-			setText(cardHTML1 + cardHTML2 + cardHTML3 + cardHTML4);
+			setText(cardHTML);
 			//Scroll the window back up to the top
 			setCaretPosition(0);
 		}

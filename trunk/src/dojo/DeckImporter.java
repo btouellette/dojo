@@ -50,13 +50,13 @@ class DeckImporter
 				// Check the type
 				String type = currentCard.getType();
 				// If the card is a wind put it on the table instead of in a deck and if there is a stronghold on the table attach the wind to it
-				if(type.equals("winds"))
+				if(type.equals("wind"))
 				{
 					wind = new PlayableCard(currentCard);
 					wind.setFaceUp();
 				}
 				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
-				else if(type.equals("strongholds"))
+				else if(type.equals("stronghold"))
 				{
 					stronghold = new PlayableCard(currentCard);
 					stronghold.setFaceUp();
