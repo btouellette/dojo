@@ -319,16 +319,16 @@ class Main
 			  + ", uri " + spe.getSystemId());
 		   System.err.println("   " + spe.getMessage() );
 		} catch (IOException io) {
-			System.out.print("failed\n** Card database missing. Attempting to get from kamisasori.net: ");
+			System.out.print("failed\n** Card database missing.\n** Attempting to get from kamisasori.net: ");
 			// Database not present so try to get database off kamisasori.net
 			//TODO: Also do this if someone you connect to has a newer database
 			try {	
 				// Create an input stream to the appropriate card file
-				URL url = new URL("http://kamisasori.net/files/cards-gamepukku.zip");
+				URL url = new URL("http://kamisasori.net/files/cards-complete.zip");
 				int fileSize = url.openConnection().getContentLength();
 				ProgressMonitorInputStream is = new ProgressMonitorInputStream(frame, "Downloading cards database...", url.openStream());
 				is.getProgressMonitor().setMaximum(fileSize);
-				FileOutputStream fos = new FileOutputStream("cards-gempukku.zip");
+				FileOutputStream fos = new FileOutputStream("cards.zip");
 				// And read the input stream in
 				for (int c = is.read(); c != -1; c = is.read()) {
 					fos.write(c);
@@ -338,13 +338,20 @@ class Main
 				System.out.println("success!");
 				
 				// Unzip database
-				InputStream fis = new ProgressMonitorInputStream(frame, "Unzipping cards database...", new FileInputStream("cards-gempukku.zip"));
+				InputStream fis = new ProgressMonitorInputStream(frame, "Unzipping cards database...", new FileInputStream("cards.zip"));
 				ZipInputStream zis = new ZipInputStream(fis);
 				ZipEntry ze;
 				// Unzip everything inside the file (should just be cards.xml)
 				while ((ze = zis.getNextEntry()) != null) {
 					System.out.print("** Unzipping " + ze.getName() + ": ");
-					fos = new FileOutputStream(ze.getName());
+					if(ze.getName().equals("cards-complete.xml"))
+					{
+						fos = new FileOutputStream("cards.xml");
+					}
+					else
+					{
+						fos = new FileOutputStream(ze.getName());
+					}
 					// And write unzipped data out to the file
 					for (int c = zis.read(); c != -1; c = zis.read()) {
 						fos.write(c);
@@ -357,7 +364,7 @@ class Main
 
 				// Cleanup temp files downloaded
 				System.out.print("** Deleting zip file after extraction: ");
-				File f = new File("cards-gempukku.zip");
+				File f = new File("cards.zip");
 				f.delete();
 				System.out.println("success!");
 				// Successfully got database so read it in again
@@ -365,7 +372,7 @@ class Main
 				importDatabase();
 			} catch (InterruptedIOException io_e) {
 		        TextActionListener.send("Card database necessary, please restart Dojo", "Error");
-		        File f1 = new File("cards-gempukku.zip");
+		        File f1 = new File("cards.zip");
 				if(f1.exists())
 				{
 					f1.delete();
@@ -377,7 +384,7 @@ class Main
 				}
 			} catch (IOException io_e) {
 				System.err.println("failed. Check your internet connection.");
-				File f1 = new File("cards-gempukku.zip");
+				File f1 = new File("cards.zip");
 				if(f1.exists())
 				{
 					f1.delete();
@@ -387,6 +394,7 @@ class Main
 				{
 					f2.delete();
 				}
+				io_e.printStackTrace();
 				System.exit(1);
 			}
 		} catch (ParserConfigurationException t) {

@@ -33,15 +33,15 @@ class StoredCard extends Card
 	{
 		this.type = type;
 		// Set appropriate dynasty field
-		if(type.equals("actions")   || type.equals("kihos")     || type.equals("spells") ||
-		   type.equals("ancestors") || type.equals("followers") || type.equals("items")  ||
-		   type.equals("rings")     || type.equals("senseis")   || type.equals("winds"))
+		if(type.equals("strategy") || type.equals("kiho")     || type.equals("spell") ||
+		   type.equals("ancestor") || type.equals("follower") || type.equals("item")  ||
+		   type.equals("ring")     || type.equals("sensei")   || type.equals("wind"))
 		{
 			isDynasty = false;
 		}
 		else
 		{
-			// True for: events, regions, holdings, personalities, strongholds
+			// True for: celestials, events, regions, holdings, personalities, strongholds
 			isDynasty = true;
 		}
 	}
