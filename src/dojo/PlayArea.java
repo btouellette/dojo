@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -41,8 +42,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	private BufferedImage background;
 	// Which of your provinces was clicked (left to right)
 	private int numProvClicked;
-	// Context (right-click) menus
-	private JPopupMenu popupCard, popupAttachment, popupProv, popupDeck, popupDiscard;
 	// Number of provinces
 	private int oppNumProv = 4;
 	// Size of PlayArea in pixels
@@ -89,50 +88,101 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Interaction is handled within the class
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
-		createMenu();
 	}
 	
-	private void createMenu()
+	private JPopupMenu createMenu()
 	{
+		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuItem menuItem;
 		// Creates the context menus used in the application
-		//TODO: Flesh out context menus
-		//TODO: Generate dynamically depending on what is clicked (add certain items for attached cards/dishonored cards/etc)
-		popupCard = new JPopupMenu();
-		popupAttachment = new JPopupMenu();
-		popupProv = new JPopupMenu();
-		popupDeck = new JPopupMenu();
-		popupDiscard = new JPopupMenu();
-
-		JMenuItem menuItem = new JMenuItem("Destroy");
-		menuItem.addActionListener(this);
-		popupCard.add(menuItem);
-		popupAttachment.add(menuItem);
-		popupProv.add(menuItem);
+		//TODO: Flesh out context menus				
+		if(cardClicked)
+		{
+			if(attachmentClicked)
+			{
+				menuItem = new JMenuItem("Unattach");
+				menuItem.addActionListener(this);
+				popupMenu.add(menuItem);
+				if(clickedAttachment.getType().equals("personality"))
+				{
+					if(clickedAttachment.isHonorable())
+					{
+						menuItem = new JMenuItem("Dishonor");
+						menuItem.addActionListener(this);
+						popupMenu.add(menuItem);
+					}
+					else
+					{
+						menuItem = new JMenuItem("Rehonor");
+						menuItem.addActionListener(this);
+						popupMenu.add(menuItem);
+					}
+				}
+				if(clickedAttachment.isToken())
+				{
+					menuItem = new JMenuItem("Edit");
+					menuItem.addActionListener(this);
+					popupMenu.add(menuItem);					
+				}
+			}
+			else
+			{
+				menuItem = new JMenuItem("Attach");
+				menuItem.addActionListener(this);
+				popupMenu.add(menuItem);
+				if(clickedCard.getType().equals("personality"))
+				{
+					if(clickedCard.isHonorable())
+					{
+						menuItem = new JMenuItem("Dishonor");
+						menuItem.addActionListener(this);
+						popupMenu.add(menuItem);
+					}
+					else
+					{
+						menuItem = new JMenuItem("Rehonor");
+						menuItem.addActionListener(this);
+						popupMenu.add(menuItem);
+					}
+				}
+				if(clickedCard.isToken())
+				{
+					menuItem = new JMenuItem("Edit");
+					menuItem.addActionListener(this);
+					popupMenu.add(menuItem);					
+				}
+			}
+			
+		}
 		
-		menuItem = new JMenuItem("Attach");
-		menuItem.addActionListener(this);
-		popupCard.add(menuItem);
-		
-		menuItem = new JMenuItem("Unattach");
-		menuItem.addActionListener(this);
-		popupAttachment.add(menuItem);
+		if(provClicked)
+		{
+			menuItem = new JMenuItem("Destroy");
+			menuItem.addActionListener(this);
+			popupMenu.add(menuItem);
+			menuItem = new JMenuItem("Add Province On Left");
+			menuItem.addActionListener(this);
+			popupMenu.add(menuItem);
+			menuItem = new JMenuItem("Add Province On Right");
+			menuItem.addActionListener(this);
+			popupMenu.add(menuItem);
+		}
 
-		menuItem = new JMenuItem("Add Province On Left");
-		menuItem.addActionListener(this);
-		popupProv.add(menuItem);
-		menuItem = new JMenuItem("Add Province On Right");
-		menuItem.addActionListener(this);
-		popupProv.add(menuItem);
-
-		menuItem = new JMenuItem("Shuffle");
-		menuItem.addActionListener(this);
-		popupDeck.add(menuItem);
+		if(deckClicked)
+		{
+			menuItem = new JMenuItem("Shuffle");
+			menuItem.addActionListener(this);
+			popupMenu.add(menuItem);
+		}
 		
-		menuItem = new JMenuItem("Search");
-		menuItem.addActionListener(this);
-		popupDeck.add(menuItem);
-		popupDiscard.add(menuItem);
+		if(deckClicked || discardClicked)
+		{
+			menuItem = new JMenuItem("Search");
+			menuItem.addActionListener(this);
+			popupMenu.add(menuItem);
+		}
+		
+		return popupMenu;
 	}
 
 	// Override the default JComponent paint method
@@ -374,32 +424,6 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		return attachmentHeight;
 	}
 
-	// Pop up the correct context menu
-	private void showPopup(MouseEvent e)
-	{
-		// Now launch the right menu at the click location
-		if(attachmentClicked)
-		{
-			popupAttachment.show(this, e.getX(), e.getY());
-		}
-		else if(cardClicked)
-		{
-			popupCard.show(this, e.getX(), e.getY());
-		}
-		else if(provClicked)
-		{
-			popupProv.show(this, e.getX(), e.getY());
-		}
-		else if(deckClicked)
-		{
-			popupDeck.show(this, e.getX(), e.getY());
-		}
-		else if(discardClicked)
-		{
-			popupDiscard.show(this, e.getX(), e.getY());
-		}
-	}
-	
 	public void mouseClicked(MouseEvent e)
 	{
 		// On a double click launch correct doubleClicked method
@@ -656,7 +680,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Show appropriate right click menus
 		if(e.isPopupTrigger())
 		{
-			showPopup(e);
+			// Now launch the right menu at the click location
+			createMenu().show(this, e.getX(), e.getY());
 		}
 	}
 
@@ -702,7 +727,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// Show appropriate right-click menus (has to be here as well as mousePressed for cross-platform compatibility
 		if(e.isPopupTrigger())
 		{
-			showPopup(e);
+			// Now launch the right menu at the click location
+			createMenu().show(this, e.getX(), e.getY());
 		}
 	}
 
@@ -823,7 +849,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		List<Province> provinces = state.getProvinces();
 		//TODO: Fill out rest of context menu and actions
 		/********** Province Menu Items **********/
-		if(name.equals("Destroy"))
+		if(name.equals("Destroy") && provClicked)
 		{
 			Province province = provinces.get(numProvClicked);
 			province.destroy();
@@ -878,6 +904,51 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		else if(name.equals("Attach"))
 		{
 			attachingCard = clickedCard;
+		}
+		else if(name.equals("Dishonor"))
+		{
+			if(attachmentClicked)
+			{
+				clickedAttachment.dishonor();
+			}
+			else
+			{
+				clickedCard.dishonor();
+			}
+			repaint();
+		}
+		else if(name.equals("Rehonor"))
+		{
+			if(attachmentClicked)
+			{
+				clickedAttachment.rehonor();
+			}
+			else
+			{
+				clickedCard.rehonor();
+			}
+			repaint();
+		}
+		/********** Token Menu Items **********/
+		else if(name.equals("Edit"))
+		{
+			if(attachmentClicked)
+			{
+				String str = JOptionPane.showInputDialog("New token name:");
+				if(str != null)
+				{
+					clickedAttachment.createTokenImage(str);
+				}
+			}
+			else
+			{
+				String str = JOptionPane.showInputDialog("New token name:");
+				if(str != null)
+				{
+					clickedCard.createTokenImage(str);
+				}
+			}
+			repaint();
 		}
 	}
 }
