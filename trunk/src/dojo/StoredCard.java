@@ -17,6 +17,7 @@ class StoredCard extends Card
 	private String edition, text, cost, focus;
 	private String provinceStrength, goldProduction, startingHonor;
 	private String force, chi, personalHonor, honorReq;
+	private List<String> rulings, rarity, flavor, artist;
 
 	public StoredCard(String id)
 	{
@@ -159,6 +160,7 @@ class StoredCard extends Card
 		return null;
 	}
 
+	//TODO: Make this smarter. Try to download multiple editions if possible
 	public String getImageEdition()
 	{
 		if(!imageEdition.isEmpty())
@@ -237,5 +239,45 @@ class StoredCard extends Card
 	public List<String> getLegal()
 	{
 		return legal;
+	}
+
+	public void setRarity(String rarity)
+	{
+		this.rarity.add(rarity);
+	}
+
+	public List<String> getRarity()
+	{
+		return rarity;
+	}
+
+	public void setFlavor(String flavor)
+	{
+		this.flavor.add(flavor);
+	}
+
+	public List<String> getFlavor()
+	{
+		return flavor;
+	}
+
+	public void setArtist(String artist)
+	{
+		this.artist.add(artist);
+	}
+
+	public List<String> getArtist()
+	{
+		return artist;
+	}
+
+	public void setRulings(String rulings)
+	{
+		this.rulings.add(rulings);
+	}
+
+	public List<String> getRulings()
+	{
+		return rulings;
 	}
 }
