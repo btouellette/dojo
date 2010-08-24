@@ -14,6 +14,7 @@ class XMLImporter extends DefaultHandler
 	//private String version;
 	private String eName;
 	// Database to map ID or name to card
+	//TODO: Serialize these databases and only reload if the xml is newer
 	private Map<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
@@ -234,6 +235,22 @@ class XMLImporter extends DefaultHandler
 			else if(eName.equals("honor_req"))
 			{
 				currentCard.setHonorReq(s);
+			}
+			else if(eName.equals("rarity"))
+			{
+				currentCard.setRarity(s);
+			}
+			else if(eName.equals("flavor"))
+			{
+				currentCard.setFlavor(s);
+			}
+			else if(eName.equals("artist"))
+			{
+				currentCard.setArtist(s);
+			}
+			else if(eName.equals("rulings"))
+			{
+				currentCard.setRulings(s);
 			}
 		}
 	}
