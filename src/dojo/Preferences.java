@@ -97,6 +97,7 @@ class Preferences
 					}
 				}
 			}
+			br.close();
 		} catch(IOException e) {
 			System.err.println("** Couldn't find config file. Using defaults.");
 			defaultPreferences();

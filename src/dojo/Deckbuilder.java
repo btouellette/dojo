@@ -573,8 +573,6 @@ class Deckbuilder
 
 		RESET();
 
-
-		max=vect.size();
 		y=0;
 		legal = Legal.getSelectedItem().toString().toLowerCase();
 		clan = faction.getSelectedItem().toString().toLowerCase();
