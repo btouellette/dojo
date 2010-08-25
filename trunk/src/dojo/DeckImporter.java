@@ -130,10 +130,13 @@ class DeckImporter
 		// Pull the string in and tokenize it
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String deck = br.readLine();
-		StringTokenizer st = new StringTokenizer(deck, "|");
-		while(st.hasMoreTokens())
+		if(deck != null)
 		{
-			cards.add(Main.databaseID.get(st.nextToken()));
+			StringTokenizer st = new StringTokenizer(deck, "|");
+			while(st.hasMoreTokens())
+			{
+				cards.add(Main.databaseID.get(st.nextToken()));
+			}
 		}
 		return cards;
 	}

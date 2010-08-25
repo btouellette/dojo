@@ -55,16 +55,17 @@ public abstract class CardHolder
 		return returnedCard;
 	}
 	
-	public PlayableCard remove(StoredCard card)
+	public PlayableCard remove(PlayableCard card)
 	{
 		// Remove the specific card if it is present and return a PlayableCard to be put on the table
 		// Return null if it isn't
 		PlayableCard returnedCard = null;
-		if(cards.remove(card))
+		boolean removed = cards.remove(card);
+		if(removed)
 		{
-			returnedCard = new PlayableCard(card);
+			return returnedCard;
 		}
-		return returnedCard;
+		return null;
 	}
 	
 	public void removeAll()

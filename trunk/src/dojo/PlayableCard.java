@@ -388,12 +388,19 @@ class PlayableCard extends Card
 									fis.getProgressMonitor().setNote("Unzipping " + ze.getName() + "...");
 									// Make any directories as needed before unzipping
 									File f = new File("images/cards/" + databaseCard.getImageEdition());
-									f.mkdirs();
-									fos = new FileOutputStream("images/cards/" + ze.getName());
-									// Write the entire unzipped image to the output file
-									for (int c = zis.read(); c != -1; c = zis.read())
+									// Check if we made any necessary directories for this file
+									if(f.mkdirs())
 									{
-										fos.write(c);
+										fos = new FileOutputStream("images/cards/" + ze.getName());
+										// Write the entire unzipped image to the output file
+										for (int c = zis.read(); c != -1; c = zis.read())
+										{
+											fos.write(c);
+										}
+									}
+									else
+									{
+										throw new IOException();
 									}
 									zis.closeEntry();
 									fos.close();

@@ -12,12 +12,13 @@ class StoredCard extends Card
 {
 	private String type;
 	private String name;
+	//TODO: Update to only be MRP in new XML type
 	private List<String> imageLocation, imageEdition;
-	private List<String> legal, clan;
+	private List<String> legal, clan, rulings;
 	private String edition, text, cost, focus;
 	private String provinceStrength, goldProduction, startingHonor;
 	private String force, chi, personalHonor, honorReq;
-	private List<String> rulings, rarity, flavor, artist;
+	private String rarity, flavor, artist;
 
 	public StoredCard(String id)
 	{
@@ -26,6 +27,7 @@ class StoredCard extends Card
 		imageEdition = new ArrayList<String>();
 		legal = new ArrayList<String>();
 		clan = new ArrayList<String>();
+		rulings = new ArrayList<String>();
 		//Avoid null values in the text field (it isn't guaranteed present in cards.xml)
 		text = "";
 	}
@@ -243,30 +245,30 @@ class StoredCard extends Card
 
 	public void setRarity(String rarity)
 	{
-		this.rarity.add(rarity);
+		this.rarity = rarity;
 	}
 
-	public List<String> getRarity()
+	public String getRarity()
 	{
 		return rarity;
 	}
 
 	public void setFlavor(String flavor)
 	{
-		this.flavor.add(flavor);
+		this.flavor = flavor;
 	}
 
-	public List<String> getFlavor()
+	public String getFlavor()
 	{
 		return flavor;
 	}
 
 	public void setArtist(String artist)
 	{
-		this.artist.add(artist);
+		this.artist = artist;
 	}
 
-	public List<String> getArtist()
+	public String getArtist()
 	{
 		return artist;
 	}
