@@ -28,20 +28,20 @@ class MenuListener implements ActionListener
 			JFileChooser fc = new JFileChooser("decks");
 			// Add filter so it only shows appropriate files and directories
 			fc.addChoosableFileFilter(new FileFilter() {
-			    public boolean accept(File file) {
-			        String filename = file.getName();
-			        return file.isDirectory() || filename.endsWith(".l5d") || filename.endsWith(".dck");
-			    }
-			    public String getDescription() {
-			        return "Deck Files (*.dck and *.l5d)";
-			    }
+				public boolean accept(File file) {
+					String filename = file.getName();
+					return file.isDirectory() || filename.endsWith(".l5d") || filename.endsWith(".dck");
+				}
+				public String getDescription() {
+					return "Deck Files (*.dck and *.l5d)";
+				}
 			});
 			int returnVal = fc.showOpenDialog(Main.frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				// And import the deck if they picked one
 				DeckImporter.importDeck(fc.getSelectedFile());
-	        }
+			}
 		}
 		else if(name.equals("Start Game"))
 		{

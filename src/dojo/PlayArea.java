@@ -485,7 +485,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 	}
 
 	public void mousePressed(MouseEvent e)
-	{		
+	{
 		// On mouse click check to see if anything relevant was clicked
 		cardClicked = false;
 		attachmentClicked = false;
@@ -576,7 +576,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		}
 		// If there wasn't a card clicked check to see if any of the provinces were
 		if(!cardClicked)
-		{	
+		{
 			int leftBorder = 2*(cardWidth+8)-2;
 			int startHand = width - (int)(cardWidth*1.5);
 			int rightBorder = startHand - (2*(cardWidth+8)-2);

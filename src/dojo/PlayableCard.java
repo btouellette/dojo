@@ -548,7 +548,7 @@ class PlayableCard extends Card
 		String name = Main.databaseID.get(id).getName();
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
-	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
+		int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;
 		// And the card name
 		g.setColor(Color.BLACK);  
 		g.drawString(name, x, 50);
@@ -570,7 +570,7 @@ class PlayableCard extends Card
 		//TODO: Use templates that are type appropriate (get F/C and display)
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
-	    int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;  
+		int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;
 		// And the card name
 		g.setColor(Color.BLACK);  
 		g.drawString(name, x, 50);

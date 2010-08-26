@@ -121,16 +121,16 @@ class Deckbuilder
 	public void showGUI(int width, int height)
 	{
 		frame = new JFrame("DeckBuilder");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
-        frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-        //frame.setLayout(new GridLayout(1,3));
-        //frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+		//frame.setLayout(new GridLayout(1,3));
+		//frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
 		frame.setPreferredSize(new Dimension(width,height));
 		//Set up defaults if pref file is unavailable
-
-        width+=12;
-        height+=187;
+		
+		width+=12;
+		height+=187;
 
 		JPanel panel1 = createSearch(width);
 		panel1.setMaximumSize(panel1.getPreferredSize());
@@ -144,12 +144,12 @@ class Deckbuilder
 		frame.add(panel1);
 		frame.add(resPanel);
 		frame.add(decPanel);
-        //Set the menu bar and add the label to the content pane
-        frame.setJMenuBar(createMenuBar(width));
-        //Display the window
-
+		//Set the menu bar and add the label to the content pane
+		frame.setJMenuBar(createMenuBar(width));
+		//Display the window
+		
 		frame.pack();
-        frame.setVisible(true);
+		frame.setVisible(true);
 	}
 
 	private static JMenuBar createMenuBar(int width)
@@ -266,38 +266,31 @@ class Deckbuilder
 				Vector<StoredCard> stor = new Vector<StoredCard>(vect.size());
 			public void insertUpdate(DocumentEvent e)
 			{
-        		stor.addAll(dothis());
-        			refresh();
-    		}
-   			public void removeUpdate(DocumentEvent e)
-    		{
-    		    vect.addAll(stor);
+				stor.addAll(dothis());
+					refresh();
+			}
+			public void removeUpdate(DocumentEvent e)
+			{
+				vect.addAll(stor);
 				stor.clear();
-       		    for (int x = 0; x<vect.size();x++)
-        			if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
-        			{
-        				stor.add(vect.elementAt(x));
-        				vect.remove(x);
-        				x--;
-        			}
-        			refresh();
-    		}
-   			public void changedUpdate(DocumentEvent e) {}
-
-
-
+				for (int x = 0; x<vect.size();x++)
+					if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
+					{
+						stor.add(vect.elementAt(x));
+						vect.remove(x);
+						x--;
+					}
+				refresh();
+			}
+			public void changedUpdate(DocumentEvent e) {}
 
 			}
-
-
-
 
 */
 			);
 
 		goldcost =  new PanelCreator();
 		//goldcost.min.getDocument().addDocumentListener(new MyDocumentListener());
-
 
 		force = new PanelCreator();
 		chi = new PanelCreator();
@@ -310,21 +303,20 @@ class Deckbuilder
 		layout.setAutoCreateGaps(true);
 		//layout.setAutoCreateContainerGaps(true);
 
-
 		layout.setHorizontalGroup(
 		   layout.createSequentialGroup()
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 		      .addComponent(c[0])
-			  .addComponent(c[1])
-			  .addComponent(c[2])
-			  .addComponent(c[3])
-			  .addComponent(c[4])
-			  .addComponent(c[5])
-			  .addComponent(c[6])
-			  .addComponent(c[7])
-			  .addComponent(c[8])
-			  .addComponent(c[9])
-			  .addComponent(c[10]))
+		      .addComponent(c[1])
+		      .addComponent(c[2])
+		      .addComponent(c[3])
+		      .addComponent(c[4])
+		      .addComponent(c[5])
+		      .addComponent(c[6])
+		      .addComponent(c[7])
+		      .addComponent(c[8])
+		      .addComponent(c[9])
+		      .addComponent(c[10]))
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 		      .addComponent(Legal)
 		      .addComponent(CardType)
@@ -341,38 +333,38 @@ class Deckbuilder
 		layout.setVerticalGroup(
 		   layout.createSequentialGroup()
 		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		           .addComponent(c[0])
-		           .addComponent(Legal))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[1])
-			  	   .addComponent(CardType))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[2])
-			  	   .addComponent(faction))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[3])
-			  	   .addComponent(title))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[4])
-			  	   .addComponent(text))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[5])
-			  	   .addComponent(goldcost))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[6])
-			  	   .addComponent(force))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[7])
-			  	   .addComponent(chi))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[8])
-			  	   .addComponent(honor))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[9])
-			  	   .addComponent(phonor))
-			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			  	   .addComponent(c[10])
-			  	   .addComponent(focus))
+		                  .addComponent(c[0])
+		                  .addComponent(Legal))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[1])
+		                  .addComponent(CardType))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[2])
+		                  .addComponent(faction))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[3])
+		                  .addComponent(title))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[4])
+		                  .addComponent(text))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[5])
+		                  .addComponent(goldcost))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[6])
+		                  .addComponent(force))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[7])
+		                  .addComponent(chi))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[8])
+		                  .addComponent(honor))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[9])
+		                  .addComponent(phonor))
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		                  .addComponent(c[10])
+		                  .addComponent(focus))
 		);
 		//panel.add(Box.createVerticalStrut(5));
 		searchlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -449,28 +441,27 @@ class Deckbuilder
 		dlist.addListSelectionListener(new DeckActionListener(dyn));
 		dlist.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e)
-    		{
-   				if(e.getClickCount()%2 == 0)
-   				{
-
-     				if (dlist.getSelectedValue()==null)
-     					dlist.clearSelection();
-     				else
-     				{
-     					String val = dlist.getSelectedValue().toString().substring(3);
-     					for (int i=0;i<dyn.size();i++)
-     						if (dyn.elementAt(i).getName().equals(val))
-     						{
-     							if (dyn.elementAt(i).getType().equals("strongholds"))
-     								hasSH=false;
-     							dyn.remove(i);
-     							break;
-     						}
-     					refreshDyn();
-     					setFrameTitle(fileName,true);
-     				}
-       	 		}
-    		}
+			{
+				if(e.getClickCount()%2 == 0)
+				{
+	 				if (dlist.getSelectedValue()==null)
+	 					dlist.clearSelection();
+	 				else
+	 				{
+	 					String val = dlist.getSelectedValue().toString().substring(3);
+	 					for (int i=0;i<dyn.size();i++)
+	 						if (dyn.elementAt(i).getName().equals(val))
+	 						{
+	 							if (dyn.elementAt(i).getType().equals("strongholds"))
+	 								hasSH=false;
+	 							dyn.remove(i);
+	 							break;
+	 						}
+	 					refreshDyn();
+	 					setFrameTitle(fileName,true);
+	 				}
+				}
+			}
 		});
 		dlist.setVisibleRowCount(-1);
 
@@ -484,25 +475,25 @@ class Deckbuilder
 		flist.addListSelectionListener(new DeckActionListener(fate));
 		flist.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e)
-    		{
-   				if(e.getClickCount()%2 == 0)
-   				{
-     				if (flist.getSelectedValue()==null)
-     					flist.clearSelection();
-     				else
-     				{
-     					String val = flist.getSelectedValue().toString().substring(3);
-     					for (int i=0;i<fate.size();i++)
-     						if (fate.elementAt(i).getName().equals(val))
-     						{
-     							fate.remove(i);
-     							break;
-     						}
-     					refreshFate();
-     					setFrameTitle(fileName,true);
-     				}
-       	 		}
-    		}
+			{
+				if(e.getClickCount()%2 == 0)
+				{
+					if (flist.getSelectedValue()==null)
+						flist.clearSelection();
+					else
+					{
+						String val = flist.getSelectedValue().toString().substring(3);
+						for (int i=0;i<fate.size();i++)
+							if (fate.elementAt(i).getName().equals(val))
+							{
+								fate.remove(i);
+								break;
+							}
+						refreshFate();
+						setFrameTitle(fileName,true);
+					}
+				}
+			}
 		});
 		flist.setVisibleRowCount(-1);
 
@@ -566,7 +557,7 @@ class Deckbuilder
 				}
 	}
 	public static void display()
-    {
+	{
 		int max,y;
 		String type="", clan, legal;
 		String titleVal, textVal;
@@ -712,14 +703,14 @@ class Deckbuilder
 	{
 		Vector<StoredCard> stor = new Vector<StoredCard>(vect.size());
 		for (int x = 0; x<vect.size();x++)
-        	if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
-        	{
-        		stor.add(vect.elementAt(x));
-        		vect.remove(x);
-        		x--;
-        	}
-        	refresh();
-        return stor;
+			if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
+			{
+				stor.add(vect.elementAt(x));
+				vect.remove(x);
+				x--;
+			}
+			refresh();
+		return stor;
 	}
 	public static DefaultListModel formatDB(Vector<StoredCard> v)
 	{

@@ -28,14 +28,14 @@ class DeckActionListener implements ListSelectionListener
 			else
 			{
 				for (int i=0;i<vec.size();i++)
-     			{
-     				if (vec.elementAt(i).getName().equals(list.getSelectedValue().toString().substring(3)))
-     				{
-     					Deckbuilder.card.setCard(vec.elementAt(i));
-     					break;
-     				}
-     			}
+				{
+					if (vec.elementAt(i).getName().equals(list.getSelectedValue().toString().substring(3)))
+					{
+						Deckbuilder.card.setCard(vec.elementAt(i));
+						break;
+					}
+		}
 			}
 		}
-    }
+	}
 }

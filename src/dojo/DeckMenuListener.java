@@ -89,26 +89,26 @@ class DeckMenuListener implements ActionListener
 			open.setCurrentDirectory(new File(new File(".\\decks").getCanonicalPath()));
 		}catch(IOException e){}
 
-    	open.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
-    	{
-    		public boolean accept(File file)
-    		{
-        		String filename = file.getName();
-        		if(file.isDirectory())
-        			return true;
-        		return filename.endsWith(".jbp");
-    		}
-    		public String getDescription()
-    		{
-    			return "*.jbp Files";
-    		}
-    	});
-    	open.setAcceptAllFileFilterUsed(false);
+		open.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
+		{
+			public boolean accept(File file)
+			{
+				String filename = file.getName();
+				if(file.isDirectory())
+					return true;
+				return filename.endsWith(".jbp");
+			}
+			public String getDescription()
+			{
+				return "*.jbp Files";
+			}
+		});
+		open.setAcceptAllFileFilterUsed(false);
 
-    	int ret = open.showDialog(null, "Open");
+		int ret = open.showDialog(null, "Open");
 
-	    if (ret == JFileChooser.APPROVE_OPTION)
-	    	file = open.getSelectedFile();
+		if (ret == JFileChooser.APPROVE_OPTION)
+			file = open.getSelectedFile();
 
 		return file;
 
@@ -143,13 +143,13 @@ class DeckMenuListener implements ActionListener
 	{
 		try
 		{
-    		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-    		for (int i=0;i<Deckbuilder.dyn.size();i++)
-    			out.write(Deckbuilder.dyn.elementAt(i).getName()+ "|");
-    		for (int i=0;i<Deckbuilder.fate.size();i++)
-    			out.write(Deckbuilder.fate.elementAt(i).getName()+ "|");
-    		out.close();
-    		Deckbuilder.setFrameTitle(file.getName(),false);
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			for (int i=0;i<Deckbuilder.dyn.size();i++)
+				out.write(Deckbuilder.dyn.elementAt(i).getName()+ "|");
+			for (int i=0;i<Deckbuilder.fate.size();i++)
+				out.write(Deckbuilder.fate.elementAt(i).getName()+ "|");
+			out.close();
+			Deckbuilder.setFrameTitle(file.getName(),false);
 		} catch (IOException e) {}
 	}
 	private void readFile(File file)
@@ -184,11 +184,8 @@ class DeckMenuListener implements ActionListener
 				}
 			}
 			in.close();
-
 			Deckbuilder.setFrameTitle(file.getName(),false);
-
-
-		}catch (IOException e) {}
-
+		}catch (IOException e) {
+		}
 	}
 }
