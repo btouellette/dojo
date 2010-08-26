@@ -166,6 +166,14 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			menuItem = new JMenuItem("Add Province On Right");
 			menuItem.addActionListener(this);
 			popupMenu.add(menuItem);
+			Province province = state.getProvinces().get(numProvClicked);
+			if(!province.isEmpty() && !province.isFaceUp())
+			{
+				//TODO: Make this do something (multiple opponents supported)
+				menuItem = new JMenuItem("Show To Opponent");
+				menuItem.addActionListener(this);
+				popupMenu.add(menuItem);
+			}
 		}
 
 		if(deckClicked)

@@ -426,6 +426,6 @@ class Main
 			}
 		});
 		
-		new NetworkServer();
+		new Network();
 	}
 }
