@@ -425,5 +425,7 @@ class Main
 				createAndShowGUI();
 			}
 		});
+		
+		new NetworkServer();
 	}
 }
