@@ -94,7 +94,7 @@ class CardInfoBox extends JEditorPane
 			else if(type.equals("ring"))
 			{
 				cardHTML = "<center><table width=" + width + "><tr><td colspan=\"5\" align=center><b>" + card.getName() + "</b></td></tr>" +
-		                   "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>" +
+				           "<tr><td colspan = \"5\">" + card.getText() + "</td></tr>" +
 				           "<tr><td colspan = \"5\" align=center>" + card.getFocus() + " Focus</td></tr></table></center>";
 			}
 			else if(type.equals("sensei") || type.equals("stronghold"))

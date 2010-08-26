@@ -12,8 +12,8 @@ public class PanelCreator extends JPanel
 	private static final long serialVersionUID = 3037675290112377311L;
 	JTextField min,max;
 
-    public PanelCreator()
-    {
+	public PanelCreator()
+	{
 		//JPanel panel = new JPanel();
 		min = new JTextField(3);
 		min.setText("");
@@ -29,5 +29,5 @@ public class PanelCreator extends JPanel
 		add(min);
 		add(to);
 		add(max);
-    }
+	}
 }

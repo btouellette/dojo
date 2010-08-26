@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 class StoredImages
 {
 	public static BufferedImage originalDynasty, dynasty, dynastyBowed;
-    public static BufferedImage originalFate, fate, fateBowed;
+	public static BufferedImage originalFate, fate, fateBowed;
 
 	public static void loadImages()
 	{
