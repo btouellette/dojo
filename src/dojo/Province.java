@@ -41,6 +41,15 @@ class Province extends CardHolder
 	{
 		return cards.isEmpty();
 	}
+	
+	public boolean isFaceUp()
+	{
+		if(!cards.isEmpty())
+		{
+			return cards.get(0).isFaceUp();
+		}
+		return false;
+	}
 		
 	public List<PlayableCard> getAttachments()
 	{
