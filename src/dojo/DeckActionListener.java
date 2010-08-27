@@ -34,7 +34,7 @@ class DeckActionListener implements ListSelectionListener
 						Deckbuilder.card.setCard(vec.elementAt(i));
 						break;
 					}
-		}
+				}
 			}
 		}
 	}
