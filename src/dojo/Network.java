@@ -15,22 +15,21 @@ import org.json.*;
 public class Network
 {
 	// Protocol version. Keep incompatible versions from trying to play together
-	private int protocolVersion = 8;
+	private static int protocolVersion = 8;
 	// Port the game communications use
-	private int gamePort = 18072;
+	private static int gamePort = 18072;
+	private static List<NetworkHandler> connections;
 	
 	public Network()
 	{
-		ServerSocket serverSocket;
 		// Using a vector since it is thread safe
-		List<NetworkHandler> connections = new Vector<NetworkHandler>();
+		connections = new Vector<NetworkHandler>();
 		try {
 			while(true)
 			{
-				serverSocket = new ServerSocket(gamePort);
-				Socket clientSocket = null;
+				ServerSocket serverSocket = new ServerSocket(gamePort);
 				try {
-					clientSocket = serverSocket.accept();
+					Socket clientSocket = serverSocket.accept();
 					NetworkHandler nh = new NetworkHandler(clientSocket, connections);
 					nh.start();
 					connections.add(nh);
@@ -41,6 +40,14 @@ public class Network
 			}
 		} catch (IOException e) {
 			System.err.println("Could not listen on port: " + gamePort + ".");
+		}
+	}
+	
+	public static void broadcast(String message)
+	{
+		for(NetworkHandler nh : connections)
+		{
+			nh.send(message);
 		}
 	}
 
@@ -76,6 +83,10 @@ private class NetworkHandler extends Thread
 						if(command.equals("protocol"))
 						{
 							handleProtocol(jarray.getJSONObject(1));
+						}
+						else if(command.equals("rejected"))
+						{
+							handleRejected(jarray.getJSONObject(1));
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -140,12 +151,14 @@ private class NetworkHandler extends Thread
 		}
 	}
 	
+	// Send our protocol version to the client
 	private void sendProtocol() throws JSONException
 	{
 		String message = encode("protocol", "version", protocolVersion);
 		send(message);
 	}
 	
+	// Exchanging protocol versions as a handshake
 	private void handleProtocol(JSONObject jobj) throws JSONException
 	{
 		if(jobj.getInt("version") == protocolVersion )
@@ -159,6 +172,12 @@ private class NetworkHandler extends Thread
 			String message = encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
 			send(message);
 		}
+	}
+	
+	// Sent a rejected message if our client protocol handshake wasn't established correctly
+	private void handleRejected(JSONObject jobj) throws JSONException
+	{
+		String message = jobj.getString("msg");
 	}
 }
 }
