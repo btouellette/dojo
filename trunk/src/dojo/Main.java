@@ -32,6 +32,8 @@ class Main
 	// Object representing current game state
 	static GameState state;
 	static JFrame frame;
+	// Interface to the network
+	static Network network;
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -426,6 +428,7 @@ class Main
 			}
 		});
 		
-		new Network();
+		network = new Network();
+		network.start();
 	}
 }

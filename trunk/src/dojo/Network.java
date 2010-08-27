@@ -7,23 +7,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
 import org.json.*;
 
-public class Network
+public class Network extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
-	private static int protocolVersion = 8;
+	private int protocolVersion = 8;
 	// Port the game communications use
-	private static int gamePort = 18072;
-	private static List<NetworkHandler> connections;
+	private int gamePort = 18072;
+	private List<NetworkHandler> connections;
 	
 	public Network()
 	{
 		// Using a vector since it is thread safe
 		connections = new Vector<NetworkHandler>();
+	}
+	
+	public void run()
+	{
 		try {
 			while(true)
 			{
@@ -39,11 +44,29 @@ public class Network
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Could not listen on port: " + gamePort + ".");
+			System.err.println("** Could not listen on port: " + gamePort + ".");
 		}
 	}
 	
-	public static void broadcast(String message)
+	public boolean connect(String server)
+	{
+		try {
+			Socket hostSocket = new Socket(server, gamePort);
+			NetworkHandler nh = new NetworkHandler(hostSocket, connections);
+			nh.handshake();
+			nh.start();
+			connections.add(nh);
+		} catch (UnknownHostException e) {
+			System.err.println("** Could not find server " + server);
+			return false;
+		} catch (IOException e) {
+			System.err.println("** Could not connect to server " + server);
+			return false;
+		}
+		return true;
+	}
+	
+	public void broadcast(String message)
 	{
 		for(NetworkHandler nh : connections)
 		{
@@ -148,6 +171,16 @@ private class NetworkHandler extends Thread
 			{
 				nh.send(message);
 			}
+		}
+	}
+	
+	public void handshake()
+	{
+		try {
+			sendProtocol();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			System.err.println("** Failed to parse JSON command from client");
 		}
 	}
 	
