@@ -1,5 +1,12 @@
 package dojo;
-
+/*
+Loading card database: success!
+Sent: ["protocol",{"version":8}]
+Connect succeeded.
+Got:  ["welcome", {"clid": 5}]
+Got:  ["client-names", {"names": [[0, "Toku-san"]]}]
+Got:  ["client-join", {"clid": 5}]
+ */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.json.*;
@@ -80,6 +88,8 @@ private class NetworkHandler extends Thread
 	private BufferedReader in;
 	private BufferedWriter out;
 	private List<NetworkHandler> connections;
+	private int clientID;
+	private Map<Integer,String> clientNames;
 	
 	public NetworkHandler(Socket s, List<NetworkHandler> connections)
 	{
@@ -113,13 +123,24 @@ private class NetworkHandler extends Thread
 						{
 							handleRejected(jarray.getJSONObject(1));
 						}
+						else if(command.equals("welcome"))
+						{
+							handleWelcome(jarray.getJSONObject(1));
+						}
+						else if(command.equals("client-names"))
+						{
+							handleClientNames(jarray.getJSONObject(1));
+						}
+						else if(command.equals("client-join"))
+						{
+							handleClientJoin(jarray.getJSONObject(1));
+						}
 					} catch (JSONException e) {
 						e.printStackTrace();
 						System.err.println("** Failed to parse JSON command from client");
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
 				System.err.println("** Couldn't get new line from client");
 			}
 		}
@@ -162,7 +183,8 @@ private class NetworkHandler extends Thread
 	public void send(String message)
 	{
 		try {
-			out.write(message);
+			out.write(message + "\n");
+			out.flush();
 			System.out.println("Sent: " + message);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -198,7 +220,7 @@ private class NetworkHandler extends Thread
 		send(message);
 	}
 	
-	// Exchanging protocol versions as a handshake
+	// Handle the "protocol" message from client for exchanging protocol versions as a handshake
 	private void handleProtocol(JSONObject jobj) throws JSONException
 	{
 		if(jobj.getInt("version") == protocolVersion )
@@ -214,10 +236,39 @@ private class NetworkHandler extends Thread
 		}
 	}
 	
-	// Sent a rejected message if our client protocol handshake wasn't established correctly
+	// Handle the "rejected" message from server if our protocol handshake wasn't established correctly
 	private void handleRejected(JSONObject jobj) throws JSONException
 	{
-		String message = jobj.getString("msg");
+		final String message = jobj.getString("msg");
+		// Report the error but do so on the event dispatch queue where it is safe to interact with Swing components
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				TextActionListener.send(message, "Error");
+			}
+		});
+	}
+	
+	// Handle the "welcome" message from server on connect
+	private void handleWelcome(JSONObject jobj) throws JSONException
+	{
+		// Update our clientID with the one reported back to us
+		clientID = jobj.getInt("clid");
+		
+		//TODO: Send name to server
+	}
+	
+	private void handleClientJoin(JSONObject jobj) throws JSONException
+	{
+		int clientID = jobj.getInt("clid");
+		// Ignore the join if it is us joining
+		if(this.clientID == clientID)
+		{
+			return;
+		}
+	}
+
+	private void handleClientNames(JSONObject jobj) throws JSONException
+	{
 	}
 }
 }
