@@ -82,6 +82,7 @@ class Main
 		frame.setVisible(true);
 
 		// Read in cards.xml
+		//TODO: Prevent instantiation of StoredCard before this finishes
 		new Thread() {
 			public void run() {
 				importDatabase();
