@@ -21,6 +21,11 @@ class MenuListener implements ActionListener
 		
 		if(name.equals("Connect"))
 		{
+			String str = JOptionPane.showInputDialog("IP or Hostname:");
+			if(str != null)
+			{
+				Main.network.connect(str);
+			}
 		}
 		else if(name.equals("Load Deck"))
 		{

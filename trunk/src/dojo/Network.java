@@ -30,9 +30,9 @@ public class Network extends Thread
 	public void run()
 	{
 		try {
+			ServerSocket serverSocket = new ServerSocket(gamePort);
 			while(true)
 			{
-				ServerSocket serverSocket = new ServerSocket(gamePort);
 				try {
 					Socket clientSocket = serverSocket.accept();
 					NetworkHandler nh = new NetworkHandler(clientSocket, connections);
@@ -56,6 +56,7 @@ public class Network extends Thread
 			nh.handshake();
 			nh.start();
 			connections.add(nh);
+			System.out.println("Connect succeeded.");
 		} catch (UnknownHostException e) {
 			System.err.println("** Could not find server " + server);
 			return false;
@@ -97,11 +98,12 @@ private class NetworkHandler extends Thread
 		while (true)
 		{
 			try {
-				String outputLine = in.readLine();
-				if(outputLine != null)
+				String inputLine = in.readLine();
+				if(inputLine != null)
 				{
+					System.out.println("Got:  " + inputLine);
 					try {
-						JSONArray jarray = new JSONArray(outputLine);
+						JSONArray jarray = new JSONArray(inputLine);
 						String command = jarray.getString(0);
 						if(command.equals("protocol"))
 						{
@@ -126,37 +128,42 @@ private class NetworkHandler extends Thread
 	// Encode values into a JSON compatible string to send over the network
 	private String encode(String type, String key, int value) throws JSONException
 	{
-		JSONWriter object = new JSONStringer().object()
-		                                      .key(key)
-		                                      .value(value)
-		                                      .endObject();
-		String message = new JSONStringer().array()
-		                                   .value(type)
-		                                   .value(object)
-		                                   .endArray()
-		                                   .toString();
-		return message;
+		// Create an array where:
+		// 1st: String of message type
+		// 2nd: Object with multiple key value pairs corresponding to information to send
+		JSONStringer message = new JSONStringer();
+		message.array();
+		message.value(type);
+		message.object();
+		message.key(key);
+        message.value(value);
+        message.endObject();
+		message.endArray();
+		return message.toString();
 	}
 	
 	// Encode values into a JSON compatible string to send over the network
 	private String encode(String type, String key, String value) throws JSONException
 	{
-		JSONWriter object = new JSONStringer().object()
-		                                      .key(key)
-		                                      .value(value)
-		                                      .endObject();
-		String message = new JSONStringer().array()
-		                                   .value(type)
-		                                   .value(object)
-		                                   .endArray()
-		                                   .toString();
-		return message;
+		// Create an array where:
+		// 1st: String of message type
+		// 2nd: Object with multiple key value pairs corresponding to information to send
+		JSONStringer message = new JSONStringer();
+		message.array();
+		message.value(type);
+		message.object();
+		message.key(key);
+        message.value(value);
+        message.endObject();
+		message.endArray();
+		return message.toString();
 	}
 	
 	public void send(String message)
 	{
 		try {
 			out.write(message);
+			System.out.println("Sent: " + message);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("** Failed to send: " + message);
