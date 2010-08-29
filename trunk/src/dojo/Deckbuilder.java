@@ -636,7 +636,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 		
 		textDeck = new TextDecklist();
-		textDeck.setText(dynDeck.deck, fateDeck.deck);
+		textDeck.setText(dynDeck.deck,fateDeck.deck);
 		JScrollPane textScroller = new JScrollPane(textDeck);
 		
 		JPanel textPanel = new JPanel();
@@ -689,7 +689,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		int index = -1;
 		for (int i = 0; i < dynDeck.size(); i++)
 		{
-			if (dynDeck.deck.get(i).getType().equalsIgnoreCase("strongholds"))
+			if (dynDeck.deck.get(i).getType().equalsIgnoreCase("stronghold"))
 			{
 				hasSH = true;
 				index = i;
@@ -703,7 +703,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		//Set data fields after change
 		dynLabel.setText("Dynasty (" + (hasSH?(dynDeck.size() - 1):(dynDeck.size())) + "):");
 		stronghold.setText("Stronghold: " + (hasSH?dynDeck.deck.get(index):""));
-		textDeck.setText(dynDeck.deck, fateDeck.deck);
+		textDeck.setText(dynDeck.deck,fateDeck.deck);
 	}
 	
 	private void updateFate()
@@ -712,7 +712,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		fateDeck.setModel();
 		fateList.setModel(fateDeck);
 		fateLabel.setText("Fate (" + fateDeck.size() + "):");
-		textDeck.setText(dynDeck.deck, fateDeck.deck);
+		textDeck.setText(dynDeck.deck,fateDeck.deck);
 	}
 
 	private void setFrameTitle(String s, boolean ed)
@@ -964,6 +964,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 						String cardName = line.substring(count+1);
 						// And add the correct number of copies
 						StoredCard currentCard = Main.databaseName.get(cardName);
+						System.out.println(currentCard.getName());
 						for(int i = 0; i < num; i++)
 						{
 							cards.add(currentCard);
@@ -987,18 +988,14 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 			in.close();
 			
 			//Add the cards to the Deck lists
-			for(int x = 0; x < cards.size(); x++)
+			for(StoredCard currentCard : cards)
 			{
-				System.out.println(x);
-				if (cards.get(x).getType().equals("strongholds"))
-						System.out.println("say so");
-				if (cards.get(x).isDynasty())
+				if (currentCard.isDynasty())
 				{
-					dynDeck.deck.add(cards.get(x));
-					//TODO System.out.println(x + " " + dynDeck.deck.get(x).getName());
+					dynDeck.deck.add(currentCard);
 				}
-				else if (!cards.get(x).isDynasty())
-					fateDeck.deck.add(cards.get(x));
+				else if (!currentCard.isDynasty())
+					fateDeck.deck.add(currentCard);
 			}
 			
 			updateDyn();
