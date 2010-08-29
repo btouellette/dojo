@@ -93,7 +93,7 @@ class DeckImporter
 		}
 	}
 
-	private static List<StoredCard> importEggStyle(BufferedReader br) throws IOException
+	public static List<StoredCard> importEggStyle(BufferedReader br) throws IOException
 	{
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String line;
@@ -124,7 +124,7 @@ class DeckImporter
 		return cards;
 	}
 
-	private static List<StoredCard> importGameStyle(BufferedReader br) throws IOException
+	public static List<StoredCard> importGameStyle(BufferedReader br) throws IOException
 	{
 		// Game-style decks are only one line of card ID's separated by '|'s
 		// Pull the string in and tokenize it

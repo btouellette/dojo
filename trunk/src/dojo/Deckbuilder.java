@@ -10,19 +10,30 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.StringTokenizer;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -33,7 +44,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class Deckbuilder extends JFrame implements Comparable<Object>
+public class Deckbuilder extends JFrame implements Comparable<Object>, ActionListener
 {
 	
 	CardInfoBox card;
@@ -156,27 +167,31 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 	private JMenuBar createMenuBar()
 	{
 		//Create the menu bar
-		//TODO add menulistener
+		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);
+		menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
+		
 		//Size is across the entire application and 25 pixels high
 		//menuBar.setPreferredSize(new Dimension(width, 25));
-		menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
 
 		//Lay out the File menu
 		JMenu file = new JMenu("File");
-		//DeckMenuListener menuListener = new DeckMenuListener();
 		
 		JMenuItem newDeck = new JMenuItem("New");
-		//newDeck.addActionListener(this);
+		newDeck.addActionListener(this);
+		
 		JMenuItem load = new JMenuItem("Load");
-		//load.addActionListener(this);
+		load.addActionListener(this);
+		
 		JMenuItem save = new JMenuItem("Save");
-		//save.addActionListener(this);
+		save.addActionListener(this);
+		
 		JMenuItem saveas = new JMenuItem("Save As...");
-		//saveas.addActionListener(this);
+		saveas.addActionListener(this);
+		
 		JMenuItem close = new JMenuItem("Close");
-		//close.addActionListener(this);
+		close.addActionListener(this);
 		
 		file.add(newDeck);
 		file.add(load);
@@ -191,6 +206,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 		JMenu option = new JMenu("Options");
 		JMenuItem diag = new JMenuItem("Diagnostics");
 		//diag.addActionListener(this);
+		//TODO Add diagnostics and proxy printer??
 		//JMenuItem proxyPrint = new JMenuItem("Proxy Printer");
 		//proxyPrint.addActionListener(this);
 		option.add(diag);
@@ -659,7 +675,6 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 						  focus.min.getText().toLowerCase(),
 						  focus.max.getText().toLowerCase());
 		
-		//TODO fix sort
 		Collections.sort(search);
 		resultLabel.setText("Card Results (" + search.size() + "):");
 		searchList.setListData(search.toArray());
@@ -668,12 +683,13 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 	private void updateDyn()
 	{
 		dynDeck.setModel();
+		dynList.setModel(dynDeck);
 	
 		//Check for a Stronghold
 		int index = -1;
 		for (int i = 0; i < dynDeck.size(); i++)
 		{
-			if (dynDeck.deck.get(i).getType().equals("strongholds"))
+			if (dynDeck.deck.get(i).getType().equalsIgnoreCase("strongholds"))
 			{
 				hasSH = true;
 				index = i;
@@ -694,7 +710,8 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 	{
 		//Set data fields after change
 		fateDeck.setModel();
-		fateLabel.setText("Fate ("+fateDeck.size()+"):");
+		fateList.setModel(fateDeck);
+		fateLabel.setText("Fate (" + fateDeck.size() + "):");
 		textDeck.setText(dynDeck.deck, fateDeck.deck);
 	}
 
@@ -714,4 +731,286 @@ public class Deckbuilder extends JFrame implements Comparable<Object>
 		return 0;
 	}
 	
+	protected void processWindowEvent(WindowEvent e) 
+	{
+        if (e.getID() == WindowEvent.WINDOW_CLOSING && edit == true) 
+        {
+            int exit = JOptionPane.showConfirmDialog(this, "Save Before Closing?");
+            if (exit == JOptionPane.NO_OPTION)
+            	dispose();
+        }
+        else
+        	super.processWindowEvent(e);
+    }
+
+	public void actionPerformed(ActionEvent e)
+	{
+		String name = ((AbstractButton)e.getSource()).getText();
+		
+		if(name.equals("New"))
+		{
+			if(promptSave() != JOptionPane.CANCEL_OPTION)
+				newFile();
+		}
+		else if(name.equals("Load"))
+		{
+			if(promptSave() != JOptionPane.CANCEL_OPTION)
+			{
+				File file = chooseFile();
+				if (file != null)
+				{
+					newFile();
+					readFile(file);
+				}
+			}
+		}
+		else if(name.equals("Save"))
+		{
+			save();
+		}
+		else if(name.equals("Save As..."))
+		{
+			saveAs();
+		}
+		else if(name.equals("Close"))
+		{
+			dispose();
+		}
+		else if(name.equals("Diagnostics"))
+		{
+		}
+		else if(name.equals("Proxy Printer"))
+		{
+		}
+
+	}
+	
+	private int promptSave()
+	{
+		//Ask to save file before changing it
+		int option = JOptionPane.NO_OPTION;
+		if (edit == true)
+			option = JOptionPane.showOptionDialog(null, "Save before closing?", "Save", 
+													JOptionPane.YES_NO_CANCEL_OPTION, 
+													JOptionPane.QUESTION_MESSAGE,
+													null, null, null);
+		if (option == JOptionPane.YES_OPTION)
+			save();
+		return option;
+	}
+	
+	private void newFile()
+	{
+		//Reset the decklists
+		dynDeck = new Decklist();
+		fateDeck = new Decklist();
+		
+		updateDyn();
+		updateFate();
+		
+		setFrameTitle(null, false);
+	}
+	
+	private File chooseFile()
+	{
+		File file = null;
+		JFileChooser open = new JFileChooser();
+
+		try {
+			open.setCurrentDirectory(new File(new File(".\\decks").getCanonicalPath()));
+		} 
+		catch(IOException e)
+		{
+			System.err.println("Decks file is missing. Please reinstall.");
+		}
+		
+		//Add new Filter for the File Chooser
+    	open.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
+    	{
+    		public boolean accept(File file)
+    		{
+        		String filename = file.getName();
+        		if(file.isDirectory())
+        			return true;
+        		if (filename.endsWith(".dck") || filename.endsWith(".l5d"))
+        			return true;
+        		return false;
+    		}
+    		public String getDescription()
+    		{
+    			return "*.dck, *.l5d";
+    		}
+    	});
+    	open.setAcceptAllFileFilterUsed(false);
+
+    	//Prompt user to choose file
+    	int choice = open.showDialog(null, "Open");
+
+	    if (choice == JFileChooser.APPROVE_OPTION)
+	    	file = open.getSelectedFile();
+
+		return file;
+
+	}
+
+	private void save()
+	{
+		//Save as current file, or ask for a new one
+		if(fileName == null)
+			saveAs();
+		else
+		{
+			writeFile(new File("decks\\" + fileName));
+		}
+	}
+	
+	private void saveAs()
+	{
+		//Prompt for file name
+		String name = (String)JOptionPane.showInputDialog(this, "Enter a deck name:", 
+										"Save As...", JOptionPane.QUESTION_MESSAGE, 
+										null, null, null);
+		Object[] options = {"Yes", "No", "Cancel"};
+		int option = JOptionPane.YES_OPTION;
+		if (name != null)
+		{
+			File file = new File("decks\\" + name + ".l5d");
+			try
+			{
+				//If file exists, ask to overwrite
+				if(!file.createNewFile())
+					option = JOptionPane.showOptionDialog(null, ("File " + file.getName()+ " exists. Overwrite?"), 
+														"Save As...",JOptionPane.YES_NO_CANCEL_OPTION, 
+														JOptionPane.QUESTION_MESSAGE, null, options, 
+														options[0]);
+				if (option == JOptionPane.YES_OPTION)
+					writeFile(file);
+			} catch(IOException err){}
+		}
+	}
+	
+	private void writeFile(File file)
+	{
+		try
+		{
+    		BufferedWriter out = new BufferedWriter(new FileWriter(file));
+    		for (int i = 0; i < dynDeck.size(); i++)
+    			out.write(dynDeck.deck.get(i).getName() + "|");
+    		for (int i = 0; i < fateDeck.size(); i++)
+    			out.write(fateDeck.deck.get(i).getName() + "|");
+    		//TODO make deck exportable
+    		for (int i = 0; i < (dynDeck.size() + fateDeck.size()); i++)
+    		{
+    			
+    		}/*
+    		while((line = br.readLine()) != null)
+    		{
+    			// As long as the line isn't blank or commented out
+    			if(!line.isEmpty() && line.charAt(0) != '#')
+    			{
+    				int count = 0, num = 0;
+    				// First grab the number of cards
+    				while(Character.isDigit(line.charAt(count)))
+    				{
+    					num *= 10;
+    					num += Character.getNumericValue(line.charAt(count));
+    					count++;
+    				}
+    				// Then the card itself
+    				String cardName = line.substring(count+1);
+    				// And add the correct number of copies
+    				StoredCard currentCard = Main.databaseName.get(cardName);
+    				for(int i = 0; i < num; i++)
+    				{
+    					cards.add(currentCard);
+    				}
+    			}
+    		}*/
+    		out.close();
+    		setFrameTitle(file.getName(), false);
+		} catch (IOException e) {}
+	}
+	
+	private void readFile(File file)
+	{
+		try
+		{
+			BufferedReader in = new BufferedReader(new FileReader(file));
+
+			ArrayList<StoredCard> cards = new ArrayList<StoredCard>();
+			// Grab the file path
+			String path = file.getAbsolutePath();
+			// So we can grab the file extension
+			String fileType = path.substring(path.length()-4);
+			
+			if(fileType.equals(".l5d"))
+			{
+				String line;
+				// Iterate over the entire file
+				while((line = in.readLine()) != null)
+				{
+					// As long as the line isn't blank or commented out
+					if(!line.isEmpty() && line.charAt(0) != '#')
+					{
+						int count = 0, num = 0;
+						// First grab the number of cards
+						while(Character.isDigit(line.charAt(count)))
+						{
+							num *= 10;
+							num += Character.getNumericValue(line.charAt(count));
+							count++;
+						}
+						// Then the card itself
+						String cardName = line.substring(count+1);
+						// And add the correct number of copies
+						StoredCard currentCard = Main.databaseName.get(cardName);
+						for(int i = 0; i < num; i++)
+						{
+							cards.add(currentCard);
+						}
+					}
+				}
+			}
+			else if(fileType.equals(".dck"))
+			{
+				cards = new ArrayList<StoredCard>(100);
+				String deck = in.readLine();
+				if(deck != null)
+				{
+					StringTokenizer st = new StringTokenizer(deck, "|");
+					while(st.hasMoreTokens())
+					{
+						cards.add(Main.databaseID.get(st.nextToken()));
+					}
+				}
+			}
+			in.close();
+			
+			//Add the cards to the Deck lists
+			for(int x = 0; x < cards.size(); x++)
+			{
+				System.out.println(x);
+				if (cards.get(x).getType().equals("strongholds"))
+						System.out.println("say so");
+				if (cards.get(x).isDynasty())
+				{
+					dynDeck.deck.add(cards.get(x));
+					//TODO System.out.println(x + " " + dynDeck.deck.get(x).getName());
+				}
+				else if (!cards.get(x).isDynasty())
+					fateDeck.deck.add(cards.get(x));
+			}
+			
+			updateDyn();
+			updateFate();
+			setFrameTitle(file.getName(), false);
+
+
+		} catch (IOException err) {
+			TextActionListener.send("Failed to read in deck.\n", "Error");
+			err.printStackTrace();
+		}
+
+	}
+
 }
