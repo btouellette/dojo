@@ -226,6 +226,10 @@ private class NetworkHandler extends Thread
 		if(jobj.getInt("version") == protocolVersion )
 		{
 			// Handshake okay, continue on
+			// send welcome clid clientID
+			// send client-names names clientNames
+			// send deck-submitted clid clientID
+			// broadcast client-join clid clientID
 		}
 		else
 		{

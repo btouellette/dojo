@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-class StoredCard extends Card
+class StoredCard extends Card implements Comparable<StoredCard>
 {
 	private String type;
 	private String name;
@@ -281,5 +281,10 @@ class StoredCard extends Card
 	public List<String> getRulings()
 	{
 		return rulings;
+	}
+
+	public int compareTo(StoredCard card)
+	{
+		return name.compareTo(card.getName());
 	}
 }
