@@ -33,8 +33,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class Deckbuilder extends JFrame
+public class Deckbuilder extends JFrame implements Comparable<Object>
 {
+	
 	CardInfoBox card;
 	DataList search;
 	PanelCreator gold, force, chi, honor, phonor, focus;
@@ -46,6 +47,7 @@ public class Deckbuilder extends JFrame
 	JLabel resultLabel, stronghold, dynLabel, fateLabel;
 	JList searchList, dynList, fateList;
 	
+	private static final long serialVersionUID = 1L;
 	ArrayList<String> types, legal, clans;
 	boolean hasSH, edit;
 	String fileName;
@@ -119,6 +121,7 @@ public class Deckbuilder extends JFrame
 
 		Collections.sort(types);
 		Collections.sort(clans);
+		Collections.sort(search);
 		
 		setTitle("DeckBuilder");
 		
@@ -657,7 +660,7 @@ public class Deckbuilder extends JFrame
 						  focus.max.getText().toLowerCase());
 		
 		//TODO fix sort
-		//Collections.sort(search);
+		Collections.sort(search);
 		resultLabel.setText("Card Results (" + search.size() + "):");
 		searchList.setListData(search.toArray());
 	}
@@ -704,6 +707,11 @@ public class Deckbuilder extends JFrame
 		if (s==null)
 			name = true;
 		setTitle((name?"DeckBuilder":("DeckBuilder - " + s)) + (edit?"*":""));
+	}
+
+	public int compareTo(Object arg) 
+	{
+		return 0;
 	}
 	
 }
