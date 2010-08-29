@@ -1,8 +1,6 @@
 package dojo;
 
 import java.util.ArrayList;
-import java.util.Collections;
-
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
@@ -14,6 +12,7 @@ import javax.swing.event.ListDataListener;
  */
 public class DataList extends ArrayList<StoredCard> implements ListModel
 {
+	private static final long serialVersionUID = 1L;
 	Object[] p;
 	public DataList()
 	{
@@ -27,7 +26,6 @@ public class DataList extends ArrayList<StoredCard> implements ListModel
 		clear();
 		for (int x = 0; x < p.length; x++)
 			add(Main.databaseID.get(p[x]));
-		//sortList(); Collections.sort(this);
 	}
 	
     public void filterList(String legal, String clan, String type, String title,
@@ -118,21 +116,6 @@ public class DataList extends ArrayList<StoredCard> implements ListModel
 			if(!Character.isDigit(val.charAt(0)))
 				return false;
 		return true;
-	}
-	
-	private void sortList()
-	{
-
-		StoredCard currentCard;
-		
-		for (int x = 0; x < size(); x++)
-			for (int y = 0; y < size(); y++)
-				if(get(x).getName().toString().compareToIgnoreCase(get(y).getName().toString())<0)
-				{
-					currentCard = get(y);    //temp = y
-					set(y,get(x));   	   //y = x
-					set(x,currentCard);    //x = temp
-				}
 	}
 
 	public Object getElementAt(int arg) 
