@@ -1,12 +1,10 @@
 package dojo;
-// Deckbuilder.java
-// Written by James Spencer
-// Deck building interface and logic
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,10 +12,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -29,54 +26,60 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-class Deckbuilder
+public class Deckbuilder extends JFrame
 {
-	public static JFrame frame;
-	static ArrayList<String> legalChoices,types,clans;
-	public static CardInfoBox card;
-	public static JList list, dlist, flist;
-	public static Vector<StoredCard> vect, dyn, fate;
-	public static JLabel results, dyncards, fatecards, stronghold;
-	public static JScrollPane listScroller, dlistScroller, flistScroller;
-	public static JComboBox Legal,CardType,faction;
-	public static JTextField title,text,min,max;
-	public static JTextArea deck;
-	public static PanelCreator goldcost, force, chi, honor, phonor, focus;
-	public static boolean hasSH, edit;
-	public static DefaultListModel formDyn,formFate;
-	public static String fileName;
-
-
-	public Deckbuilder()
+	CardInfoBox card;
+	DataList search;
+	PanelCreator gold, force, chi, honor, phonor, focus;
+	TextDecklist textDeck;
+	Decklist dynDeck, fateDeck;
+	
+	JTextField title, text;
+	JComboBox legalBox, typeBox, clanBox;
+	JLabel resultLabel, stronghold, dynLabel, fateLabel;
+	JList searchList, dynList, fateList;
+	
+	ArrayList<String> types, legal, clans;
+	boolean hasSH, edit;
+	String fileName;
+	
+	public Deckbuilder(int width, int height)
 	{
-		Object[] p = Main.databaseID.keySet().toArray();
+		super();
 
-		vect = new Vector<StoredCard>();
-		types = new ArrayList<String>();
-		legalChoices = new ArrayList<String>();
-		clans = new ArrayList<String>();
-		hasSH = false;
-		edit = false;
 		fileName = null;
+		
+		dynDeck = new Decklist();
+		fateDeck = new Decklist();
+		
+		types = new ArrayList<String>();
+		legal = new ArrayList<String>();
+		clans = new ArrayList<String>();
 
 		types.add("");
 		clans.add("");
+		
+		search = new DataList();
+		
+		Object[] p = Main.databaseID.keySet().toArray();
 
 		for(int i = 0; i < p.length; i++)
 		{
 			StoredCard currentCard = Main.databaseID.get(p[i]);
-			vect.add(Main.databaseID.get(p[i]));
 
 			ArrayList<String> currentCardLegal = (ArrayList<String>) currentCard.getLegal();
 			for(int k = 0; k < currentCardLegal.size(); k++)
 			{
-				if(!legalChoices.contains(currentCardLegal.get(k)))
+				if(!legal.contains(currentCardLegal.get(k)))
 				{
-					legalChoices.add(currentCardLegal.get(k));
+					legal.add(currentCardLegal.get(k));
 				}
 			}
 
@@ -96,10 +99,10 @@ class Deckbuilder
 			}
 		}
 
-		for(int i = 0; i < legalChoices.size(); i++)
+		for(int i = 0; i < legal.size(); i++)
 		{
-			String temp = legalChoices.get(i).substring(0,1).toUpperCase() + legalChoices.get(i).substring(1);
-			legalChoices.set(i, temp);
+			String temp = legal.get(i).substring(0,1).toUpperCase() + legal.get(i).substring(1);
+			legal.set(i, temp);
 		}
 
 		for(int i = 1; i < types.size(); i++)
@@ -116,64 +119,62 @@ class Deckbuilder
 
 		Collections.sort(types);
 		Collections.sort(clans);
-	}
-
-	public void showGUI(int width, int height)
-	{
-		frame = new JFrame("DeckBuilder");
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
-		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-		//frame.setLayout(new GridLayout(1,3));
-		//frame.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
-		frame.setPreferredSize(new Dimension(width,height));
-		//Set up defaults if pref file is unavailable
+		setTitle("DeckBuilder");
 		
-		width+=12;
-		height+=187;
+		//TODO: Add dialog if file is not saved/or save temp file, reload on open
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		JPanel panel1 = createSearch(width);
-		panel1.setMaximumSize(panel1.getPreferredSize());
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        
+		setPreferredSize(new Dimension(width,height));
+
+		JPanel seaPanel = searchPanel();
+		seaPanel.setMaximumSize(seaPanel.getPreferredSize());
 
 		JPanel resPanel = resultPanel();
-		resPanel.setPreferredSize(new Dimension(width-panel1.getWidth()/2,height));
-		JPanel decPanel = deckPanel();
-		decPanel.setPreferredSize(new Dimension(width-panel1.getWidth()/2,height));
-
-
-		frame.add(panel1);
-		frame.add(resPanel);
-		frame.add(decPanel);
-		//Set the menu bar and add the label to the content pane
-		frame.setJMenuBar(createMenuBar(width));
-		//Display the window
+		resPanel.setPreferredSize(new Dimension(width-seaPanel.getWidth()/2,height));
 		
-		frame.pack();
-		frame.setVisible(true);
-	}
+		JPanel decPanel = deckPanel();
+		decPanel.setPreferredSize(new Dimension(width-seaPanel.getWidth()/2,height));
 
-	private static JMenuBar createMenuBar(int width)
+
+		add(seaPanel);
+		add(resPanel);
+		add(decPanel);
+        
+		setJMenuBar(createMenuBar());
+		
+		//Display the window
+		pack();
+        setVisible(true);
+	}
+	
+	private JMenuBar createMenuBar()
 	{
 		//Create the menu bar
+		//TODO add menulistener
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);
 		//Size is across the entire application and 25 pixels high
-		menuBar.setPreferredSize(new Dimension(width, 25));
+		//menuBar.setPreferredSize(new Dimension(width, 25));
 		menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
 
 		//Lay out the File menu
 		JMenu file = new JMenu("File");
-		DeckMenuListener menuListener = new DeckMenuListener();
+		//DeckMenuListener menuListener = new DeckMenuListener();
+		
 		JMenuItem newDeck = new JMenuItem("New");
-		newDeck.addActionListener(menuListener);
+		//newDeck.addActionListener(this);
 		JMenuItem load = new JMenuItem("Load");
-		load.addActionListener(menuListener);
+		//load.addActionListener(this);
 		JMenuItem save = new JMenuItem("Save");
-		save.addActionListener(menuListener);
+		//save.addActionListener(this);
 		JMenuItem saveas = new JMenuItem("Save As...");
-		saveas.addActionListener(menuListener);
+		//saveas.addActionListener(this);
 		JMenuItem close = new JMenuItem("Close");
-		close.addActionListener(menuListener);
+		//close.addActionListener(this);
+		
 		file.add(newDeck);
 		file.add(load);
 		file.add(save);
@@ -186,144 +187,145 @@ class Deckbuilder
 
 		JMenu option = new JMenu("Options");
 		JMenuItem diag = new JMenuItem("Diagnostics");
-		diag.addActionListener(menuListener);
-		JMenuItem proxyPrint = new JMenuItem("Proxy Printer");
-		proxyPrint.addActionListener(menuListener);
+		//diag.addActionListener(this);
+		//JMenuItem proxyPrint = new JMenuItem("Proxy Printer");
+		//proxyPrint.addActionListener(this);
 		option.add(diag);
-		option.add(proxyPrint);
+		//option.add(proxyPrint);
 
 		//Add the Options menu to the menu bar
 		menuBar.add(option);
 
-		return(menuBar);
+		return menuBar;
 	}
 
-	private static JPanel createSearch(int width)
+	private JPanel searchPanel()
 	{
-		ActionListener pewp = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				display();
-			}
-		};
-
-		String[] array = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
+		String[] namesArray = {"Legal: ","Card Type: ","Clan: ","Title: ","Text: ",
 							 "Gold Cost: ","Force: ","Chi: ","Honor Req.: ","PH: ",
 							 "Focus Value: "};
-		JLabel[] c = new JLabel[array.length];
-
-		for (int i=0;i<array.length;i++)
+		
+		JLabel[] names = new JLabel[namesArray.length];
+		
+		//Add an ActionListener for the Drop Menus
+		ActionListener searchListener = new ActionListener()
 		{
-			c[i] = new JLabel(array[i]);
-		//	c[i].setFont(new Font("Serif", Font.PLAIN, 13));
-		}
+			public void actionPerformed(ActionEvent e) 
+			{
+				updateSearch();
+			}
+		};
+		
+		//Add a DocumentListener for TextField events
+		DocumentListener textListener = new DocumentListener()
+		{
+			public void insertUpdate(DocumentEvent d) 
+			{
+				updateSearch();
+			}
+			public void removeUpdate(DocumentEvent d) 
+			{
+				updateSearch();	
+			}
+			public void changedUpdate(DocumentEvent d) {}
+		};
 
+		//Creates an array of JLabels based on namesArray values
+		for (int i = 0; i < namesArray.length; i++)
+		{
+			names[i] = new JLabel(namesArray[i]);
+			names[i].setFont(new Font("Serif", Font.PLAIN, 13));
+		}
+		
 		JPanel panel = new JPanel();
 		panel.setOpaque(true);
-
-		JPanel searchMenu = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+		
+		JLabel label = new JLabel("Search Criteria:");
+		label.setFont(new Font("Serif", Font.BOLD, 14));
+		label.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.add(label);
+ 
+		JPanel searchMenu = new JPanel();		
 
-		card = new CardInfoBox();
-		card.setPreferredSize(new Dimension((width-12)/4, 2000));
+		legalBox = new JComboBox(legal.toArray());
+		legalBox.addActionListener(searchListener);
+		legalBox.setPreferredSize(new Dimension(140, 20));
+		legalBox.setMaximumSize(legalBox.getPreferredSize());
+		legalBox.setBackground(Color.WHITE);
 
-		JScrollPane cardScrollPane = new JScrollPane(card);
+		typeBox = new JComboBox(types.toArray());
+		typeBox.addActionListener(searchListener);
+		typeBox.setPreferredSize(new Dimension(140, 20));
+		typeBox.setMaximumSize(typeBox.getPreferredSize());
+		typeBox.setBackground(Color.WHITE);
 
-		JLabel infolabel=new JLabel("Card Info:");
-		//infolabel.setFont(new Font("Serif",Font.BOLD,14));
-
-		JLabel searchlabel = new JLabel("Search Criteria:");
-		//searchlabel.setFont(new Font("Serif",Font.BOLD,14));
-
-		Legal = new JComboBox(legalChoices.toArray());
-		Legal.setSelectedIndex(0);
-		Legal.addActionListener(pewp);
-		Legal.setPreferredSize(new Dimension(140, 20));
-		Legal.setMaximumSize(Legal.getPreferredSize());
-		Legal.setBackground(Color.WHITE);
-
-		CardType = new JComboBox(types.toArray());
-		CardType.addActionListener(pewp);
-		CardType.setPreferredSize(new Dimension(140, 20));
-		CardType.setMaximumSize(CardType.getPreferredSize());
-		CardType.setBackground(Color.WHITE);
-
-		faction = new JComboBox(clans.toArray());
-		faction.addActionListener(pewp);
-		faction.setPreferredSize(new Dimension(140, 20));
-		faction.setMaximumSize(faction.getPreferredSize());
-		faction.setBackground(Color.WHITE);
+		clanBox = new JComboBox(clans.toArray());
+		clanBox.addActionListener(searchListener);
+		clanBox.setPreferredSize(new Dimension(140, 20));
+		clanBox.setMaximumSize(clanBox.getPreferredSize());
+		clanBox.setBackground(Color.WHITE);
 
 		title = new JTextField(10);
 		title.setMaximumSize(new Dimension(140,20));
-		title.getDocument().addDocumentListener(new MyDocumentListener());
+		title.getDocument().addDocumentListener(textListener);
 
 		text = new JTextField(10);
 		text.setMaximumSize(new Dimension(140,20));
-		text.getDocument().addDocumentListener(new MyDocumentListener()
-		/*	{
-				Vector<StoredCard> stor = new Vector<StoredCard>(vect.size());
-			public void insertUpdate(DocumentEvent e)
-			{
-				stor.addAll(dothis());
-					refresh();
-			}
-			public void removeUpdate(DocumentEvent e)
-			{
-				vect.addAll(stor);
-				stor.clear();
-				for (int x = 0; x<vect.size();x++)
-					if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
-					{
-						stor.add(vect.elementAt(x));
-						vect.remove(x);
-						x--;
-					}
-				refresh();
-			}
-			public void changedUpdate(DocumentEvent e) {}
+		text.getDocument().addDocumentListener(textListener);
 
-			}
-
-*/
-			);
-
-		goldcost =  new PanelCreator();
-		//goldcost.min.getDocument().addDocumentListener(new MyDocumentListener());
-
-		force = new PanelCreator();
-		chi = new PanelCreator();
-		honor = new PanelCreator();
+		
+		gold   = new PanelCreator();
+		force  = new PanelCreator();
+		chi    = new PanelCreator();
+		honor  = new PanelCreator();
 		phonor = new PanelCreator();
-		focus = new PanelCreator();
-
+		focus  = new PanelCreator();
+		
+		gold.min.getDocument().addDocumentListener(textListener);
+		gold.max.getDocument().addDocumentListener(textListener);
+		
+		force.min.getDocument().addDocumentListener(textListener);
+		force.max.getDocument().addDocumentListener(textListener);
+		
+		chi.min.getDocument().addDocumentListener(textListener);
+		chi.max.getDocument().addDocumentListener(textListener);
+		
+		honor.min.getDocument().addDocumentListener(textListener);
+		honor.max.getDocument().addDocumentListener(textListener);
+		
+		phonor.min.getDocument().addDocumentListener(textListener);
+		phonor.max.getDocument().addDocumentListener(textListener);
+		
+		focus.min.getDocument().addDocumentListener(textListener);
+		focus.max.getDocument().addDocumentListener(textListener);
+		
+		//Set up the layout for the search area
 		GroupLayout layout = new GroupLayout(searchMenu);
 		searchMenu.setLayout(layout);
 		layout.setAutoCreateGaps(true);
-		//layout.setAutoCreateContainerGaps(true);
 
 		layout.setHorizontalGroup(
 		   layout.createSequentialGroup()
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(c[0])
-		      .addComponent(c[1])
-		      .addComponent(c[2])
-		      .addComponent(c[3])
-		      .addComponent(c[4])
-		      .addComponent(c[5])
-		      .addComponent(c[6])
-		      .addComponent(c[7])
-		      .addComponent(c[8])
-		      .addComponent(c[9])
-		      .addComponent(c[10]))
+		      .addComponent(names[0])
+			  .addComponent(names[1])
+			  .addComponent(names[2])
+			  .addComponent(names[3])
+			  .addComponent(names[4])
+			  .addComponent(names[5])
+			  .addComponent(names[6])
+			  .addComponent(names[7])
+			  .addComponent(names[8])
+			  .addComponent(names[9])
+			  .addComponent(names[10]))
 		   .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		      .addComponent(Legal)
-		      .addComponent(CardType)
-		      .addComponent(faction)
+		      .addComponent(legalBox)
+		      .addComponent(typeBox)
+		      .addComponent(clanBox)
 		      .addComponent(title)
 		      .addComponent(text)
-		      .addComponent(goldcost)
+		      .addComponent(gold)
 		      .addComponent(force)
 		      .addComponent(chi)
 		      .addComponent(honor)
@@ -333,206 +335,296 @@ class Deckbuilder
 		layout.setVerticalGroup(
 		   layout.createSequentialGroup()
 		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[0])
-		                  .addComponent(Legal))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[1])
-		                  .addComponent(CardType))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[2])
-		                  .addComponent(faction))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[3])
-		                  .addComponent(title))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[4])
-		                  .addComponent(text))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[5])
-		                  .addComponent(goldcost))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[6])
-		                  .addComponent(force))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[7])
-		                  .addComponent(chi))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[8])
-		                  .addComponent(honor))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[9])
-		                  .addComponent(phonor))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		                  .addComponent(c[10])
-		                  .addComponent(focus))
+		           .addComponent(names[0])
+		           .addComponent(legalBox))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[1])
+			  	   .addComponent(typeBox))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[2])
+			  	   .addComponent(clanBox))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[3])
+			  	   .addComponent(title))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[4])
+			  	   .addComponent(text))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[5])
+			  	   .addComponent(gold))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[6])
+			  	   .addComponent(force))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[7])
+			  	   .addComponent(chi))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[8])
+			  	   .addComponent(honor))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[9])
+			  	   .addComponent(phonor))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			  	   .addComponent(names[10])
+			  	   .addComponent(focus))
 		);
-		//panel.add(Box.createVerticalStrut(5));
-		searchlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		
 		searchMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
-		infolabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		cardScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-		panel.add(searchlabel);
 		panel.add(searchMenu);
+
 		panel.add(Box.createHorizontalStrut(5));
-		panel.add(infolabel);
+		
+		label = new JLabel("Card Info:");
+		label.setFont(new Font("Serif", Font.BOLD, 14));
+		panel.add(label);
+		
+		card = new CardInfoBox();
+		card.setPreferredSize(new Dimension(140, 2000));
+		JScrollPane cardScrollPane = new JScrollPane(card);
+		cardScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(cardScrollPane);
 
-		return(panel);
+		return panel;
 
 	}
-
-	public static JPanel resultPanel()
+	
+	private JPanel resultPanel()
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
-		results = new JLabel("Card Results (" + vect.size() + "):");
-		//results.setFont(new Font("Serif",Font.BOLD,14));
-		results.setMaximumSize(new Dimension(140,20));
-		results.setAlignmentX(Component.LEFT_ALIGNMENT);
+		resultLabel = new JLabel("Card Results (" + search.size() + "):");
+		resultLabel.setFont(new Font("Serif",Font.BOLD,14));
+		resultLabel.setMaximumSize(new Dimension(140,20));
+		resultLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.add(resultLabel);
 
-		alphasort(vect);
+		searchList = new JList(search.toArray());
+		searchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		searchList.setLayoutOrientation(JList.VERTICAL);
+		searchList.setVisibleRowCount(-1);
+		searchList.setSelectedIndex(0);
+		
+		//Set CardInfoBox to first value
+		if (search.get(0)!=null)
+			card.setCard(search.get(0));
+		
+		//Add a Selection Listener to change Card Info Box when selection changes
+		searchList.addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				if(!e.getValueIsAdjusting())
+				{
+					if(searchList.getSelectedIndex() < 0)
+					{
+						searchList.setSelectedIndex(0);
+					}
+					if(search.size()!=0)
+						card.setCard(search.get(searchList.getSelectedIndex()));
+				}
+			}
+		});
+		
+		//Add a Mouse Listener to add cards to deck list if Double Clicked
+		searchList.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+		    {
+		   		if(e.getClickCount()%2 == 0)
+		   		{
+		     		int index = searchList.locationToIndex(e.getPoint());
 
-		list = new JList(vect); //data has type Object[]
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setLayoutOrientation(JList.VERTICAL);
-		list.addListSelectionListener(new ListListener());
-		list.addMouseListener(new ListActionListener());
-		list.setVisibleRowCount(-1);
-		list.setSelectedIndex(0);
-		if (vect.elementAt(0)!=null)
-			card.setCard(vect.elementAt(0));
+		     		try
+		     		{
+		     			if(search.get(index).isDynasty())
+		     			{
+		     				if(!(search.get(index).getType().equals("strongholds")
+		     						&& hasSH==true))
+		     					dynDeck.deck.add(search.get(index));
+		     				updateDyn();
+		     			}
+		     			else if (!search.get(index).isDynasty())
+		     			{
+		     				fateDeck.deck.add(search.get(index));
+		     				updateFate();
+		     			}
+		     		} catch(ArrayIndexOutOfBoundsException excptn){}
+		     		setFrameTitle(fileName,true);
+		        }
+		    }
+		});
 
-		listScroller = new JScrollPane(list);
+		JScrollPane listScroller = new JScrollPane(searchList);
 		listScroller.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		panel.add(results);
 		panel.add(listScroller);
+		
 		return panel;
 	}
+	
+	private JPanel deckPanel()
+	{	
+		JTabbedPane tabbedPane = new JTabbedPane();
+		JPanel deckPanel = new JPanel();
+		deckPanel.setOpaque(true);
+		deckPanel.setLayout(new BoxLayout(deckPanel,BoxLayout.PAGE_AXIS));
 
-	public static JPanel deckPanel()
-	{
-		dyn = new Vector<StoredCard>();
-		fate = new Vector<StoredCard>();
+		JPanel dynSide = new JPanel();
+		dynSide.setLayout(new BoxLayout(dynSide,BoxLayout.PAGE_AXIS));
 
-		JPanel pane = new JPanel();
-		pane.setLayout(new BoxLayout(pane,BoxLayout.PAGE_AXIS));
+		dynLabel = new JLabel("Dynasty ("+ dynDeck.size() + "):");
+		dynLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		dynSide.add(dynLabel);
 
-		JPanel panel = new JPanel();
-		panel.setOpaque(true);
-		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
-
-		JPanel deck1 = new JPanel();
-		deck1.setLayout(new BoxLayout(deck1,BoxLayout.PAGE_AXIS));
-
-		JPanel deck2 = new JPanel();
-		deck2.setLayout(new BoxLayout(deck2,BoxLayout.PAGE_AXIS));
-
-		stronghold = new JLabel("Stronghold: ");
-
-		dyncards = new JLabel("Dynasty ("+ dyn.size() + "):");
-		fatecards = new JLabel("Fate ("+ fate.size() + "):");
-
-		formDyn = formatDB(dyn);
-		dlist = new JList(formDyn);
-		dlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		dlist.setLayoutOrientation(JList.VERTICAL);
-		dlist.addListSelectionListener(new DeckActionListener(dyn));
-		dlist.addMouseListener(new MouseAdapter(){
-			public void mouseClicked(MouseEvent e)
+		dynList = new JList(dynDeck);
+		dynList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		dynList.setLayoutOrientation(JList.VERTICAL);
+		dynList.setVisibleRowCount(-1);
+		
+		//Add Selection Listener to change CardInfoBox
+		dynList.addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
 			{
-				if(e.getClickCount()%2 == 0)
+				JList list = (JList) e.getSource();
+				if(e.getValueIsAdjusting() == false)
 				{
-	 				if (dlist.getSelectedValue()==null)
-	 					dlist.clearSelection();
-	 				else
-	 				{
-	 					String val = dlist.getSelectedValue().toString().substring(3);
-	 					for (int i=0;i<dyn.size();i++)
-	 						if (dyn.elementAt(i).getName().equals(val))
-	 						{
-	 							if (dyn.elementAt(i).getType().equals("strongholds"))
-	 								hasSH=false;
-	 							dyn.remove(i);
-	 							break;
-	 						}
-	 					refreshDyn();
-	 					setFrameTitle(fileName,true);
-	 				}
-				}
-			}
-		});
-		dlist.setVisibleRowCount(-1);
-
-		dlistScroller = new JScrollPane(dlist);
-
-		formFate = new DefaultListModel();
-		formFate = formatDB(fate);
-		flist = new JList(formFate);
-		flist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		flist.setLayoutOrientation(JList.VERTICAL);
-		flist.addListSelectionListener(new DeckActionListener(fate));
-		flist.addMouseListener(new MouseAdapter(){
-			public void mouseClicked(MouseEvent e)
-			{
-				if(e.getClickCount()%2 == 0)
-				{
-					if (flist.getSelectedValue()==null)
-						flist.clearSelection();
+					if(list.getSelectedValue()==null)
+						list.clearSelection();
 					else
 					{
-						String val = flist.getSelectedValue().toString().substring(3);
-						for (int i=0;i<fate.size();i++)
-							if (fate.elementAt(i).getName().equals(val))
-							{
-								fate.remove(i);
-								break;
-							}
-						refreshFate();
-						setFrameTitle(fileName,true);
+						for (int i = 0; i < dynDeck.size(); i++)
+		     			{
+		     				if (dynDeck.deck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
+		     				{
+		     					card.setCard(dynDeck.deck.get(i));
+		     					break;
+		     				}
+		     			}
 					}
 				}
-			}
+		    }
 		});
-		flist.setVisibleRowCount(-1);
+		
+		//Add mouse listener to remove cards from the list on a Double Click
+		dynList.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+    		{
+   				if(e.getClickCount()%2 == 0)
+   				{
 
-		flistScroller = new JScrollPane(flist);
-
-		stronghold.setAlignmentX(Component.LEFT_ALIGNMENT);
-		dyncards.setAlignmentX(Component.LEFT_ALIGNMENT);
-		fatecards.setAlignmentX(Component.LEFT_ALIGNMENT);
+     				if (dynList.getSelectedValue()==null)
+     					dynList.clearSelection();
+     				else
+     				{
+     					String val = dynList.getSelectedValue().toString().substring(3);
+     					for (int i=0;i<dynDeck.size();i++)
+     						if (dynDeck.deck.get(i).getName().equals(val))
+     						{
+     							dynDeck.deck.remove(i);
+     							break;
+     						}
+     					updateDyn();
+     					setFrameTitle(fileName,true);
+     				}
+       	 		}
+    		}
+		});
+		
+		JScrollPane dlistScroller = new JScrollPane(dynList);		
 		dlistScroller.setAlignmentX(Component.LEFT_ALIGNMENT);
+		dynSide.add(dlistScroller);
+		
+		JPanel fateSide = new JPanel();
+		fateSide.setLayout(new BoxLayout(fateSide,BoxLayout.PAGE_AXIS));
+
+		fateLabel = new JLabel("Fate ("+ fateDeck.size() + "):");
+		fateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		fateSide.add(fateLabel);
+		
+		fateList = new JList(fateDeck);
+		fateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		fateList.setLayoutOrientation(JList.VERTICAL);
+		fateList.setVisibleRowCount(-1);
+		
+		//Add Selection Listener to change CardInfoBox
+		fateList.addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				JList list = (JList) e.getSource();
+				if(e.getValueIsAdjusting() == false)
+				{
+					if(list.getSelectedValue()==null)
+						list.clearSelection();
+					else
+					{
+						for (int i = 0; i < fateDeck.size(); i++)
+		     			{
+		     				if (fateDeck.deck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
+		     				{
+		     					card.setCard(fateDeck.deck.get(i));
+		     					break;
+		     				}
+		     			}
+					}
+				}
+		    }
+		});
+		
+		//Add mouse listener to remove cards from the list on a Double Click
+		fateList.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+    		{
+   				if(e.getClickCount()%2 == 0)
+   				{
+
+     				if (fateList.getSelectedValue()==null)
+     					fateList.clearSelection();
+     				else
+     				{
+     					String val = fateList.getSelectedValue().toString().substring(3);
+     					for (int i=0;i<fateDeck.size();i++)
+     						if (fateDeck.deck.get(i).getName().equals(val))
+     						{
+     							fateDeck.deck.remove(i);
+     							break;
+     						}
+     					updateFate();
+     					setFrameTitle(fileName,true);
+     				}
+       	 		}
+    		}
+		});
+		
+		JScrollPane flistScroller = new JScrollPane(fateList);
 		flistScroller.setAlignmentX(Component.LEFT_ALIGNMENT);
+		fateSide.add(flistScroller);
+		
+		stronghold = new JLabel("Stronghold: ");
+		stronghold.setAlignmentX(Component.LEFT_ALIGNMENT);
+		deckPanel.add(stronghold);
+		
+		JPanel pane = new JPanel();
+		pane.setLayout(new BoxLayout(pane,BoxLayout.PAGE_AXIS));
+		pane.add(dynSide);
+		pane.add(fateSide);
+		deckPanel.add(pane);
 
-		deck1.add(dyncards);
-		deck1.add(dlistScroller);
-
-		deck2.add(fatecards);
-		deck2.add(flistScroller);
-
-		pane.add(deck1);
-		pane.add(deck2);
-
-		panel.add(stronghold);
-		panel.add(pane);
-
-		JPanel panel1 = new JPanel();
-		panel1.setLayout(new BorderLayout());
-
-		deck = new JTextArea();
-		setText();
-
-		JScrollPane textScroller = new JScrollPane(deck);
-
-		panel1.add(textScroller, BorderLayout.CENTER);
-
-		JTabbedPane tabbedPane = new JTabbedPane();
-
-		tabbedPane.addTab("Editable", panel);
+		tabbedPane.addTab("Editable", deckPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+		
+		textDeck = new TextDecklist();
+		textDeck.setText(dynDeck.deck, fateDeck.deck);
+		JScrollPane textScroller = new JScrollPane(textDeck);
+		
+		JPanel textPanel = new JPanel();
+		textPanel.setLayout(new BorderLayout());
+		textPanel.add(textScroller, BorderLayout.CENTER);
 
-		tabbedPane.addTab("Text", panel1);
+		tabbedPane.addTab("Text", textPanel);
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		JPanel mainPanel = new JPanel();
@@ -542,313 +634,76 @@ class Deckbuilder
 
 		return mainPanel;
 	}
-	public static void alphasort(Vector<StoredCard> vex)
-	{
-		Vector<StoredCard> temp = new Vector<StoredCard>();
-		temp.add(null);
 
-		for (int x = 0; x < vex.size(); x++)
-			for (int y = 0; y < vex.size(); y++)
-				if(vex.elementAt(x).getName().toString().compareToIgnoreCase(vex.elementAt(y).getName().toString())<0)
-				{
-					temp.setElementAt(vex.elementAt(y),0);    //temp = y
-					vex.setElementAt(vex.elementAt(x),y);     //y = x
-					vex.setElementAt(temp.elementAt(0),x);    //x = temp
-				}
+	private void updateSearch()
+	{
+		//Shorthand method for the long filterList
+		search.filterList(legalBox.getSelectedItem().toString().toLowerCase(),
+						  clanBox.getSelectedItem().toString().toLowerCase(),
+						  typeBox.getSelectedItem().toString().toLowerCase(),
+						  title.getText().toLowerCase(),
+						  text.getText().toLowerCase(),
+						  gold.min.getText().toLowerCase(),
+						  gold.max.getText().toLowerCase(),
+						  force.min.getText().toLowerCase(),
+						  force.max.getText().toLowerCase(),
+						  chi.min.getText().toLowerCase(),
+						  chi.max.getText().toLowerCase(),
+						  honor.min.getText().toLowerCase(),
+						  honor.max.getText().toLowerCase(),
+						  phonor.min.getText().toLowerCase(),
+						  phonor.max.getText().toLowerCase(),
+						  focus.min.getText().toLowerCase(),
+						  focus.max.getText().toLowerCase());
+		
+		//TODO fix sort
+		//Collections.sort(search);
+		resultLabel.setText("Card Results (" + search.size() + "):");
+		searchList.setListData(search.toArray());
 	}
-	public static void display()
+
+	private void updateDyn()
 	{
-		int max,y;
-		String type="", clan, legal;
-		String titleVal, textVal;
-
-		RESET();
-
-		y=0;
-		legal = Legal.getSelectedItem().toString().toLowerCase();
-		clan = faction.getSelectedItem().toString().toLowerCase();
-		type = CardType.getSelectedItem().toString().toLowerCase();
-		titleVal = title.getText().toLowerCase();
-		textVal = text.getText().toLowerCase();
-		do
+		dynDeck.setModel();
+	
+		//Check for a Stronghold
+		int index = -1;
+		for (int i = 0; i < dynDeck.size(); i++)
 		{
-			try{
-
-			if(!vect.elementAt(y).getLegal().contains(legal))
-				vect.remove(y);
-			else if(!type.equals("")&&!vect.elementAt(y).getType().equals(type))
-				vect.remove(y);
-			else if (!clan.equals("")&&!vect.elementAt(y).getClan().contains(clan))
-				vect.remove(y);
-			else if (vect.elementAt(y).getName().toLowerCase().indexOf(titleVal)<0)
-				vect.remove(y);
-			else if (vect.elementAt(y).getText().toLowerCase().indexOf(textVal)<0)
-				vect.remove(y);
-			else if (checkDigit(goldcost.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getCost())||
-						Integer.parseInt(vect.elementAt(y).getCost())<Integer.parseInt(goldcost.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(goldcost.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getCost())||
-						Integer.parseInt(vect.elementAt(y).getCost())>Integer.parseInt(goldcost.max.getText())))
-				vect.remove(y);
-			else if (checkDigit(force.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getForce())||
-						Integer.parseInt(vect.elementAt(y).getForce())<Integer.parseInt(force.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(force.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getForce())||
-						Integer.parseInt(vect.elementAt(y).getForce())>Integer.parseInt(force.max.getText())))
-				vect.remove(y);
-			else if (checkDigit(chi.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getChi())||
-						Integer.parseInt(vect.elementAt(y).getChi())<Integer.parseInt(chi.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(chi.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getChi())||
-						Integer.parseInt(vect.elementAt(y).getChi())>Integer.parseInt(chi.max.getText())))
-				vect.remove(y);
-			else if (checkDigit(honor.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getHonorReq())||
-						Integer.parseInt(vect.elementAt(y).getHonorReq())<Integer.parseInt(honor.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(honor.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getHonorReq())||
-						Integer.parseInt(vect.elementAt(y).getHonorReq())>Integer.parseInt(honor.max.getText())))
-				vect.remove(y);
-			else if (checkDigit(phonor.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getPersonalHonor())||
-						Integer.parseInt(vect.elementAt(y).getPersonalHonor())<Integer.parseInt(phonor.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(phonor.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getPersonalHonor())||
-						Integer.parseInt(vect.elementAt(y).getPersonalHonor())>Integer.parseInt(phonor.max.getText())))
-				vect.remove(y);
-			else if (checkDigit(focus.min.getText()) &&
-					(!checkDigit(vect.elementAt(y).getFocus())||
-						Integer.parseInt(vect.elementAt(y).getFocus())<Integer.parseInt(focus.min.getText())))
-				vect.remove(y);
-			else if (checkDigit(focus.max.getText()) &&
-					(!checkDigit(vect.elementAt(y).getFocus())||
-						Integer.parseInt(vect.elementAt(y).getFocus())>Integer.parseInt(focus.max.getText())))
-				vect.remove(y);
-			else y++;
-
-			}catch(NumberFormatException e){}
-
-			max=vect.size();
-		}
-		while(y<max);
-
-		refresh();
-	}
-
-	public static void refresh()
-	{
-		alphasort(vect);
-		results.setText("Card Results ("+vect.size()+"):");
-		list.setListData(vect);
-	}
-	public static void refreshDyn()
-	{
-		alphasort(dyn);
-		int index=-1;
-		for (int i=0;i<dyn.size();i++)
-		{
-			if (dyn.elementAt(i).getType().equals("strongholds"))
+			if (dynDeck.deck.get(i).getType().equals("strongholds"))
 			{
-				hasSH=true;
+				hasSH = true;
 				index = i;
 			}
-			if (index ==-1) hasSH=false;
+			if (index == -1) 
+				hasSH = false;
 		}
-		if (dyn.size()==0)
-			hasSH=false;
+		if (dynDeck.size() == 0)
+			hasSH = false;
+		
+		//Set data fields after change
+		dynLabel.setText("Dynasty (" + (hasSH?(dynDeck.size() - 1):(dynDeck.size())) + "):");
+		stronghold.setText("Stronghold: " + (hasSH?dynDeck.deck.get(index):""));
+		textDeck.setText(dynDeck.deck, fateDeck.deck);
+	}
+	
+	private void updateFate()
+	{
+		//Set data fields after change
+		fateDeck.setModel();
+		fateLabel.setText("Fate ("+fateDeck.size()+"):");
+		textDeck.setText(dynDeck.deck, fateDeck.deck);
+	}
 
-		dyncards.setText("Dynasty ("+(hasSH?(dyn.size()-1):(dyn.size()))+"):");
-		stronghold.setText("Stronghold: " + (hasSH?dyn.elementAt(index):""));
-		formDyn = formatDB(dyn);
-		dlist.setModel(formDyn);
-		setText();
-	}
-	public static void refreshFate()
+	private void setFrameTitle(String s, boolean ed)
 	{
-		alphasort(fate);
-		fatecards.setText("Fate ("+fate.size()+"):");
-		formFate = formatDB(fate);
-		flist.setModel(formFate);
-		setText();
-	}
-	public static void RESET()
-	{
-		vect.clear();
-		Object[] p = Main.databaseID.keySet().toArray();
-		for(int i = 0; i < p.length; i++)
-		{
-			vect.add(Main.databaseID.get(p[i]));
-		}
-	}
-	public static boolean checkDigit(String val) //returns true when string is a number
-	{
-		if (val==null)
-			return false;
-		else if(val.length()==0)
-			return false;
-		for (int x=0; x< val.length();x++)
-			if(!Character.isDigit(val.charAt(0)))
-				return false;
-		return true;
-	}
-	public static Vector<StoredCard> dothis()
-	{
-		Vector<StoredCard> stor = new Vector<StoredCard>(vect.size());
-		for (int x = 0; x<vect.size();x++)
-			if (vect.elementAt(x).getText().toLowerCase().indexOf(text.getText().toLowerCase())<0)
-			{
-				stor.add(vect.elementAt(x));
-				vect.remove(x);
-				x--;
-			}
-			refresh();
-		return stor;
-	}
-	public static DefaultListModel formatDB(Vector<StoredCard> v)
-	{
-		DefaultListModel arr = new DefaultListModel();
-		int x=0, i=1;
-		alphasort(v);
-
-		do
-		{
-			if(v.size()!=0)
-			{
-				while(x+1<v.size())
-				{
-					if (v.elementAt(x).getName().equals(v.elementAt(x+1).getName()))
-					{
-						i++;
-						x++;
-					}
-					else
-						break;
-				}
-
-				arr.addElement(i + "x " + v.elementAt(x).getName());
-				i=1;
-			}
-			x++;
-		}while(x<v.size());
-
-		return arr;
-	}
-	public static boolean hasSH()
-	{
-
-		for(int i=0; i<dyn.size();i++)
-		{
-			if (dyn.elementAt(i).getType().equals("strongholds"))
-				return true;
-		}
-		return false;
-	}
-	public static void setFrameTitle(String s, boolean ed)
-	{
+		//Sets frame title and fileName
 		boolean name = false;
 		fileName = s;
 		edit = ed;
 		if (s==null)
 			name = true;
-		frame.setTitle((name?"DeckBuilder":("DeckBuilder - " + s)) + (edit?"*":""));
+		setTitle((name?"DeckBuilder":("DeckBuilder - " + s)) + (edit?"*":""));
 	}
-
-	public static void setText()
-	{
-		String newline = "\n";
-		String tab = "    ";
-		String[] dynTypes = {"Celestial","Event","Holding","Personality","Region"};
-		String[] fateTypes = {"Action","Ancestor","Follower","Item","Ring","Sensei","Spell","Wind"};
-		String shName = "";
-		int counter, a = 1;
-
-		deck.setText("");
-
-		for (int x = 0; x < dynTypes.length; x++)
-		{
-			counter=0;
-			for (int i = 0; i < dyn.size();i++)
-			{
-				if (dyn.elementAt(i).getType().equalsIgnoreCase(dynTypes[x]))
-					counter++;
-				if (dyn.elementAt(i).getType().equalsIgnoreCase("Strongholds"))
-					shName = dyn.elementAt(i).getName();
-			}
-
-			if (x==0)
-			{
-				deck.append("Stronghold: " + (hasSH?shName:"") + newline + newline);
-				deck.append("Dynasty (" + dyn.size() + ")" + newline);
-			}
-
-			if (counter>0)
-				deck.append(tab + dynTypes[x] + " (" + counter + "):" + newline);
-
-			for (int y = 0; y<dyn.size();y++)
-			{
-				if(dyn.elementAt(y).getType().equalsIgnoreCase(dynTypes[x]))
-				{
-					while(y+1<dyn.size())
-					{
-					if (dyn.elementAt(y).getName().equals(dyn.elementAt(y+1).getName()))
-						{
-							a++;
-							y++;
-						}
-						else
-							break;
-					}
-
-					deck.append(tab + tab + (a + "x " + dyn.elementAt(y).getName())+ newline);
-					a=1;
-				}
-			}
-
-		}
-		deck.append(newline);
-
-		for (int x = 0; x < fateTypes.length; x++)
-		{
-			counter=0;
-			for (int i = 0; i < fate.size();i++)
-			{
-				if (fate.elementAt(i).getType().equalsIgnoreCase(fateTypes[x]))
-					counter++;
-			}
-
-			if (x==0)
-				deck.append("Fate (" + fate.size() + ")" + newline);
-
-			if (counter>0)
-				deck.append(tab + fateTypes[x] + " (" + counter + "):" + newline);
-
-			for (int y = 0; y<fate.size();y++)
-			{
-				if(fate.elementAt(y).getType().equalsIgnoreCase(fateTypes[x]))
-				{
-					while(y+1<fate.size())
-					{
-					if (fate.elementAt(y).getName().equals(fate.elementAt(y+1).getName()))
-						{
-							a++;
-							y++;
-						}
-						else
-							break;
-					}
-
-					deck.append(tab + tab + (a + "x " + fate.elementAt(y).getName())+ newline);
-					a=1;
-				}
-			}
-		}
-	}
+	
 }
