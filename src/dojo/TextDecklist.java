@@ -22,9 +22,9 @@ public class TextDecklist extends JTextArea
 	{
 		String newline = "\n";
 		String tab = "    ";
-		String[] dynTypes = {"Events", "Holdings", "Personalities", "Regions"};
-		String[] fateTypes = {"Actions", "Ancestors", "Followers", "Items", 
-							  "Rings", "Senseis", "Spells", "Winds"};
+		String[] dynTypes = {"Event", "Holding", "Personality", "Region"};
+		String[] fateTypes = {"Action", "Ancestor", "Follower", "Item", 
+							  "Ring", "Sensei", "Spell", "Wind"};
 		String shName = "";
 		int counter, a = 1;
 
@@ -37,7 +37,7 @@ public class TextDecklist extends JTextArea
 			{
 				if (dyn.get(i).getType().equalsIgnoreCase(dynTypes[x]))
 					counter++;
-				if (dyn.get(i).getType().equalsIgnoreCase("Strongholds"))
+				if (dyn.get(i).getType().equalsIgnoreCase("Stronghold"))
 					shName = dyn.get(i).getName();
 			}
 
@@ -108,5 +108,7 @@ public class TextDecklist extends JTextArea
 				}
 			}
 		}
+		//str = st.toString();
+		//return str;
 	}
 }
