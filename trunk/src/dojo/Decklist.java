@@ -11,7 +11,7 @@ import javax.swing.DefaultListModel;
  * @author Solus.
  *         Created Aug 28, 2010.
  */
-public class Decklist extends DefaultListModel implements Comparable<Object>
+public class Decklist extends DefaultListModel
 {
 	private static final long serialVersionUID = 1L;
 	ArrayList<StoredCard> deck;
@@ -58,11 +58,5 @@ public class Decklist extends DefaultListModel implements Comparable<Object>
 	public void add(StoredCard card)
 	{
 		deck.add(card);
-	}
-	
-	@Override
-	public int compareTo(Object arg0) {
-		// TODO Auto-generated method stub.
-		return 0;
 	}
 }
