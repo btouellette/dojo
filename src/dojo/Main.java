@@ -92,6 +92,7 @@ class Main
 
 	private static JMenuBar createMenuBar(int width)
 	{
+		//TODO: Save some deck favorites to load quickly
 		// Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);

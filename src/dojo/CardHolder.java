@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+//TODO: Add search interface
 public abstract class CardHolder
 {
 	// Image to display on table
