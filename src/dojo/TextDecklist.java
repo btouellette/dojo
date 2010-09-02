@@ -39,6 +39,7 @@ public class TextDecklist extends JTextArea
 			StoredCard currentCard = dyn.get(x);
 			
 			if(!dynTypes.contains(currentCard.getType()))
+				if(!currentCard.getType().equals("stronghold"))
 					dynTypes.add(currentCard.getType());
 			
 			if (dyn.get(x).getType().equals("stronghold"))
@@ -86,7 +87,8 @@ public class TextDecklist extends JTextArea
 		}
 		
 		append("Stronghold: " + shName + newline + newline);
-		append("Dynasty (" + dyn.size() + ")" + newline);
+		int size = (shName=="")?(dyn.size()):(dyn.size()-1);
+		append("Dynasty (" + size + ")" + newline);
 		
 		for (int x = 0; x < dynTypes.size(); x++)
 		{
@@ -98,7 +100,7 @@ public class TextDecklist extends JTextArea
 					counter++;
 
 			if (counter>0)
-				append(tab + dynMod.get(x) + " (" + counter + "):" + newline);
+				append(tab + dynMod.get(x) + " (" + counter + ")" + newline);
 			
 			//Then adds the actual cards to the area
 			for (int y = 0; y < dyn.size(); y++)
@@ -136,7 +138,7 @@ public class TextDecklist extends JTextArea
 					counter++;
 			
 			if (counter > 0)
-				append(tab + fateMod.get(x) + " (" + counter + "):" + newline);
+				append(tab + fateMod.get(x) + " (" + counter + ")" + newline);
 
 			//Then adds the actual cards to the area
 			for (int y = 0; y < fate.size(); y++)
