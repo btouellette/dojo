@@ -2,6 +2,7 @@ package dojo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JTextArea;
 
@@ -19,37 +20,37 @@ public class TextDecklist extends JTextArea
 	{
 		super();
 	}
-	public void setText(ArrayList<StoredCard> dyn, ArrayList<StoredCard> fate)
+	public void setText(List<StoredCard> dynDeck, List<StoredCard> fateDeck)
 	{
 		String newline = "\n";
 		String tab = "    ";
 		String shName = "";
 		int counter, num = 1;
 
-		ArrayList<String> dynTypes = new ArrayList<String>();
-		ArrayList<String> fateTypes = new ArrayList<String>();
-		ArrayList<String> dynMod = new ArrayList<String>();
-		ArrayList<String> fateMod = new ArrayList<String>();
+		List<String> dynTypes = new ArrayList<String>();
+		List<String> fateTypes = new ArrayList<String>();
+		List<String> dynMod = new ArrayList<String>();
+		List<String> fateMod = new ArrayList<String>();
 		
 		setText("");		
 		
 		//Create the dynasty types and set the Stronghold if it is known
-		for ( int x = 0; x < dyn.size(); x++)
+		for ( int x = 0; x < dynDeck.size(); x++)
 		{
-			StoredCard currentCard = dyn.get(x);
+			StoredCard currentCard = dynDeck.get(x);
 			
 			if(!dynTypes.contains(currentCard.getType()))
 				if(!currentCard.getType().equals("stronghold"))
 					dynTypes.add(currentCard.getType());
 			
-			if (dyn.get(x).getType().equals("stronghold"))
-				shName = dyn.get(x).getName();
+			if (dynDeck.get(x).getType().equals("stronghold"))
+				shName = dynDeck.get(x).getName();
 		}
 		
 		//Create the fate types
-		for (int x = 0; x < fate.size(); x++)
+		for (int x = 0; x < fateDeck.size(); x++)
 		{
-			StoredCard currentCard = fate.get(x);
+			StoredCard currentCard = fateDeck.get(x);
 			if(!fateTypes.contains(currentCard.getType()))
 				fateTypes.add(currentCard.getType());
 		}
@@ -87,7 +88,7 @@ public class TextDecklist extends JTextArea
 		}
 		
 		append("Stronghold: " + shName + newline + newline);
-		int size = (shName=="")?(dyn.size()):(dyn.size()-1);
+		int size = (shName=="")?(dynDeck.size()):(dynDeck.size()-1);
 		append("Dynasty (" + size + ")" + newline);
 		
 		for (int x = 0; x < dynTypes.size(); x++)
@@ -95,22 +96,22 @@ public class TextDecklist extends JTextArea
 			//The first part adds the types to the text area
 			counter = 0;
 			
-			for (int i = 0; i < dyn.size();i++)
-				if (dyn.get(i).getType().equals(dynTypes.get(x)))
+			for (int i = 0; i < dynDeck.size();i++)
+				if (dynDeck.get(i).getType().equals(dynTypes.get(x)))
 					counter++;
 
 			if (counter>0)
 				append(tab + dynMod.get(x) + " (" + counter + ")" + newline);
 			
 			//Then adds the actual cards to the area
-			for (int y = 0; y < dyn.size(); y++)
+			for (int y = 0; y < dynDeck.size(); y++)
 			{
-				if(dyn.get(y).getType().equals(dynTypes.get(x)))
+				if(dynDeck.get(y).getType().equals(dynTypes.get(x)))
 				{
 					//This counts the number of same cards before printing that amount
-					while(y + 1 < dyn.size())
+					while(y + 1 < dynDeck.size())
 					{
-					if (dyn.get(y).getName().equals(dyn.get(y + 1).getName()))
+					if (dynDeck.get(y).getName().equals(dynDeck.get(y + 1).getName()))
 						{
 							num++;
 							y++;
@@ -119,36 +120,36 @@ public class TextDecklist extends JTextArea
 							break;
 					}
 
-					append(tab + tab + (num + "x " + dyn.get(y).getName())+ newline);
+					append(tab + tab + (num + "x " + dynDeck.get(y).getName())+ newline);
 					num = 1;
 				}
 			}
 		}
 		
 		append(newline);
-		append("Fate (" + fate.size() + ")" + newline);
+		append("Fate (" + fateDeck.size() + ")" + newline);
 
 		for (int x = 0; x < fateTypes.size(); x++)
 		{
 			//The first part adds the types to the text area
 			counter = 0;
 			
-			for (int i = 0; i < fate.size();i++)
-				if (fate.get(i).getType().equals(fateTypes.get(x)))
+			for (int i = 0; i < fateDeck.size();i++)
+				if (fateDeck.get(i).getType().equals(fateTypes.get(x)))
 					counter++;
 			
 			if (counter > 0)
 				append(tab + fateMod.get(x) + " (" + counter + ")" + newline);
 
 			//Then adds the actual cards to the area
-			for (int y = 0; y < fate.size(); y++)
+			for (int y = 0; y < fateDeck.size(); y++)
 			{
-				if(fate.get(y).getType().equalsIgnoreCase(fateTypes.get(x)))
+				if(fateDeck.get(y).getType().equalsIgnoreCase(fateTypes.get(x)))
 				{
 					//This counts the number of same cards before printing that amount
-					while(y + 1 < fate.size())
+					while(y + 1 < fateDeck.size())
 					{
-					if (fate.get(y).getName().equals(fate.get(y+1).getName()))
+					if (fateDeck.get(y).getName().equals(fateDeck.get(y+1).getName()))
 						{
 							num++;
 							y++;
@@ -157,7 +158,7 @@ public class TextDecklist extends JTextArea
 							break;
 					}
 
-					append(tab + tab + (num + "x " + fate.get(y).getName())+ newline);
+					append(tab + tab + (num + "x " + fateDeck.get(y).getName())+ newline);
 					num = 1;
 				}
 			}

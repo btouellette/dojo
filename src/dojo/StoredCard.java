@@ -232,11 +232,6 @@ class StoredCard extends Card implements Comparable<StoredCard>
 	{
 		return honorReq;
 	}
-
-	public String toString()
-	{
-		return name;
-	}
 	
 	public List<String> getLegal()
 	{
@@ -286,5 +281,10 @@ class StoredCard extends Card implements Comparable<StoredCard>
 	public int compareTo(StoredCard card)
 	{
 		return name.compareTo(card.getName());
+	}
+
+	public String toString()
+	{
+		return name;
 	}
 }
