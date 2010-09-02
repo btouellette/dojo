@@ -41,6 +41,7 @@ class MenuListener implements ActionListener
 					return "Deck Files (*.dck and *.l5d)";
 				}
 			});
+			fc.setAcceptAllFileFilterUsed(false);
 			int returnVal = fc.showOpenDialog(Main.frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{

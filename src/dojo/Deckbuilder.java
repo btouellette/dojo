@@ -835,32 +835,18 @@ public class Deckbuilder extends JFrame implements ActionListener
 	private File chooseFile()
 	{
 		File file = null;
-		JFileChooser open = new JFileChooser();
+		JFileChooser open = new JFileChooser("decks");
 
-		try {
-			open.setCurrentDirectory(new File(new File(".\\decks").getCanonicalPath()));
-		} 
-		catch(IOException e)
-		{
-			System.err.println("Decks file is missing. Please reinstall.");
-		}
-		
 		//Add new Filter for the File Chooser
     	open.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
     	{
-    		public boolean accept(File file)
-    		{
-        		String filename = file.getName();
-        		if(file.isDirectory())
-        			return true;
-        		if (filename.endsWith(".dck") || filename.endsWith(".l5d"))
-        			return true;
-        		return false;
-    		}
-    		public String getDescription()
-    		{
-    			return "*.dck, *.l5d";
-    		}
+    		public boolean accept(File file) {
+				String filename = file.getName();
+				return file.isDirectory() || filename.endsWith(".l5d") || filename.endsWith(".dck");
+			}
+			public String getDescription() {
+				return "Deck Files (*.dck and *.l5d)";
+			}
     	});
     	open.setAcceptAllFileFilterUsed(false);
 
@@ -871,7 +857,6 @@ public class Deckbuilder extends JFrame implements ActionListener
 	    	file = open.getSelectedFile();
 
 		return file;
-
 	}
 
 	private void save()
@@ -1091,7 +1076,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 		{
 			BufferedReader in = new BufferedReader(new FileReader(file));
 
-			ArrayList<StoredCard> cards = new ArrayList<StoredCard>();
+			List<StoredCard> cards = new ArrayList<StoredCard>();
 			// Grab the file path
 			String path = file.getAbsolutePath();
 			// So we can grab the file extension
@@ -1099,44 +1084,11 @@ public class Deckbuilder extends JFrame implements ActionListener
 			
 			if(fileType.equals(".l5d"))
 			{
-				String line;
-				// Iterate over the entire file
-				while((line = in.readLine()) != null)
-				{
-					// As long as the line isn't blank or commented out
-					if(!line.isEmpty() && line.charAt(0) != '#')
-					{
-						int count = 0, num = 0;
-						// First grab the number of cards
-						while(Character.isDigit(line.charAt(count)))
-						{
-							num *= 10;
-							num += Character.getNumericValue(line.charAt(count));
-							count++;
-						}
-						// Then the card itself
-						String cardName = line.substring(count+1);
-						// And add the correct number of copies
-						StoredCard currentCard = Main.databaseName.get(cardName);
-						for(int i = 0; i < num; i++)
-						{
-							cards.add(currentCard);
-						}
-					}
-				}
+				cards = DeckImporter.importEggStyle(in);
 			}
 			else if(fileType.equals(".dck"))
 			{
-				cards = new ArrayList<StoredCard>(100);
-				String deck = in.readLine();
-				if(deck != null)
-				{
-					StringTokenizer st = new StringTokenizer(deck, "|");
-					while(st.hasMoreTokens())
-					{
-						cards.add(Main.databaseID.get(st.nextToken()));
-					}
-				}
+				cards = DeckImporter.importGameStyle(in);
 			}
 			in.close();
 			
