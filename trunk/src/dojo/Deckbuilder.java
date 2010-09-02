@@ -44,7 +44,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class Deckbuilder extends JFrame implements Comparable<Object>, ActionListener
+public class Deckbuilder extends JFrame implements ActionListener
 {
 	
 	CardInfoBox card;
@@ -65,7 +65,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 	
 	public Deckbuilder(int width, int height)
 	{
-		super();
+		super("DeckBuilder");
 
 		fileName = null;
 		
@@ -133,8 +133,6 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		Collections.sort(types);
 		Collections.sort(clans);
 		Collections.sort(search);
-		
-		setTitle("DeckBuilder");
 		
 		//TODO: Add dialog if file is not saved/or save temp file, reload on open
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -726,11 +724,6 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		setTitle((name?"DeckBuilder":("DeckBuilder - " + s)) + (edit?"*":""));
 	}
 
-	public int compareTo(Object arg) 
-	{
-		return 0;
-	}
-	
 	protected void processWindowEvent(WindowEvent e) 
 	{
         if (e.getID() == WindowEvent.WINDOW_CLOSING && edit == true) 
@@ -894,15 +887,148 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 		try
 		{
     		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-    		for (int i = 0; i < dynDeck.size(); i++)
-    			out.write(dynDeck.deck.get(i).getName() + "|");
-    		for (int i = 0; i < fateDeck.size(); i++)
-    			out.write(fateDeck.deck.get(i).getName() + "|");
-    		//TODO make deck exportable
-    		for (int i = 0; i < (dynDeck.size() + fateDeck.size()); i++)
+    		
+    		String newline = "\n";
+    		String shName = "";
+    		
+    		int counter, num = 1;
+
+    		ArrayList<String> dynTypes = new ArrayList<String>();
+    		ArrayList<String> fateTypes = new ArrayList<String>();
+    		ArrayList<String> dynMod = new ArrayList<String>();
+    		ArrayList<String> fateMod = new ArrayList<String>();
+    		
+    		//Create the dynasty types and set the Stronghold if it is known
+    		for ( int x = 0; x < dynDeck.deck.size(); x++)
     		{
+    			StoredCard currentCard = dynDeck.deck.get(x);
     			
-    		}/*
+    			if(!dynTypes.contains(currentCard.getType()))
+    				if(!currentCard.getType().equals("stronghold"))
+    					dynTypes.add(currentCard.getType());
+    			
+    			if (dynDeck.deck.get(x).getType().equals("stronghold"))
+    				shName = dynDeck.deck.get(x).getName();
+    		}
+    		
+    		//Create the fate types
+    		for (int x = 0; x < fateDeck.deck.size(); x++)
+    		{
+    			StoredCard currentCard = fateDeck.deck.get(x);
+    			if(!fateTypes.contains(currentCard.getType()))
+    				fateTypes.add(currentCard.getType());
+    		}
+
+    		Collections.sort(dynTypes);
+    		Collections.sort(fateTypes);
+    		
+    		//Clean up dyn types, add capitalization and word fixes, and store to new list
+    		for(int i = 0; i < dynTypes.size(); i++)
+    		{
+    			String temp = dynTypes.get(i).substring(0,1).toUpperCase() + dynTypes.get(i).substring(1);
+    			
+    			if (dynTypes.get(i).charAt(dynTypes.get(i).length()-1) == 'y')
+    				temp = temp.substring(0,temp.length() - 1) + "ies";
+    			else
+    				temp = temp + "s";
+    			dynMod.add(temp);
+    		}
+    		
+    		//Clean up fate types, add capitalization and word fixes, and store to new list
+    		for(int i = 0; i < fateTypes.size(); i++)
+    		{
+    			String temp = fateTypes.get(i).substring(0,1).toUpperCase() + fateTypes.get(i).substring(1);
+    			
+    			if (temp.equals("Action"))
+    				fateMod.add("Strategies");
+    			else
+    			{
+    				if (fateTypes.get(i).charAt(fateTypes.get(i).length()-1) == 'y')
+    					temp = temp.substring(0,temp.length() - 1) + "ies";
+    				else
+    					temp = temp + "s";
+    				fateMod.add(temp);
+    			}
+    		}
+    		
+    		out.write(newline + "1 " + shName + newline + newline);
+    		int size = (shName=="")?(dynDeck.deck.size()):(dynDeck.deck.size()-1);
+    		out.write("# Dynasty (" + size + ")" + newline);
+    		
+    		for (int x = 0; x < dynTypes.size(); x++)
+    		{
+    			//The first part adds the types to the text area
+    			counter = 0;
+    			
+    			for (int i = 0; i < dynDeck.deck.size();i++)
+    				if (dynDeck.deck.get(i).getType().equals(dynTypes.get(x)))
+    					counter++;
+
+    			if (counter>0)
+    				out.write(newline + "# " + dynMod.get(x) + " (" + counter + ")" + newline);
+    			
+    			//Then adds the actual cards to the area
+    			for (int y = 0; y < dynDeck.deck.size(); y++)
+    			{
+    				if(dynDeck.deck.get(y).getType().equals(dynTypes.get(x)))
+    				{
+    					//This counts the number of same cards before printing that amount
+    					while(y + 1 < dynDeck.deck.size())
+    					{
+    					if (dynDeck.deck.get(y).getName().equals(dynDeck.deck.get(y + 1).getName()))
+    						{
+    							num++;
+    							y++;
+    						}
+    						else
+    							break;
+    					}
+
+    					out.write((num + " " + dynDeck.deck.get(y).getName())+ newline);
+    					num = 1;
+    				}
+    			}
+    		}
+    		
+    		out.write(newline);
+    		out.write("# Fate (" + fateDeck.deck.size() + ")" + newline);
+
+    		for (int x = 0; x < fateTypes.size(); x++)
+    		{
+    			//The first part adds the types to the text area
+    			counter = 0;
+    			
+    			for (int i = 0; i < fateDeck.deck.size();i++)
+    				if (fateDeck.deck.get(i).getType().equals(fateTypes.get(x)))
+    					counter++;
+    			
+    			if (counter > 0)
+    				out.write(newline + "# " + fateMod.get(x) + " (" + counter + ")" + newline);
+
+    			//Then adds the actual cards to the area
+    			for (int y = 0; y < fateDeck.deck.size(); y++)
+    			{
+    				if(fateDeck.deck.get(y).getType().equals(fateTypes.get(x)))
+    				{
+    					//This counts the number of same cards before printing that amount
+    					while(y + 1 < fateDeck.deck.size())
+    					{
+    						if (fateDeck.deck.get(y).getName().equals(fateDeck.deck.get(y+1).getName()))
+    						{
+    							num++;
+    							y++;
+    						}
+    						else
+    							break;
+    					}
+
+    					out.write((num + " " + fateDeck.deck.get(y).getName())+ newline);
+    					num = 1;
+    				}
+    			}
+    		}
+    		
+    		/*
     		while((line = br.readLine()) != null)
     		{
     			// As long as the line isn't blank or commented out
@@ -964,7 +1090,6 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 						String cardName = line.substring(count+1);
 						// And add the correct number of copies
 						StoredCard currentCard = Main.databaseName.get(cardName);
-						System.out.println(currentCard.getName());
 						for(int i = 0; i < num; i++)
 						{
 							cards.add(currentCard);
@@ -991,9 +1116,7 @@ public class Deckbuilder extends JFrame implements Comparable<Object>, ActionLis
 			for(StoredCard currentCard : cards)
 			{
 				if (currentCard.isDynasty())
-				{
 					dynDeck.deck.add(currentCard);
-				}
 				else if (!currentCard.isDynasty())
 					fateDeck.deck.add(currentCard);
 			}
