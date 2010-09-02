@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.AbstractButton;
@@ -51,7 +52,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 	DataList search;
 	PanelCreator gold, force, chi, honor, phonor, focus;
 	TextDecklist textDeck;
-	Decklist dynDeck, fateDeck;
+	List<StoredCard> dynDeck, fateDeck;
 	
 	JTextField title, text;
 	JComboBox legalBox, typeBox, clanBox;
@@ -69,8 +70,8 @@ public class Deckbuilder extends JFrame implements ActionListener
 
 		fileName = null;
 		
-		dynDeck = new Decklist();
-		fateDeck = new Decklist();
+		dynDeck = new ArrayList<StoredCard>();
+		fateDeck = new ArrayList<StoredCard>();
 		
 		types = new ArrayList<String>();
 		legal = new ArrayList<String>();
@@ -458,12 +459,12 @@ public class Deckbuilder extends JFrame implements ActionListener
 		     			{
 		     				if(!(search.get(index).getType().equals("strongholds")
 		     						&& hasSH==true))
-		     					dynDeck.deck.add(search.get(index));
+		     					dynDeck.add(search.get(index));
 		     				updateDyn();
 		     			}
 		     			else if (!search.get(index).isDynasty())
 		     			{
-		     				fateDeck.deck.add(search.get(index));
+		     				fateDeck.add(search.get(index));
 		     				updateFate();
 		     			}
 		     		} catch(ArrayIndexOutOfBoundsException excptn){}
@@ -493,7 +494,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 		dynLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		dynSide.add(dynLabel);
 
-		dynList = new JList(dynDeck);
+		dynList = new JList(dynDeck.toArray());
 		dynList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		dynList.setLayoutOrientation(JList.VERTICAL);
 		dynList.setVisibleRowCount(-1);
@@ -512,9 +513,9 @@ public class Deckbuilder extends JFrame implements ActionListener
 					{
 						for (int i = 0; i < dynDeck.size(); i++)
 		     			{
-		     				if (dynDeck.deck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
+		     				if (dynDeck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
 		     				{
-		     					card.setCard(dynDeck.deck.get(i));
+		     					card.setCard(dynDeck.get(i));
 		     					break;
 		     				}
 		     			}
@@ -537,9 +538,9 @@ public class Deckbuilder extends JFrame implements ActionListener
      				{
      					String val = dynList.getSelectedValue().toString().substring(3);
      					for (int i=0;i<dynDeck.size();i++)
-     						if (dynDeck.deck.get(i).getName().equals(val))
+     						if (dynDeck.get(i).getName().equals(val))
      						{
-     							dynDeck.deck.remove(i);
+     							dynDeck.remove(i);
      							break;
      						}
      					updateDyn();
@@ -560,7 +561,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 		fateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		fateSide.add(fateLabel);
 		
-		fateList = new JList(fateDeck);
+		fateList = new JList(fateDeck.toArray());
 		fateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		fateList.setLayoutOrientation(JList.VERTICAL);
 		fateList.setVisibleRowCount(-1);
@@ -579,9 +580,9 @@ public class Deckbuilder extends JFrame implements ActionListener
 					{
 						for (int i = 0; i < fateDeck.size(); i++)
 		     			{
-		     				if (fateDeck.deck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
+		     				if (fateDeck.get(i).getName().equals(list.getSelectedValue().toString().substring(3)))
 		     				{
-		     					card.setCard(fateDeck.deck.get(i));
+		     					card.setCard(fateDeck.get(i));
 		     					break;
 		     				}
 		     			}
@@ -604,9 +605,9 @@ public class Deckbuilder extends JFrame implements ActionListener
      				{
      					String val = fateList.getSelectedValue().toString().substring(3);
      					for (int i=0;i<fateDeck.size();i++)
-     						if (fateDeck.deck.get(i).getName().equals(val))
+     						if (fateDeck.get(i).getName().equals(val))
      						{
-     							fateDeck.deck.remove(i);
+     							fateDeck.remove(i);
      							break;
      						}
      					updateFate();
@@ -634,7 +635,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 		
 		textDeck = new TextDecklist();
-		textDeck.setText(dynDeck.deck,fateDeck.deck);
+		textDeck.setText(dynDeck,fateDeck);
 		JScrollPane textScroller = new JScrollPane(textDeck);
 		
 		JPanel textPanel = new JPanel();
@@ -679,15 +680,12 @@ public class Deckbuilder extends JFrame implements ActionListener
 	}
 
 	private void updateDyn()
-	{
-		dynDeck.setModel();
-		dynList.setModel(dynDeck);
-	
+	{	
 		//Check for a Stronghold
 		int index = -1;
 		for (int i = 0; i < dynDeck.size(); i++)
 		{
-			if (dynDeck.deck.get(i).getType().equalsIgnoreCase("stronghold"))
+			if (dynDeck.get(i).getType().equalsIgnoreCase("stronghold"))
 			{
 				hasSH = true;
 				index = i;
@@ -700,19 +698,49 @@ public class Deckbuilder extends JFrame implements ActionListener
 		
 		//Set data fields after change
 		dynLabel.setText("Dynasty (" + (hasSH?(dynDeck.size() - 1):(dynDeck.size())) + "):");
-		stronghold.setText("Stronghold: " + (hasSH?dynDeck.deck.get(index):""));
-		textDeck.setText(dynDeck.deck,fateDeck.deck);
+		stronghold.setText("Stronghold: " + (hasSH?dynDeck.get(index):""));
+		textDeck.setText(dynDeck,fateDeck);
+		Collections.sort(dynDeck);
+		dynList.setListData(deckToText(dynDeck));
 	}
 	
 	private void updateFate()
 	{
 		//Set data fields after change
-		fateDeck.setModel();
-		fateList.setModel(fateDeck);
 		fateLabel.setText("Fate (" + fateDeck.size() + "):");
-		textDeck.setText(dynDeck.deck,fateDeck.deck);
+		textDeck.setText(dynDeck,fateDeck);
+		Collections.sort(fateDeck);
+		fateList.setListData(deckToText(fateDeck));
 	}
 
+	private String[] deckToText(List<StoredCard> deck)
+	{
+		List<String> deckText = new ArrayList<String>();
+		Collections.sort(deck);
+		int x = 0, i = 1;
+		do
+		{
+			if(deck.size() != 0)
+			{
+				while(x + 1 < deck.size())
+				{
+					if (deck.get(x).getName().equals(deck.get(x + 1).getName()))
+					{
+						i++;
+						x++;
+					}
+					else
+						break;
+				}
+
+				deckText.add(i + "x " + deck.get(x).getName());
+				i = 1;
+			}
+			x++;
+		}while(x < deck.size());
+		return deckText.toArray(new String[0]);
+	}
+	
 	private void setFrameTitle(String s, boolean ed)
 	{
 		//Sets frame title and fileName
@@ -795,8 +823,8 @@ public class Deckbuilder extends JFrame implements ActionListener
 	private void newFile()
 	{
 		//Reset the decklists
-		dynDeck = new Decklist();
-		fateDeck = new Decklist();
+		dynDeck = new ArrayList<StoredCard>();
+		fateDeck = new ArrayList<StoredCard>();
 		
 		updateDyn();
 		updateFate();
@@ -887,7 +915,7 @@ public class Deckbuilder extends JFrame implements ActionListener
 		try
 		{
     		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-    		
+   		
     		String newline = "\n";
     		String shName = "";
     		
@@ -899,22 +927,22 @@ public class Deckbuilder extends JFrame implements ActionListener
     		ArrayList<String> fateMod = new ArrayList<String>();
     		
     		//Create the dynasty types and set the Stronghold if it is known
-    		for ( int x = 0; x < dynDeck.deck.size(); x++)
+    		for ( int x = 0; x < dynDeck.size(); x++)
     		{
-    			StoredCard currentCard = dynDeck.deck.get(x);
+    			StoredCard currentCard = dynDeck.get(x);
     			
     			if(!dynTypes.contains(currentCard.getType()))
     				if(!currentCard.getType().equals("stronghold"))
     					dynTypes.add(currentCard.getType());
     			
-    			if (dynDeck.deck.get(x).getType().equals("stronghold"))
-    				shName = dynDeck.deck.get(x).getName();
+    			if (dynDeck.get(x).getType().equals("stronghold"))
+    				shName = dynDeck.get(x).getName();
     		}
     		
     		//Create the fate types
-    		for (int x = 0; x < fateDeck.deck.size(); x++)
+    		for (int x = 0; x < fateDeck.size(); x++)
     		{
-    			StoredCard currentCard = fateDeck.deck.get(x);
+    			StoredCard currentCard = fateDeck.get(x);
     			if(!fateTypes.contains(currentCard.getType()))
     				fateTypes.add(currentCard.getType());
     		}
@@ -952,7 +980,7 @@ public class Deckbuilder extends JFrame implements ActionListener
     		}
     		
     		out.write(newline + "1 " + shName + newline + newline);
-    		int size = (shName=="")?(dynDeck.deck.size()):(dynDeck.deck.size()-1);
+    		int size = (shName=="")?(dynDeck.size()):(dynDeck.size()-1);
     		out.write("# Dynasty (" + size + ")" + newline);
     		
     		for (int x = 0; x < dynTypes.size(); x++)
@@ -960,22 +988,22 @@ public class Deckbuilder extends JFrame implements ActionListener
     			//The first part adds the types to the text area
     			counter = 0;
     			
-    			for (int i = 0; i < dynDeck.deck.size();i++)
-    				if (dynDeck.deck.get(i).getType().equals(dynTypes.get(x)))
+    			for (int i = 0; i < dynDeck.size();i++)
+    				if (dynDeck.get(i).getType().equals(dynTypes.get(x)))
     					counter++;
 
     			if (counter>0)
     				out.write(newline + "# " + dynMod.get(x) + " (" + counter + ")" + newline);
     			
     			//Then adds the actual cards to the area
-    			for (int y = 0; y < dynDeck.deck.size(); y++)
+    			for (int y = 0; y < dynDeck.size(); y++)
     			{
-    				if(dynDeck.deck.get(y).getType().equals(dynTypes.get(x)))
+    				if(dynDeck.get(y).getType().equals(dynTypes.get(x)))
     				{
     					//This counts the number of same cards before printing that amount
-    					while(y + 1 < dynDeck.deck.size())
+    					while(y + 1 < dynDeck.size())
     					{
-    					if (dynDeck.deck.get(y).getName().equals(dynDeck.deck.get(y + 1).getName()))
+    					if (dynDeck.get(y).getName().equals(dynDeck.get(y + 1).getName()))
     						{
     							num++;
     							y++;
@@ -984,36 +1012,36 @@ public class Deckbuilder extends JFrame implements ActionListener
     							break;
     					}
 
-    					out.write((num + " " + dynDeck.deck.get(y).getName())+ newline);
+    					out.write((num + " " + dynDeck.get(y).getName())+ newline);
     					num = 1;
     				}
     			}
     		}
     		
     		out.write(newline);
-    		out.write("# Fate (" + fateDeck.deck.size() + ")" + newline);
+    		out.write("# Fate (" + fateDeck.size() + ")" + newline);
 
     		for (int x = 0; x < fateTypes.size(); x++)
     		{
     			//The first part adds the types to the text area
     			counter = 0;
     			
-    			for (int i = 0; i < fateDeck.deck.size();i++)
-    				if (fateDeck.deck.get(i).getType().equals(fateTypes.get(x)))
+    			for (int i = 0; i < fateDeck.size();i++)
+    				if (fateDeck.get(i).getType().equals(fateTypes.get(x)))
     					counter++;
     			
     			if (counter > 0)
     				out.write(newline + "# " + fateMod.get(x) + " (" + counter + ")" + newline);
 
     			//Then adds the actual cards to the area
-    			for (int y = 0; y < fateDeck.deck.size(); y++)
+    			for (int y = 0; y < fateDeck.size(); y++)
     			{
-    				if(fateDeck.deck.get(y).getType().equals(fateTypes.get(x)))
+    				if(fateDeck.get(y).getType().equals(fateTypes.get(x)))
     				{
     					//This counts the number of same cards before printing that amount
-    					while(y + 1 < fateDeck.deck.size())
+    					while(y + 1 < fateDeck.size())
     					{
-    						if (fateDeck.deck.get(y).getName().equals(fateDeck.deck.get(y+1).getName()))
+    						if (fateDeck.get(y).getName().equals(fateDeck.get(y+1).getName()))
     						{
     							num++;
     							y++;
@@ -1022,7 +1050,7 @@ public class Deckbuilder extends JFrame implements ActionListener
     							break;
     					}
 
-    					out.write((num + " " + fateDeck.deck.get(y).getName())+ newline);
+    					out.write((num + " " + fateDeck.get(y).getName())+ newline);
     					num = 1;
     				}
     			}
@@ -1116,9 +1144,9 @@ public class Deckbuilder extends JFrame implements ActionListener
 			for(StoredCard currentCard : cards)
 			{
 				if (currentCard.isDynasty())
-					dynDeck.deck.add(currentCard);
+					dynDeck.add(currentCard);
 				else if (!currentCard.isDynasty())
-					fateDeck.deck.add(currentCard);
+					fateDeck.add(currentCard);
 			}
 			
 			updateDyn();
