@@ -10,7 +10,7 @@ import javax.swing.event.ListDataListener;
  * @author Solus.
  *         Created Aug 27, 2010.
  */
-public class DataList extends ArrayList<StoredCard> implements ListModel
+class DataList extends ArrayList<StoredCard> implements ListModel
 {
 	private static final long serialVersionUID = 1L;
 	Object[] p;

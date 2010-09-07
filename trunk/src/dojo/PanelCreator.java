@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PanelCreator extends JPanel
+class PanelCreator extends JPanel
 {
 	private static final long serialVersionUID = 3037675290112377311L;
 	JTextField min, max;
