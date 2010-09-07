@@ -3,7 +3,7 @@ package dojo;
 // Written by Brian Ouellette
 // Base class for PlayableCard and StoredCard's commonalities
 
-public abstract class Card
+abstract class Card
 {
 	// The ID of the card in the XML database
 	protected final String id;

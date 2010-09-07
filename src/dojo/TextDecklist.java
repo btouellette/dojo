@@ -12,7 +12,7 @@ import javax.swing.JTextArea;
  * @author Solus.
  *         Created Aug 27, 2010.
  */
-public class TextDecklist extends JTextArea
+class TextDecklist extends JTextArea
 {
 	private static final long serialVersionUID = 1L;
 	

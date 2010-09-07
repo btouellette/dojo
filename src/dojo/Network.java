@@ -21,7 +21,7 @@ import java.util.Vector;
 
 import org.json.*;
 
-public class Network extends Thread
+class Network extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;

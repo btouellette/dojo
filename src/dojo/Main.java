@@ -34,6 +34,11 @@ class Main
 	static JFrame frame;
 	// Interface to the network
 	static Network network;
+	// Lock used to disable interface while we're downloading the database or updates
+	// This allows us to launch the Swing GUI before we load in everything
+	static boolean loading = false;	
+	// Game version, will be checked against the version present online and updated as needed
+	static double version = 0.5;
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -309,6 +314,13 @@ class Main
 		// Use the default (non-validating) parser
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
+			// Wait for the loading flag to be cleared
+			while(Main.loading)
+			{
+				// Do nothing
+			}
+			// Let the program know we're loading something and to stall
+			Main.loading = true;
 		 	// Parse the input
 			SAXParser saxParser = factory.newSAXParser();
 			System.out.print("Loading card database: ");
@@ -409,6 +421,8 @@ class Main
 			System.err.println("\n** Unknown failure: Please report at http://code.google.com/p/dojo/issues/entry");
 			t.printStackTrace();
 			System.exit(1);
+		} finally {
+			Main.loading = false;
 		}
 	}
 
@@ -427,8 +441,10 @@ class Main
 				createAndShowGUI();
 			}
 		});
-		
+		// Start the networking module
 		network = new Network();
 		network.start();
+		// Check for updates
+		new Updater().start();
 	}
 }
