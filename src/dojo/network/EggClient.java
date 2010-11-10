@@ -23,7 +23,7 @@ Got:  ["welcome", {"clid": 5}]
 Got:  ["client-names", {"names": [[0, "Toku-san"]]}]
 Got:  ["client-join", {"clid": 5}]
  */
-public class EggClient
+public class EggClient extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;

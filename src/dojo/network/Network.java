@@ -40,13 +40,12 @@ public class Network extends Thread
 		}
 	}
 	
-	public boolean connect(String server)
+	public boolean connectEgg(String server)
 	{
 		try {
 			Socket hostSocket = new Socket(server, gamePort);
-			NetworkHandler nh = new NetworkHandler(hostSocket, connections);
-			nh.start();
-			connections.add(nh);
+			EggClient client = new EggClient(hostSocket);
+			client.start();
 			System.out.println("Connect succeeded.");
 		} catch (UnknownHostException e) {
 			System.err.println("** Could not find server " + server);
