@@ -16,7 +16,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-class TextActionListener implements ActionListener
+public class TextActionListener implements ActionListener
 {
 	private JTextPane chatBox;
 	// Locks the updating of the chat box so multiple threads can send updates
