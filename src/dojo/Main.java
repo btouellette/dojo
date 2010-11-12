@@ -279,7 +279,7 @@ class Main
 		// Register a listener to update the split height in preferences when the user resizes
 		outerInfoArea1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
-				Preferences.cardBoxSplitWidth = ((Number)e.getNewValue()).intValue();;
+				Preferences.cardBoxSplitWidth = ((Number)e.getNewValue()).intValue();
 			}
 		});
 		
@@ -294,7 +294,7 @@ class Main
 		// Register a listener to update the split height in preferences when the user resizes
 		outerInfoArea2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
-				Preferences.gameInfoSplitWidth = ((Number)e.getNewValue()).intValue();;
+				Preferences.gameInfoSplitWidth = ((Number)e.getNewValue()).intValue();
 			}
 		});
 

@@ -56,7 +56,6 @@ public class Peer implements Comparable<Peer>
      * MetaInfo.
      */
     public Peer (PeerID peerID, byte[] my_id, MetaInfo metainfo)
-        throws IOException
     {
         this.peerID = peerID;
         this.my_id = my_id;
