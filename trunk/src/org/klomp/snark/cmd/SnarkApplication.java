@@ -43,7 +43,7 @@ public class SnarkApplication
             if (arg.equals("--show-peers") || arg.equals("--share")) {
                 showPeers = true;
             }
-        };
+        }
 
         // Set things up to exit gracefully
         ShutdownListener listener = new ShutdownListener() {

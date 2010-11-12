@@ -199,7 +199,7 @@ public class EggClient extends Thread
 		}
 	}
 
-	private void handleClientNames(JSONObject jobj) throws JSONException
+	private void handleClientNames(JSONObject jobj)
 	{
 	}
 }
