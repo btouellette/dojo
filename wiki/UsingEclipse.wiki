@@ -51,3 +51,23 @@ govtpiggy: hit the big Run play button
 govtpiggy: select Java Application
 govtpiggy: and it should work
 }}}
+
+Step by Step 2013
+{{{
+Download Eclipse for Java developers - latest version
+Extract to folder where it'll live (I used My Documents)
+Use default workspace location
+Help -> Eclipse Marketplace
+Click over to popular and install Subclipse (with all options)
+Accept all EULAs and install
+Within the package explorer (the panel on the left if you're in the java developer perspective), right click to get the context menu and go to 'New' and 'Other...'
+Expand the SVN folder and select 'Checkout Projects from SVN' and select Next
+Select the Create a new repository location and select Next
+The URL will be: https://dojo.googlecode.com/svn
+At this point you'll either proceed to the "Check Out As" screen or get an error. If you're having issues connecting and may be behind a corporate firewall using a proxy server you'll need to configure those values: In %AppData%\Roaming\Subversion there is a file "servers", add appropriate http-proxy-host and http-proxy-port entries under the [global] section
+Select "trunk" then Finish
+Select Java Project
+Project name -> dojo -> Next
+Change default output folder to dojo/classes
+Project should now build and launch appropriately
+}}}
