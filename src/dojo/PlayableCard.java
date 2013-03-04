@@ -379,34 +379,41 @@ class PlayableCard extends Card
 			
 								// Unzip image pack
 								ProgressMonitorInputStream fis = new ProgressMonitorInputStream(Main.frame, "Unzipping " + imageEdition + "...", new FileInputStream("tmp-imagepack.zip"));
-								ZipInputStream zis = new ZipInputStream(fis);
-								ZipEntry ze;
-								// Unzip every image in the zip file
-								while((ze = zis.getNextEntry()) != null)
-								{
-									System.out.print("** Unzipping " + ze.getName() + ": ");
-									fis.getProgressMonitor().setNote("Unzipping " + ze.getName() + "...");
-									// Make any directories as needed before unzipping
-									File f = new File("images/cards/" + databaseCard.getImageEdition());
-									// Check if we made any necessary directories for this file
-									if(f.mkdirs())
+								ZipInputStream zis = null;
+								try {
+									zis = new ZipInputStream(fis);
+									ZipEntry ze;
+									// Unzip every image in the zip file
+									while((ze = zis.getNextEntry()) != null)
 									{
-										fos = new FileOutputStream("images/cards/" + ze.getName());
-										// Write the entire unzipped image to the output file
-										for (int c = zis.read(); c != -1; c = zis.read())
+										System.out.print("** Unzipping " + ze.getName() + ": ");
+										fis.getProgressMonitor().setNote("Unzipping " + ze.getName() + "...");
+										// Make any directories as needed before unzipping
+										File f = new File("images/cards/" + databaseCard.getImageEdition());
+										// Check if we made any necessary directories for this file
+										if(f.mkdirs())
 										{
-											fos.write(c);
+											fos = new FileOutputStream("images/cards/" + ze.getName());
+											// Write the entire unzipped image to the output file
+											for (int c = zis.read(); c != -1; c = zis.read())
+											{
+												fos.write(c);
+											}
 										}
+										else
+										{
+											throw new IOException();
+										}
+										zis.closeEntry();
+										fos.close();
+										System.out.println("success!");
 									}
-									else
+								} finally {		
+									if(zis != null)
 									{
-										throw new IOException();
+										zis.close();
 									}
-									zis.closeEntry();
-									fos.close();
-									System.out.println("success!");
 								}
-								zis.close();
 			
 								// Delete leftover zip file
 								System.out.print("** Deleting zip file after extraction: ");

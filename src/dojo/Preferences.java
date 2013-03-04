@@ -29,8 +29,9 @@ class Preferences
 		// Go ahead and set the preferences to the default and we'll overwrite if we find saved prefs
 		defaultPreferences();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		BufferedReader br = null;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("prefs.cfg"));
+			br = new BufferedReader(new FileReader("prefs.cfg"));
 			String line;
 			// Read in every line of the config file
 			while((line = br.readLine()) != null)
@@ -97,10 +98,17 @@ class Preferences
 					}
 				}
 			}
-			br.close();
 		} catch(IOException e) {
 			System.err.println("** Couldn't find config file. Using defaults.");
 			defaultPreferences();
+		} finally {
+			if(br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					System.err.println("** Couldn't close BufferedReader during preferences load.");
+				}
+			} 
 		}
 	}
 

@@ -53,7 +53,7 @@ class Deckbuilder extends JFrame implements ActionListener
 	List<StoredCard> dynDeck, fateDeck;
 	
 	JTextField title, text;
-	JComboBox legalBox, typeBox, clanBox;
+	JComboBox<String> legalBox, typeBox, clanBox;
 	JLabel resultLabel, stronghold, dynLabel, fateLabel;
 	JList searchList, dynList, fateList;
 	
@@ -264,19 +264,19 @@ class Deckbuilder extends JFrame implements ActionListener
  
 		JPanel searchMenu = new JPanel();		
 
-		legalBox = new JComboBox(legal.toArray());
+		legalBox = new JComboBox<String>(legal.toArray(new String[legal.size()]));
 		legalBox.addActionListener(searchListener);
 		legalBox.setPreferredSize(new Dimension(140, 20));
 		legalBox.setMaximumSize(legalBox.getPreferredSize());
 		legalBox.setBackground(Color.WHITE);
 
-		typeBox = new JComboBox(types.toArray());
+		typeBox = new JComboBox<String>(types.toArray(new String[types.size()]));
 		typeBox.addActionListener(searchListener);
 		typeBox.setPreferredSize(new Dimension(140, 20));
 		typeBox.setMaximumSize(typeBox.getPreferredSize());
 		typeBox.setBackground(Color.WHITE);
 
-		clanBox = new JComboBox(clans.toArray());
+		clanBox = new JComboBox<String>(clans.toArray(new String[clans.size()]));
 		clanBox.addActionListener(searchListener);
 		clanBox.setPreferredSize(new Dimension(140, 20));
 		clanBox.setMaximumSize(clanBox.getPreferredSize());

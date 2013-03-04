@@ -21,8 +21,9 @@ public class Network extends Thread
 	
 	public void run()
 	{
+		ServerSocket serverSocket = null;
 		try {
-			ServerSocket serverSocket = new ServerSocket(gamePort);
+			serverSocket = new ServerSocket(gamePort);
 			while(true)
 			{
 				try {
@@ -37,6 +38,14 @@ public class Network extends Thread
 			}
 		} catch (IOException e) {
 			System.err.println("** Could not listen on port: " + gamePort + ".");
+		} finally {
+			if(serverSocket != null) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					System.err.println("** Failed to close ServerSocket.");
+				}
+			}
 		}
 	}
 	

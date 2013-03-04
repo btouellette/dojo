@@ -19,7 +19,7 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void actionPerformed(ActionEvent e)
 	{
 		boolean dupeTest = true;
-		JComboBox comboBox = (JComboBox)e.getSource();
+		JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
 
 		// Get the text entered
 		String text = (String)comboBox.getSelectedItem();
@@ -50,7 +50,7 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void mouseClicked(MouseEvent e)
 	{
 		// This is implementing a tip style combobox (light gray text until clicked in)
-		JComboBox comboBox = (JComboBox)e.getComponent();
+		JComboBox<String> comboBox = (JComboBox<String>)e.getComponent();
 		if(!comboBox.isEditable())
 		{
 			comboBox.setEnabled(true);

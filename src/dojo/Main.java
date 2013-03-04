@@ -178,7 +178,7 @@ class Main
 		sizeSlider.setOpaque(false);
 
 		// Create the token generator (naming box and button)
-		JComboBox tokenName = new JComboBox();
+		JComboBox<String> tokenName = new JComboBox<String>();
 		tokenName.setPreferredSize(new Dimension(175, 23));
 		tokenName.setMaximumSize(tokenName.getPreferredSize());
 		// Indent the text by 3 pixels
