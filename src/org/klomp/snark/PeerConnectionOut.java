@@ -55,7 +55,6 @@ class PeerConnectionOut implements Runnable
      * Continuesly monitors for more outgoing messages that have to be send.
      * Stops if quit is true of an IOException occurs.
      */
-    @SuppressWarnings("null")
 	public void run ()
     {
         try {

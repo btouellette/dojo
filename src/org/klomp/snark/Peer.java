@@ -151,18 +151,21 @@ public class Peer implements Comparable<Peer>
         try {
             // Do we need to handshake?
             if (din == null) {
-                Socket sock = new Socket(peerID.getAddress(), peerID.getPort());
-                BufferedInputStream bis = new BufferedInputStream(
-                    sock.getInputStream());
-                BufferedOutputStream bos = new BufferedOutputStream(
-                    sock.getOutputStream());
-                byte[] id = handshake(bis, bos);
-                byte[] expected_id = peerID.getID();
-                if (!Arrays.equals(expected_id, id)) {
-                    throw new IOException("Unexpected peerID '"
-                        + PeerID.idencode(id) + "' expected '"
-                        + PeerID.idencode(expected_id) + "'");
-                }
+            	Socket sock = null;
+            	try {
+	                sock = new Socket(peerID.getAddress(), peerID.getPort());
+	                BufferedInputStream bis = new BufferedInputStream(sock.getInputStream());
+	                BufferedOutputStream bos = new BufferedOutputStream(sock.getOutputStream());
+	                byte[] id = handshake(bis, bos);
+	                byte[] expected_id = peerID.getID();
+	                if (!Arrays.equals(expected_id, id)) {
+	                    throw new IOException("Unexpected peerID '"
+	                        + PeerID.idencode(id) + "' expected '"
+	                        + PeerID.idencode(expected_id) + "'");
+	                }
+            	} finally {
+            		sock.close();
+            	}
             }
 
             PeerConnectionIn in = new PeerConnectionIn(this, din);
