@@ -1,4 +1,5 @@
 package dojo;
+
 // GameInfoBox.java
 // Written by Brian Ouellette
 // Box for displaying information on the game state.
@@ -7,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: This sucks. Needs to be better.
+// TODO: This sucks. Needs to be better.
 class GameInfoBox extends JPanel implements ActionListener
 {
 	private static final long serialVersionUID = 1L;
@@ -16,12 +17,12 @@ class GameInfoBox extends JPanel implements ActionListener
 	private JLabel yHonor, oHonor;
 	private JLabel yHand, oHand;
 	private JLabel yFavor, oFavor;
+
 	/*
 	JLabel yFateDeck, oFateDeck;
 	JLabel yFateDis, oFateDis;
 	JLabel yDynDeck, oDynDeck;
 	JLabel yDynDis, oDynDis;*/
-
 
 	public GameInfoBox()
 	{
@@ -34,7 +35,7 @@ class GameInfoBox extends JPanel implements ActionListener
 		yFavor = new JLabel("", JLabel.CENTER);
 		oFavor = new JLabel("", JLabel.CENTER);
 
-		//Too much information, disabled for now
+		// Too much information, disabled for now
 		/*yFateDeck = new JLabel("", JLabel.CENTER);
 		oFateDeck = new JLabel("", JLabel.CENTER);
 		yFateDis = new JLabel("", JLabel.CENTER);
@@ -68,15 +69,13 @@ class GameInfoBox extends JPanel implements ActionListener
 
 		// Set up a JPanel for each item to be displayed
 		// Markers for which side of the info box is whose
-		if(arg.equals("name"))
-		{
+		if (arg.equals("name")) {
 			panel.setLayout(new GridLayout(1, 2));
 			panel.add(new JLabel("Your", JLabel.CENTER));
 			panel.add(new JLabel("Opponent's", JLabel.CENTER));
 		}
 		// Display honor totals and arrows to change your total
-		else if(arg.equals("honor"))
-		{
+		else if (arg.equals("honor")) {
 			panel.setLayout(new GridLayout(1, 3));
 
 			// Panel to hold buttons and honor total
@@ -125,8 +124,7 @@ class GameInfoBox extends JPanel implements ActionListener
 			panel.add(oHonor);
 		}
 		// Display number of cards present in hands
-		else if(arg.equals("hand"))
-		{
+		else if (arg.equals("hand")) {
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yHand);
 			panel.add(new JLabel(":Hand:", JLabel.CENTER));
@@ -171,8 +169,7 @@ class GameInfoBox extends JPanel implements ActionListener
 		}
 		*/
 		// Display who has the Imperial Favor
-		else if(arg.equals("favor"))
-		{
+		else if (arg.equals("favor")) {
 			panel.setLayout(new GridLayout(1, 3));
 			panel.add(yFavor);
 			panel.add(new JLabel(":Favor:", JLabel.CENTER));
@@ -186,17 +183,14 @@ class GameInfoBox extends JPanel implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		// Move honor total up or down depending on which button is pressed
-		if(e.getActionCommand().equals("up"))
-		{
+		if (e.getActionCommand().equals("up")) {
 			// Take the string, convert it to an int to add to it and then back to a string to display
 			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) + 1));
-			TextActionListener.send(Preferences.userName + " increases honor to " + yHonor.getText() + "." , "Action");
-		}
-		else if(e.getActionCommand().equals("down"))
-		{
+			TextActionListener.send(Preferences.userName + " increases honor to " + yHonor.getText() + ".", "Action");
+		} else if (e.getActionCommand().equals("down")) {
 			// Take the string, convert it to an int to add to it and then back to a string to display
 			yHonor.setText(Integer.toString(Integer.parseInt(yHonor.getText()) - 1));
-			TextActionListener.send(Preferences.userName + " decreases honor to " + yHonor.getText() + "." , "Action");
+			TextActionListener.send(Preferences.userName + " decreases honor to " + yHonor.getText() + ".", "Action");
 		}
 	}
 }

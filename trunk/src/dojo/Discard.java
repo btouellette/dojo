@@ -1,4 +1,5 @@
 package dojo;
+
 // Discard.java
 // Written by Brian Ouellette
 // Represents fate and dynasty discards
@@ -9,8 +10,7 @@ class Discard extends CardHolder
 {
 	public BufferedImage getImage()
 	{
-		if(!cards.isEmpty())
-		{
+		if (!cards.isEmpty()) {
 			return cards.get(0).getImage();
 		}
 		return null;

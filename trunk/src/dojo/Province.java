@@ -1,4 +1,5 @@
 package dojo;
+
 // Province.java
 // Written by Brian Ouellette
 // Used for representing your provinces
@@ -7,12 +8,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 
-//TODO: Add support for provinces which contain multiple cards
-//TODO: Add support for provinces which don't refill
+// TODO: Add support for provinces which contain multiple cards
+// TODO: Add support for provinces which don't refill
 class Province extends CardHolder
 {
 	private List<PlayableCard> attachments;
-	
+
 	public Province()
 	{
 		// Only allocate space for 1 card
@@ -22,16 +23,13 @@ class Province extends CardHolder
 
 	public void doubleClicked()
 	{
-		if(!cards.isEmpty())
-		{
+		if (!cards.isEmpty()) {
 			// Turn the card in the province over on double click
-			if(!cards.get(0).isFaceUp())
-			{
+			if (!cards.get(0).isFaceUp()) {
 				cards.get(0).setFaceUp();
 			}
 			// Or do default (put card on table)
-			else
-			{
+			else {
 				super.doubleClicked();
 			}
 		}
@@ -41,16 +39,15 @@ class Province extends CardHolder
 	{
 		return cards.isEmpty();
 	}
-	
+
 	public boolean isFaceUp()
 	{
-		if(!cards.isEmpty())
-		{
+		if (!cards.isEmpty()) {
 			return cards.get(0).isFaceUp();
 		}
 		return false;
 	}
-		
+
 	public List<PlayableCard> getAttachments()
 	{
 		return attachments;
@@ -68,24 +65,21 @@ class Province extends CardHolder
 	private void updateAttachmentLocations()
 	{
 		// Update all attachment locations
-		for(int i = 0; i < attachments.size(); i++)
-		{
-			attachments.get(i).setLocationSimple(location[0], location[1] - (int)(Main.playArea.getCardHeight()*Main.playArea.getAttachmentHeight()*(i+1)) - 4);
+		for (int i = 0; i < attachments.size(); i++) {
+			attachments.get(i).setLocationSimple(location[0], location[1] - (int) (Main.playArea.getCardHeight() * Main.playArea.getAttachmentHeight() * (i + 1)) - 4);
 		}
 	}
-	
+
 	public void unattach(PlayableCard card)
 	{
 		// Move card from attachments to the play table
-		if(attachments.remove(card))
-		{
+		if (attachments.remove(card)) {
 			Main.state.addToTable(card);
 			// Unattach any cards attached to the card from the province as well
-			for(PlayableCard attachment : card.getAllAttachments())
-			{
+			for (PlayableCard attachment : card.getAllAttachments()) {
 				attachments.remove(attachment);
 			}
-			card.setLocation(location[0], location[1] - (Main.playArea.getCardHeight()+8));
+			card.setLocation(location[0], location[1] - (Main.playArea.getCardHeight() + 8));
 			updateAttachmentLocations();
 		}
 
@@ -93,8 +87,7 @@ class Province extends CardHolder
 
 	public BufferedImage getImage()
 	{
-		if(cards.isEmpty())
-		{
+		if (cards.isEmpty()) {
 			return null;
 		}
 		return cards.get(0).getImage();
@@ -103,28 +96,24 @@ class Province extends CardHolder
 	public void rescale()
 	{
 		// Rescale all cards in the province
-		for(PlayableCard card : cards)
-		{
+		for (PlayableCard card : cards) {
 			card.rescale();
 		}
 		// And all cards attached to the province
-		for(PlayableCard attachment : attachments)
-		{
+		for (PlayableCard attachment : attachments) {
 			attachment.rescale();
 		}
 		updateAttachmentLocations();
 	}
-	
+
 	public void destroy()
 	{
 		// Destroy all attachments
-		for(PlayableCard attachment : attachments)
-		{
+		for (PlayableCard attachment : attachments) {
 			attachment.destroy();
 		}
 		// And the cards in the province
-		for(PlayableCard card : cards)
-		{
+		for (PlayableCard card : cards) {
 			card.destroy();
 		}
 	}

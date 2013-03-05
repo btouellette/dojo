@@ -1,4 +1,5 @@
 package dojo;
+
 // GameState.java
 // Written by Brian Ouellette
 // Contains any pertinent information to the state of the game (cards on the table, decks, etc)
@@ -6,8 +7,9 @@ package dojo;
 import java.util.ArrayList;
 import java.util.List;
 
-class GameState {
-	// Your decks and discard piles 
+class GameState
+{
+	// Your decks and discard piles
 	private Deck dynastyDeck, fateDeck;
 	private Discard dynastyDiscard, fateDiscard;
 	// Provinces (left to right from 0->max)
@@ -22,7 +24,7 @@ class GameState {
 
 	public GameState()
 	{
-		//TODO: Support Ratling/Spirit or other starting sizes
+		// TODO: Support Ratling/Spirit or other starting sizes
 		// Initialize four provinces
 		provinces = new ArrayList<Province>(4);
 		provinces.add(new Province());
@@ -45,19 +47,16 @@ class GameState {
 	public void rescale()
 	{
 		// Rescale images for all cards in units in play
-		for(PlayableCard card : table)
-		{
+		for (PlayableCard card : table) {
 			card.rescale();
 			card.updateAttachmentLocations();
 			// Including their attachments
-			for(PlayableCard attachment : card.getAllAttachments())
-			{
+			for (PlayableCard attachment : card.getAllAttachments()) {
 				attachment.rescale();
 			}
 		}
 		// Rescale images from cards contained in or attached to provinces
-		for(Province province : provinces)
-		{
+		for (Province province : provinces) {
 			province.rescale();
 		}
 	}
@@ -82,7 +81,7 @@ class GameState {
 		provinces.add(new Province());
 	}
 
-	//TODO: Move logic from random classes into GameState, these getters should all be gone eventually ideally
+	// TODO: Move logic from random classes into GameState, these getters should all be gone eventually ideally
 	public List<Province> getProvinces()
 	{
 		return provinces;
@@ -113,12 +112,9 @@ class GameState {
 		// Takes a card from table and puts it in the appropriate discard
 		table.remove(card);
 		allCards.remove(card);
-		if(card.isDynasty())
-		{
+		if (card.isDynasty()) {
 			dynastyDiscard.add(card);
-		}
-		else
-		{
+		} else {
 			fateDiscard.add(card);
 		}
 	}
@@ -128,38 +124,31 @@ class GameState {
 		// Takes a card from table and puts it in the appropriate deck
 		table.remove(card);
 		allCards.remove(card);
-		if(card.isDynasty())
-		{
+		if (card.isDynasty()) {
 			dynastyDeck.add(card);
-		}
-		else
-		{
+		} else {
 			fateDeck.add(card);
 		}
 	}
-	
+
 	public void unbowAll()
 	{
 		// Unbow all cards on the table
-		for(PlayableCard card : table)
-		{
+		for (PlayableCard card : table) {
 			card.unbow();
 			// And all cards attached to them
-			for(PlayableCard attachment : card.getAllAttachments())
-			{
+			for (PlayableCard attachment : card.getAllAttachments()) {
 				attachment.unbow();
 			}
 		}
 		// And all cards attached to provinces
-		for(Province province : provinces)
-		{
-			for(PlayableCard attachment : province.getAttachments())
-			{
+		for (Province province : provinces) {
+			for (PlayableCard attachment : province.getAttachments()) {
 				attachment.unbow();
 			}
 		}
 	}
-	
+
 	public List<PlayableCard> getAllCards()
 	{
 		return allCards;
@@ -168,14 +157,13 @@ class GameState {
 	public boolean addToTable(PlayableCard card)
 	{
 		// If we successfully add it then also add to all cards and indicate success
-		if(table.add(card))
-		{
+		if (table.add(card)) {
 			allCards.add(card);
 			return true;
 		}
 		return false;
 	}
-	
+
 	// Remove from either the table or the hand, wherever it is
 	public boolean removeCard(PlayableCard card)
 	{
@@ -185,48 +173,42 @@ class GameState {
 	public boolean removeFromTable(PlayableCard card)
 	{
 		// If we successfully remove it then also remove from all cards and indicate success
-		if(table.remove(card))
-		{
+		if (table.remove(card)) {
 			allCards.remove(card);
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean addToHand(PlayableCard card)
 	{
 		// If we successfully add it then also add to all cards and indicate success
-		if(hand.add(card))
-		{
+		if (hand.add(card)) {
 			allCards.add(card);
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean removeFromHand(PlayableCard card)
 	{
 		// If we successfully remove it then also remove from all cards and indicate success
-		if(hand.remove(card))
-		{
+		if (hand.remove(card)) {
 			allCards.remove(card);
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean handContains(PlayableCard card)
 	{
 		// See if the card is directly contained in the hand
-		if(hand.contains(card))
-		{
+		if (hand.contains(card)) {
 			return true;
 		}
 		// If not see if it is attached to something in the hand
-		for(PlayableCard base : hand)
-		{
-			if(base.getAllAttachments().contains(card))
-			{
+		for (PlayableCard base : hand) {
+			if (base.getAllAttachments().contains(card)) {
 				return true;
 			}
 		}

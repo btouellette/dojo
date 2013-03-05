@@ -1,4 +1,5 @@
 package dojo;
+
 // Main.java
 // Written by Brian Ouellette
 // Launcher program. Sets up the GUI and sets everything up.
@@ -23,7 +24,7 @@ class Main
 {
 	// Database of all cards in XML, ID or name maps to card
 	static Map<String, StoredCard> databaseID, databaseName;
-	//TODO: It'd be nice to be able to set the font size of these elements in preferences somewhere
+	// TODO: It'd be nice to be able to set the font size of these elements in preferences somewhere
 	// Box for displaying chat messages
 	static JTextPane chatBox;
 	// Box for displaying clicked card info
@@ -37,14 +38,12 @@ class Main
 	static Network network;
 	// Lock used to disable interface while we're downloading the database or updates
 	// This allows us to launch the Swing GUI before we load in everything
-	static boolean loading = false;	
+	static boolean loading = false;
 	// Game version, will be checked against the version present online and updated as needed
 	static double version = 0.5;
 
 	/**
-	 * Create the GUI and show it.  For thread safety,
-	 * this method should be invoked from the
-	 * event-dispatching thread.
+	 * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
 	 */
 	private static void createAndShowGUI()
 	{
@@ -88,9 +87,10 @@ class Main
 		frame.setVisible(true);
 
 		// Read in cards.xml
-		//TODO: Prevent instantiation of StoredCard before this finishes
+		// TODO: Prevent instantiation of StoredCard before this finishes
 		new Thread() {
-			public void run() {
+			public void run()
+			{
 				importDatabase();
 			}
 		}.start();
@@ -98,7 +98,7 @@ class Main
 
 	private static JMenuBar createMenuBar(int width)
 	{
-		//TODO: Save some deck favorites to load quickly
+		// TODO: Save some deck favorites to load quickly
 		// Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setOpaque(true);
@@ -168,7 +168,7 @@ class Main
 
 		// Create the top bar
 		// Create the card size slider
-		//TODO: More intelligent max/min for the slider
+		// TODO: More intelligent max/min for the slider
 		JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL);
 		sizeSlider.addChangeListener(new SliderListener());
 		sizeSlider.setValue(Preferences.sliderValue);
@@ -182,7 +182,7 @@ class Main
 		tokenName.setPreferredSize(new Dimension(175, 23));
 		tokenName.setMaximumSize(tokenName.getPreferredSize());
 		// Indent the text by 3 pixels
-		((BasicComboBoxRenderer)tokenName.getRenderer()).setBorder(new EmptyBorder(0,3,0,0));
+		((BasicComboBoxRenderer) tokenName.getRenderer()).setBorder(new EmptyBorder(0, 3, 0, 0));
 		// Prevent the popup from appearing on the first click
 		tokenName.setEnabled(false);
 		tokenName.setForeground(Color.LIGHT_GRAY);
@@ -225,21 +225,30 @@ class Main
 		JPanel infoArea = new JPanel();
 		infoArea.setOpaque(true);
 		infoArea.setBackground(Color.LIGHT_GRAY);
-		infoArea.setPreferredSize(new Dimension(width/2, 175));
-		if(Preferences.infoAreaHeight != 0)
-		{
-			infoArea.setPreferredSize(new Dimension(width/2, Preferences.infoAreaHeight));
+		infoArea.setPreferredSize(new Dimension(width / 2, 175));
+		if (Preferences.infoAreaHeight != 0) {
+			infoArea.setPreferredSize(new Dimension(width / 2, Preferences.infoAreaHeight));
 		}
 		// Register a listener to update the split height in preferences when the user resizes
 		infoArea.addComponentListener(new ComponentListener() {
-			public void componentResized(ComponentEvent e) {
-				Preferences.infoAreaHeight = ((JPanel)e.getComponent()).getHeight();
+			public void componentResized(ComponentEvent e)
+			{
+				Preferences.infoAreaHeight = ((JPanel) e.getComponent()).getHeight();
 			}
-			public void componentMoved(ComponentEvent e) {}
-			public void componentShown(ComponentEvent e) {}
-			public void componentHidden(ComponentEvent e) {}
+
+			public void componentMoved(ComponentEvent e)
+			{
+			}
+
+			public void componentShown(ComponentEvent e)
+			{
+			}
+
+			public void componentHidden(ComponentEvent e)
+			{
+			}
 		});
-		//Add a pretty border to it
+		// Add a pretty border to it
 		infoArea.setBorder(BorderFactory.createLoweredBevelBorder());
 		infoArea.setLayout(new BorderLayout());
 
@@ -257,44 +266,44 @@ class Main
 
 		// Create the card info box
 		cardBox = new CardInfoBox();
-		cardBox.setPreferredSize(new Dimension(width/4, 175));
+		cardBox.setPreferredSize(new Dimension(width / 4, 175));
 		JScrollPane cardBoxScrollPane = new JScrollPane(cardBox);
 
 		// Create the game info box
 		GameInfoBox gameInfo = new GameInfoBox();
-		gameInfo.setPreferredSize(new Dimension(width/4, 175));
+		gameInfo.setPreferredSize(new Dimension(width / 4, 175));
 
 		// Set up JSplitPanes to allow for dynamic resizing
-		//TODO: Allow corner dragging to resize multiple SplitPanes
-		//      Would have to use a different component since SplitPanes only take 2 components
-		//      Might be possible with org.jdesktop.swingx.JXMultiSplitPane (not yet in mainline swing)
+		// TODO: Allow corner dragging to resize multiple SplitPanes
+		// Would have to use a different component since SplitPanes only take 2 components
+		// Might be possible with org.jdesktop.swingx.JXMultiSplitPane (not yet in mainline swing)
 		JSplitPane outerInfoArea1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, cardBoxScrollPane, infoArea);
 		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea1.setResizeWeight(0);
-		if(Preferences.cardBoxSplitWidth != 0)
-		{
+		if (Preferences.cardBoxSplitWidth != 0) {
 			// Set the divider to the saved location
 			outerInfoArea1.setDividerLocation(Preferences.cardBoxSplitWidth);
 		}
 		// Register a listener to update the split height in preferences when the user resizes
 		outerInfoArea1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e) {
-				Preferences.cardBoxSplitWidth = ((Number)e.getNewValue()).intValue();
+			public void propertyChange(PropertyChangeEvent e)
+			{
+				Preferences.cardBoxSplitWidth = ((Number) e.getNewValue()).intValue();
 			}
 		});
-		
+
 		JSplitPane outerInfoArea2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, outerInfoArea1, gameInfo);
 		// Set it so that the chatbox gets all the extra space by default (from resizing the main window)
 		outerInfoArea2.setResizeWeight(1);
-		if(Preferences.gameInfoSplitWidth != 0)
-		{
+		if (Preferences.gameInfoSplitWidth != 0) {
 			// Set the divider to the saved location
 			outerInfoArea2.setDividerLocation(Preferences.gameInfoSplitWidth);
 		}
 		// Register a listener to update the split height in preferences when the user resizes
 		outerInfoArea2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e) {
-				Preferences.gameInfoSplitWidth = ((Number)e.getNewValue()).intValue();
+			public void propertyChange(PropertyChangeEvent e)
+			{
+				Preferences.gameInfoSplitWidth = ((Number) e.getNewValue()).intValue();
 			}
 		});
 
@@ -316,13 +325,12 @@ class Main
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
 			// Wait for the loading flag to be cleared
-			while(Main.loading)
-			{
+			while (Main.loading) {
 				// Do nothing
 			}
 			// Let the program know we're loading something and to stall
 			Main.loading = true;
-		 	// Parse the input
+			// Parse the input
 			SAXParser saxParser = factory.newSAXParser();
 			System.out.print("Loading card database: ");
 			saxParser.parse(new File("cards.xml"), handler);
@@ -331,14 +339,12 @@ class Main
 			System.out.println("success!");
 		} catch (SAXParseException spe) {
 			// Error generated by the parser
-			System.err.println("\n** Parsing error"
-			  + ", line " + spe.getLineNumber()
-			  + ", uri " + spe.getSystemId());
-			System.err.println("   " + spe.getMessage() );
+			System.err.println("\n** Parsing error" + ", line " + spe.getLineNumber() + ", uri " + spe.getSystemId());
+			System.err.println("   " + spe.getMessage());
 		} catch (IOException io) {
 			System.out.print("failed\n** Card database missing.\n** Attempting to get from kamisasori.net: ");
 			// Database not present so try to get database off kamisasori.net
-			//TODO: Also do this if someone you connect to has a newer database
+			// TODO: Also do this if someone you connect to has a newer database
 			try {
 				// Create an input stream to the appropriate card file
 				URL url = new URL("http://kamisasori.net/files/cards-complete.zip");
@@ -353,7 +359,7 @@ class Main
 				is.close();
 				fos.close();
 				System.out.println("success!");
-				
+
 				// Unzip database
 				InputStream fis = new ProgressMonitorInputStream(frame, "Unzipping cards database...", new FileInputStream("cards.zip"));
 				ZipInputStream zis = new ZipInputStream(fis);
@@ -361,12 +367,9 @@ class Main
 				// Unzip everything inside the file (should just be cards.xml)
 				while ((ze = zis.getNextEntry()) != null) {
 					System.out.print("** Unzipping " + ze.getName() + ": ");
-					if(ze.getName().equals("cards-complete.xml"))
-					{
+					if (ze.getName().equals("cards-complete.xml")) {
 						fos = new FileOutputStream("cards.xml");
-					}
-					else
-					{
+					} else {
 						fos = new FileOutputStream(ze.getName());
 					}
 					// And write unzipped data out to the file
@@ -390,25 +393,21 @@ class Main
 			} catch (InterruptedIOException io_e) {
 				TextActionListener.send("Card database necessary, please restart Dojo", "Error");
 				File f1 = new File("cards.zip");
-				if(f1.exists())
-				{
+				if (f1.exists()) {
 					f1.delete();
 				}
 				File f2 = new File("cards.xml");
-				if(f2.exists())
-				{
+				if (f2.exists()) {
 					f2.delete();
 				}
 			} catch (IOException io_e) {
 				System.err.println("failed. Check your internet connection.");
 				File f1 = new File("cards.zip");
-				if(f1.exists())
-				{
+				if (f1.exists()) {
 					f1.delete();
 				}
 				File f2 = new File("cards.xml");
-				if(f2.exists())
-				{
+				if (f2.exists()) {
 					f2.delete();
 				}
 				io_e.printStackTrace();
@@ -431,14 +430,16 @@ class Main
 	{
 		// Add shutdown hook for writing out preferences
 		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
+			public void run()
+			{
 				Preferences.writePreferences();
 			}
 		});
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+			public void run()
+			{
 				createAndShowGUI();
 			}
 		});

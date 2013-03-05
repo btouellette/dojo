@@ -1,4 +1,5 @@
 package dojo;
+
 // SliderListener.java
 // Written by Brian Ouellette
 // This is the listener for the JSlider that controls the card size. It makes the cards bigger or smaller.
@@ -11,7 +12,7 @@ class SliderListener implements ChangeListener
 {
 	public void stateChanged(ChangeEvent e)
 	{
-		Preferences.sliderValue = ((JSlider)e.getSource()).getValue();
+		Preferences.sliderValue = ((JSlider) e.getSource()).getValue();
 		// Rescale the PlayArea background
 		Main.playArea.rescale();
 		// Reload images used in multiple places

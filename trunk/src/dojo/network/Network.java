@@ -10,22 +10,21 @@ import java.util.Vector;
 public class Network extends Thread
 {
 	// Port the game communications use
-	private int gamePort = 18072;
+	private int gamePort = 18073;
 	private List<NetworkHandler> connections;
-	
+
 	public Network()
 	{
 		// Using a vector since it is thread safe
 		connections = new Vector<NetworkHandler>();
 	}
-	
+
 	public void run()
 	{
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(gamePort);
-			while(true)
-			{
+			while (true) {
 				try {
 					Socket clientSocket = serverSocket.accept();
 					NetworkHandler nh = new NetworkHandler(clientSocket, connections);
@@ -39,7 +38,7 @@ public class Network extends Thread
 		} catch (IOException e) {
 			System.err.println("** Could not listen on port: " + gamePort + ".");
 		} finally {
-			if(serverSocket != null) {
+			if (serverSocket != null) {
 				try {
 					serverSocket.close();
 				} catch (IOException e) {
@@ -48,7 +47,7 @@ public class Network extends Thread
 			}
 		}
 	}
-	
+
 	public boolean connectEgg(String server)
 	{
 		try {
@@ -65,11 +64,10 @@ public class Network extends Thread
 		}
 		return true;
 	}
-	
+
 	public void broadcast(String message)
 	{
-		for(NetworkHandler nh : connections)
-		{
+		for (NetworkHandler nh : connections) {
 			nh.send(message);
 		}
 	}

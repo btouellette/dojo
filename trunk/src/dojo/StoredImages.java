@@ -1,4 +1,5 @@
 package dojo;
+
 // StoredImages.java
 // Written by Brian Ouellette
 // Static container for images that are used throughout the program
@@ -17,13 +18,12 @@ class StoredImages
 
 	public static void loadImages()
 	{
-		try
-		{
-			//TODO: Allow them to use the old card backs as an option
+		try {
+			// TODO: Allow them to use the old card backs as an option
 			originalDynasty = ImageIO.read(new File("images/backs/dynasty_new.jpg"));
 			originalFate = ImageIO.read(new File("images/backs/fate_new.jpg"));
 			rescale();
-		} catch(IOException io) {
+		} catch (IOException io) {
 			System.err.println(io);
 		}
 	}
@@ -41,16 +41,14 @@ class StoredImages
 		Graphics2D gFate = fate.createGraphics();
 
 		// If downsizing image
-		if(originalDynasty.getHeight() >= cardHeight)
-		{
+		if (originalDynasty.getHeight() >= cardHeight) {
 			gDynasty.drawImage(originalDynasty.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
 			gDynasty.dispose();
 			gFate.drawImage(originalFate.getScaledInstance(cardWidth, cardHeight, Image.SCALE_AREA_AVERAGING), 0, 0, null);
 			gFate.dispose();
 		}
 		// If enlarging image
-		else
-		{
+		else {
 			gDynasty.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			gDynasty.drawImage(originalDynasty, 0, 0, cardWidth, cardHeight, null);
 			gDynasty.dispose();
@@ -60,7 +58,7 @@ class StoredImages
 		}
 		// Rotate it to get a bowed version
 		// Translate as well so image is still at origin of BufferedImage
-		AffineTransform tx = AffineTransform.getTranslateInstance(0,-dynasty.getHeight());
+		AffineTransform tx = AffineTransform.getTranslateInstance(0, -dynasty.getHeight());
 		tx.quadrantRotate(1, 0, dynasty.getHeight());
 		AffineTransformOp rotate = new AffineTransformOp(tx, null);
 		dynastyBowed = rotate.filter(dynasty, null);

@@ -8,11 +8,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
-
 import org.json.JSONException;
 import org.json.JSONStringer;
 
-//TODO: Remove when developing this class
+// TODO: Remove when developing this class
 @SuppressWarnings("unused")
 public class NetworkHandler extends Thread
 {
@@ -20,8 +19,8 @@ public class NetworkHandler extends Thread
 	private BufferedWriter out;
 	private List<NetworkHandler> connections;
 	private int clientID;
-	private Map<Integer,String> clientNames;
-	
+	private Map<Integer, String> clientNames;
+
 	public NetworkHandler(Socket s, List<NetworkHandler> connections)
 	{
 		this.connections = connections;
@@ -33,6 +32,7 @@ public class NetworkHandler extends Thread
 			System.err.println("** Failed to get in/out stream to client");
 		}
 	}
+
 	// Encode values into a JSON compatible string to send over the network
 	private String encode(String type, String key, int value) throws JSONException
 	{
@@ -44,12 +44,12 @@ public class NetworkHandler extends Thread
 		message.value(type);
 		message.object();
 		message.key(key);
-        message.value(value);
-        message.endObject();
+		message.value(value);
+		message.endObject();
 		message.endArray();
 		return message.toString();
 	}
-	
+
 	// Encode values into a JSON compatible string to send over the network
 	private String encode(String type, String key, String value) throws JSONException
 	{
@@ -61,12 +61,12 @@ public class NetworkHandler extends Thread
 		message.value(type);
 		message.object();
 		message.key(key);
-        message.value(value);
-        message.endObject();
+		message.value(value);
+		message.endObject();
 		message.endArray();
 		return message.toString();
 	}
-	
+
 	public void send(String message)
 	{
 		try {

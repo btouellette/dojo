@@ -11,8 +11,7 @@ class Updater extends Thread
 	public void run()
 	{
 		// Wait for the loading flag to be cleared
-		while(Main.loading)
-		{
+		while (Main.loading) {
 			// Do nothing
 		}
 		Main.loading = true;
@@ -21,8 +20,7 @@ class Updater extends Thread
 			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
 			String line = br.readLine();
 			// Check if the version recorded online is greater than the one we have
-			if(Double.parseDouble(line.substring(8)) > Main.version)
-			{
+			if (Double.parseDouble(line.substring(8)) > Main.version) {
 				// If so we need to pull down the new versions of all the files and restart
 			}
 		} catch (MalformedURLException e) {

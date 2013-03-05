@@ -1,4 +1,5 @@
 package dojo;
+
 // TokenActionListener.java
 // Written by Brian Ouellette
 // This is the Action and Mouse Listener for the JComboBox that creates tokens
@@ -19,30 +20,27 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void actionPerformed(ActionEvent e)
 	{
 		boolean dupeTest = true;
-		@SuppressWarnings("unchecked") // WTB reified generics
-		JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
+		@SuppressWarnings("unchecked")
+		// WTB reified generics
+		JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
 
 		// Get the text entered
-		String text = (String)comboBox.getSelectedItem();
+		String text = (String) comboBox.getSelectedItem();
 
-		if ("comboBoxEdited".equals(e.getActionCommand()))
-		{
+		if ("comboBoxEdited".equals(e.getActionCommand())) {
 			// String has been entered and the user wants to make a token
 			TextActionListener.send(Preferences.userName + " makes a token.", "Action");
 			// Update the list of token names
-			for(int i = 0; i < comboBox.getItemCount(); i++)
-			{
-				if(text.equals(comboBox.getItemAt(i)))
-				{
+			for (int i = 0; i < comboBox.getItemCount(); i++) {
+				if (text.equals(comboBox.getItemAt(i))) {
 					dupeTest = false;
 				}
 			}
-			if(dupeTest)
-			{
+			if (dupeTest) {
 				comboBox.insertItemAt(text, 0);
 			}
 			// Make a token and place it on the table
-			//TODO: Save the top 3 tokens on exit
+			// TODO: Save the top 3 tokens on exit
 			Main.state.addToTable(new PlayableCard(text, true));
 			Main.playArea.repaint();
 		}
@@ -51,15 +49,15 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void mouseClicked(MouseEvent e)
 	{
 		// This is implementing a tip style combobox (light gray text until clicked in)
-		@SuppressWarnings("unchecked") // WTB reified generics
-		JComboBox<String> comboBox = (JComboBox<String>)e.getComponent();
-		if(!comboBox.isEditable())
-		{
+		@SuppressWarnings("unchecked")
+		// WTB reified generics
+		JComboBox<String> comboBox = (JComboBox<String>) e.getComponent();
+		if (!comboBox.isEditable()) {
 			comboBox.setEnabled(true);
 			comboBox.setEditable(true);
 			// Bias the text five pixels from the edge of the combo box
-			JTextField textField = ((JTextField)comboBox.getEditor().getEditorComponent());
-			textField.setBorder(BorderFactory.createCompoundBorder(textField.getBorder(), BorderFactory.createEmptyBorder(0,3,0,0)));
+			JTextField textField = ((JTextField) comboBox.getEditor().getEditorComponent());
+			textField.setBorder(BorderFactory.createCompoundBorder(textField.getBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 0)));
 			comboBox.removeAllItems();
 			comboBox.requestFocusInWindow();
 		}

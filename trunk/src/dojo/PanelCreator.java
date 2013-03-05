@@ -16,17 +16,17 @@ class PanelCreator extends JPanel
 	{
 		min = new JTextField(3);
 		min.setText("");
-		
+
 		max = new JTextField(3);
 		max.setText("");
-		
+
 		JLabel to = new JLabel(" to ");
-		to.setMaximumSize(new Dimension(20,20));
+		to.setMaximumSize(new Dimension(20, 20));
 		to.setFont(new Font("Serif", Font.PLAIN, 12));
-		
-		setMaximumSize(new Dimension(140,20));
+
+		setMaximumSize(new Dimension(140, 20));
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		
+
 		add(min);
 		add(to);
 		add(max);
