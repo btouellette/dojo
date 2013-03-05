@@ -3,9 +3,9 @@ package dojo;
 // Written by Brian Ouellette
 // Used for representing your provinces
 
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO: Add support for provinces which contain multiple cards
 //TODO: Add support for provinces which don't refill

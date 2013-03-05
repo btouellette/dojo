@@ -4,9 +4,9 @@ package dojo;
 // Format in which cards are stored in the database after being read in from XML.
 // Use PlayableCard for anything outside the database and decks
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 class StoredCard extends Card implements Comparable<StoredCard>
 {

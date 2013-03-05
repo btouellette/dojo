@@ -5,7 +5,10 @@ package dojo;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 

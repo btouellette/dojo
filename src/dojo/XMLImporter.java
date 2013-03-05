@@ -3,10 +3,12 @@ package dojo;
 // Written by Brian Ouellette
 // Imports the database from the XML and stores it in a HashMap.
 
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 class XMLImporter extends DefaultHandler
 {
