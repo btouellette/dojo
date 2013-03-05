@@ -3,10 +3,8 @@ package dojo;
 // Written by Brian Ouellette
 // Listener for all GUI buttons on the main interface
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.AbstractButton;
+import java.awt.event.*;
+import javax.swing.*;
 
 class ButtonListener implements ActionListener
 {

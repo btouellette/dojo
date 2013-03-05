@@ -3,7 +3,7 @@ package dojo;
 // Written by Brian Ouellette
 // Box for showing the current selected cards information.
 
-import javax.swing.JEditorPane;
+import javax.swing.*;
 
 //TODO: Add a JPopUpMenu for detaching the panel
 //TODO: Try to get this to handle resizing better (redraw table or use CSS to set width dynamically)

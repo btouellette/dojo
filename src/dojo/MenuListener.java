@@ -6,12 +6,12 @@ package dojo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Random;
-
 import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+
+import java.util.Random;
 
 class MenuListener implements ActionListener
 {

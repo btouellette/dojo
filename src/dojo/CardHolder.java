@@ -4,9 +4,9 @@ package dojo;
 // Abstract class representing any game element which can hold cards in it
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 //TODO: Add search interface
 abstract class CardHolder

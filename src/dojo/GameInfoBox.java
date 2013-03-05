@@ -3,18 +3,9 @@ package dojo;
 // Written by Brian Ouellette
 // Box for displaying information on the game state.
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 //TODO: This sucks. Needs to be better.
 class GameInfoBox extends JPanel implements ActionListener
