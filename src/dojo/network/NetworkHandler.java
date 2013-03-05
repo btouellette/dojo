@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.json.JSONStringer;
 
 // TODO: Remove when developing this class
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class NetworkHandler extends Thread
 {
 	private BufferedReader in;
