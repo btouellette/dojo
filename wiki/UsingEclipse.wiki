@@ -53,7 +53,7 @@ govtpiggy: and it should work
 }}}
 
 Step by Step 2013
-{{{
+<pre>
 Download Eclipse for Java developers - latest version
 Extract to folder where it'll live (I used My Documents)
 Use default workspace location
@@ -70,4 +70,4 @@ Select Java Project
 Project name -> dojo -> Next
 Change default output folder to dojo/classes
 Project should now build and launch appropriately
-}}}
+</pre>
