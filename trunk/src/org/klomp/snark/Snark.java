@@ -180,8 +180,8 @@ public class Snark
         // Figure out what the torrent argument represents.
         meta = null;
         File f = null;
+        InputStream in = null;
         try {
-            InputStream in;
             f = new File(torrent);
             if (f.exists()) {
                 in = new FileInputStream(f);
@@ -231,6 +231,8 @@ public class Snark
             } else {
                 abort("Cannot open '" + torrent + "'", ioe);
             }
+        } finally {
+        	in.close();
         }
 
         log.log(Level.INFO, meta.toString());

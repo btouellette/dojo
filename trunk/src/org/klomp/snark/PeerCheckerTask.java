@@ -51,17 +51,8 @@ class PeerCheckerTask extends TimerTask
             long worstdownload = Long.MAX_VALUE;
             Peer worstDownloader = null;
 
-            int peers = 0;
             int uploaders = 0;
-            int downloaders = 0;
             int interested = 0;
-            int interesting = 0;
-            int choking = 0;
-            int choked = 0;
-
-            long uploaded = 0;
-            long downloaded = 0;
-
             // Keep track of peers we remove now,
             // we will add them back to the end of the list.
             List<Peer> removed = new ArrayList<Peer>();
@@ -76,33 +67,25 @@ class PeerCheckerTask extends TimerTask
                     continue;
                 }
 
-                peers++;
-
                 if (!peer.isChoking()) {
                     uploaders++;
                 }
                 if (!peer.isChoked() && peer.isInteresting()) {
-                    downloaders++;
                 }
                 if (peer.isInterested()) {
                     interested++;
                 }
                 if (peer.isInteresting()) {
-                    interesting++;
                 }
                 if (peer.isChoking()) {
-                    choking++;
                 }
                 if (peer.isChoked()) {
-                    choked++;
                 }
 
                 // XXX - We should calculate the up/download rate a bit
                 // more intelligently
                 long upload = peer.getUploaded();
-                uploaded += upload;
                 long download = peer.getDownloaded();
-                downloaded += download;
                 peer.resetCounters();
 
                 log.log(Level.FINEST, peer + ":" + " ul: " + upload
