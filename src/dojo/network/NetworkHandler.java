@@ -9,10 +9,12 @@ import java.net.Socket;
 import org.json.JSONException;
 import org.json.JSONStringer;
 
-// TODO: Remove when developing this class
-// For any client or server component that requires network communication
+/**
+ *  For any client or server component that requires network communication
+ *  Provides JSON encoding and read/write to socket
+ * @author Brian Ouellette
+ */
 // Provides JSON encoding and read/write to socket
-//@SuppressWarnings("unused")
 public class NetworkHandler extends Thread
 {
 	private BufferedReader in;
@@ -64,6 +66,31 @@ public class NetworkHandler extends Thread
 		message.object();
 		message.key(key);
 		message.value(value);
+		message.endObject();
+		message.endArray();
+		return message.toString();
+	}
+
+	// send ["client-names", {"names": [[0, "Toku-san"]]}]
+	public String encode(String type, String key, int[] intValues, String[] stringValues) throws JSONException
+	{
+		if(intValues.length != stringValues.length) {
+			throw new IllegalArgumentException("Must have same number of integer and string values");
+		}
+		
+		JSONStringer message = new JSONStringer();
+		message.array();
+		message.value(type);
+		message.object();
+		message.key(key);
+		message.array();
+		for (int i = 0; i < intValues.length; i++) {
+			message.array();
+			message.value(intValues[i]);
+			message.value(stringValues[i]);
+			message.endArray();
+		}		
+		message.endArray();
 		message.endObject();
 		message.endArray();
 		return message.toString();
