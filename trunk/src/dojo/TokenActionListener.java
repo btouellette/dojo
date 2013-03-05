@@ -19,6 +19,7 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void actionPerformed(ActionEvent e)
 	{
 		boolean dupeTest = true;
+		@SuppressWarnings("unchecked") // WTB reified generics
 		JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
 
 		// Get the text entered
@@ -50,6 +51,7 @@ class TokenActionListener implements ActionListener, MouseListener
 	public void mouseClicked(MouseEvent e)
 	{
 		// This is implementing a tip style combobox (light gray text until clicked in)
+		@SuppressWarnings("unchecked") // WTB reified generics
 		JComboBox<String> comboBox = (JComboBox<String>)e.getComponent();
 		if(!comboBox.isEditable())
 		{
