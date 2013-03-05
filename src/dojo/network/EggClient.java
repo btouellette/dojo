@@ -2,16 +2,12 @@ package dojo.network;
 
 //Emulator for Egg client
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
+
 import dojo.TextActionListener;
 
 /**
@@ -31,26 +27,19 @@ public class EggClient extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;
-	private BufferedReader in;
-	private BufferedWriter out;
 	private int clientID;
-
+	private NetworkHandler handler;
+	
 	public EggClient(Socket s)
 	{
-		try {
-			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("** Failed to get in/out stream to client");
-		}
+		handler = new NetworkHandler(s);
 	}
 
 	public void run()
 	{
 		while (true) {
 			try {
-				String inputLine = in.readLine();
+				String inputLine = handler.readLine();
 				if (inputLine != null) {
 					System.out.println("Got:  " + inputLine);
 					try {
@@ -76,52 +65,6 @@ public class EggClient extends Thread
 		}
 	}
 
-	// Encode values into a JSON compatible string to send over the network
-	private String encode(String type, String key, int value) throws JSONException
-	{
-		// Create an array where:
-		// 1st: String of message type
-		// 2nd: Object with multiple key value pairs corresponding to information to send
-		JSONStringer message = new JSONStringer();
-		message.array();
-		message.value(type);
-		message.object();
-		message.key(key);
-		message.value(value);
-		message.endObject();
-		message.endArray();
-		return message.toString();
-	}
-
-	// Encode values into a JSON compatible string to send over the network
-	private String encode(String type, String key, String value) throws JSONException
-	{
-		// Create an array where:
-		// 1st: String of message type
-		// 2nd: Object with multiple key value pairs corresponding to information to send
-		JSONStringer message = new JSONStringer();
-		message.array();
-		message.value(type);
-		message.object();
-		message.key(key);
-		message.value(value);
-		message.endObject();
-		message.endArray();
-		return message.toString();
-	}
-
-	public void send(String message)
-	{
-		try {
-			out.write(message + "\n");
-			out.flush();
-			System.out.println("Sent: " + message);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("** Failed to send: " + message);
-		}
-	}
-
 	public void handshake()
 	{
 		try {
@@ -135,8 +78,8 @@ public class EggClient extends Thread
 	// Send our protocol version to the client
 	private void sendProtocol() throws JSONException
 	{
-		String message = encode("protocol", "version", protocolVersion);
-		send(message);
+		String message = handler.encode("protocol", "version", protocolVersion);
+		handler.send(message);
 	}
 
 	// Handle the "rejected" message from server if our protocol handshake wasn't established correctly

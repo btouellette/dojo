@@ -1,10 +1,6 @@
 package dojo.network;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import org.json.JSONArray;
@@ -24,76 +20,79 @@ import org.json.JSONObject;
  * Got:  ["client-join", {"clid": 1}]
  * 
  */
-public class EggServer extends Thread
+public class EggServer
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;
-	private int clientID;
+	// Host client ID will always be 0
+	private final int clientID = 0;
 	private ArrayList<Client> clients = new ArrayList<Client>();
-
-	private class Client
-	{
-		int clientID;
-		BufferedReader in;
-		BufferedWriter out;
-	}
 
 	public void clientConnect(Socket s)
 	{
-		try {
-			Client client = new Client();
-			client.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			client.out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-			clients.add(client);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("** Failed to get in/out stream to client");
+		// For each client connection set up input and output streams for communication
+		Client client = new Client(s);
+		// Assign a unique client ID for this client
+		client.clientID = clients.size() + 1;
+		clients.add(client);
+		client.start();
+	}
+	
+	private class Client extends Thread
+	{
+		int clientID;
+		String name;
+		NetworkHandler handler;
+		
+		public Client(Socket s)
+		{
+			handler = new NetworkHandler(s);
 		}
-	}
-
-	public void run()
-	{
-		/*		while (true) {
-					try {
-						String inputLine = in.readLine();
-						if (inputLine != null) {
-							System.out.println("Got:  " + inputLine);
-							try {
-								JSONArray jarray = new JSONArray(inputLine);
-								String command = jarray.getString(0);
-								if (command.equals("protocol")) {
-									handleProtocol(jarray.getJSONObject(1));
-								}
-							} catch (JSONException e) {
-								e.printStackTrace();
-								System.err.println("** Failed to parse JSON command from client");
+		
+		public void run()
+		{
+			while (true) {
+				try {
+					String inputLine = handler.readLine();
+					if (inputLine != null) {
+						System.out.println("Client " + clientID + " got:  " + inputLine);
+						try {
+							JSONArray jarray = new JSONArray(inputLine);
+							String command = jarray.getString(0);
+							if (command.equals("protocol")) {
+								handleProtocol(jarray.getJSONObject(1));
 							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+							System.err.println("** Failed to parse JSON command from client");
 						}
-					} catch (IOException e) {
-						System.err.println("** Couldn't get new line from client");
 					}
-				}*/
-	}
+				} catch (IOException e) {
+					System.err.println("** Couldn't get new line from client");
+				}
+			}
+		}
 
-	// Handle the "protocol" message from client for exchanging protocol versions as a handshake
-	private void handleProtocol(JSONObject jobj) throws JSONException
-	{
-		if (jobj.getInt("version") == protocolVersion) {
-			// Handshake okay, continue on
-			// send welcome clid clientID
-			// send client-names names clientNames
-			// send deck-submitted clid clientID
-			// broadcast client-join clid clientID
+		// Handle the "protocol" message from client for exchanging protocol versions as a handshake
+		private void handleProtocol(JSONObject jobj) throws JSONException
+		{
+			if (jobj.getInt("version") == protocolVersion) {
+				// Handshake okay, continue on
+				// send welcome clid clientID
+				// send client-names names clientNames
+				// send deck-submitted clid clientID
+				// broadcast client-join clid clientID
 
-			// Assign a unique ID to the client and let it know
-			int clientId = 1;
-			// String message = encode("welcome", "clid", clientId);
+				// Assign a unique ID to the client and let it know
+				int clientId = 1;
+				// String message = encode("welcome", "clid", clientId);
 
-		} else {
-			// We've encountered a different protocol version
-			// Report back failure to the client
-			// String message = encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
-			// send(message);
+			} else {
+				// We've encountered a different protocol version
+				// Report back failure to the client
+				// String message = encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
+				// send(message);
+			}
 		}
 	}
 }
