@@ -1,8 +1,6 @@
 package dojo;
 
 import java.util.ArrayList;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
 
 /**
  * Creates and maintains search list for Deckbuilder
@@ -10,7 +8,7 @@ import javax.swing.event.ListDataListener;
  * @author Solus.
  *         Created Aug 27, 2010.
  */
-class DataList extends ArrayList<StoredCard> implements ListModel
+class DataList extends ArrayList<StoredCard>
 {
 	private static final long serialVersionUID = 1L;
 	Object[] p;
@@ -28,13 +26,13 @@ class DataList extends ArrayList<StoredCard> implements ListModel
 			add(Main.databaseID.get(p[x]));
 	}
 	
-    public void filterList(String legal, String clan, String type, String title,
-							String text, String goldMin, String goldMax,
-										 String forceMin, String forceMax,
-										 String chiMin, String chiMax,
-										 String honorMin, String honorMax,
-										 String phonorMin, String phonorMax,
-										 String focusMin, String focusMax)
+    public void filterList(String legal, String clan, String type, String title, String text, 
+							String goldMin, String goldMax,
+							String forceMin, String forceMax,
+							String chiMin, String chiMax,
+							String honorMin, String honorMax,
+							String phonorMin, String phonorMax,
+							String focusMin, String focusMax)
 	{
 		int max, index;
 
@@ -117,19 +115,4 @@ class DataList extends ArrayList<StoredCard> implements ListModel
 				return false;
 		return true;
 	}
-
-	public Object getElementAt(int arg) 
-	{
-		return null;
-	}
-
-	public int getSize() 
-	{
-		return 0;
-	}
-
-	public void addListDataListener(ListDataListener arg) {}
-
-	public void removeListDataListener(ListDataListener arg) {}
-
 }

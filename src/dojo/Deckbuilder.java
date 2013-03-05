@@ -55,7 +55,7 @@ class Deckbuilder extends JFrame implements ActionListener
 	JTextField title, text;
 	JComboBox<String> legalBox, typeBox, clanBox;
 	JLabel resultLabel, stronghold, dynLabel, fateLabel;
-	JList searchList, dynList, fateList;
+	JList<StoredCard> searchList, dynList, fateList;
 	
 	private static final long serialVersionUID = 1L;
 	ArrayList<String> types, legal, clans;
@@ -415,7 +415,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		resultLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(resultLabel);
 
-		searchList = new JList(search.toArray());
+		searchList = new JList<StoredCard>(search.toArray(new StoredCard[search.size()]));
 		searchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		searchList.setLayoutOrientation(JList.VERTICAL);
 		searchList.setVisibleRowCount(-1);
@@ -492,7 +492,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		dynLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		dynSide.add(dynLabel);
 
-		dynList = new JList(dynDeck.toArray());
+		dynList = new JList<StoredCard>(dynDeck.toArray(new StoredCard[dynDeck.size()]));
 		dynList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		dynList.setLayoutOrientation(JList.VERTICAL);
 		dynList.setVisibleRowCount(-1);
@@ -502,7 +502,8 @@ class Deckbuilder extends JFrame implements ActionListener
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				JList list = (JList) e.getSource();
+				@SuppressWarnings("unchecked") // WTB reified generics
+				JList<StoredCard> list = (JList<StoredCard>) e.getSource();
 				if(e.getValueIsAdjusting() == false)
 				{
 					if(list.getSelectedValue()==null)
@@ -559,7 +560,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		fateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		fateSide.add(fateLabel);
 		
-		fateList = new JList(fateDeck.toArray());
+		fateList = new JList<StoredCard>(fateDeck.toArray(new StoredCard[fateDeck.size()]));
 		fateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		fateList.setLayoutOrientation(JList.VERTICAL);
 		fateList.setVisibleRowCount(-1);
@@ -569,7 +570,8 @@ class Deckbuilder extends JFrame implements ActionListener
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				JList list = (JList) e.getSource();
+				@SuppressWarnings("unchecked") // WTB reified generics
+				JList<StoredCard> list = (JList<StoredCard>) e.getSource();
 				if(e.getValueIsAdjusting() == false)
 				{
 					if(list.getSelectedValue()==null)
@@ -674,7 +676,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		
 		Collections.sort(search);
 		resultLabel.setText("Card Results (" + search.size() + "):");
-		searchList.setListData(search.toArray());
+		searchList.setListData(search.toArray(new StoredCard[search.size()]));
 	}
 
 	private void updateDyn()
@@ -699,7 +701,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		stronghold.setText("Stronghold: " + (hasSH?dynDeck.get(index):""));
 		textDeck.setText(dynDeck,fateDeck);
 		Collections.sort(dynDeck);
-		dynList.setListData(deckToText(dynDeck));
+		dynList.setListData(dynDeck.toArray(new StoredCard[dynDeck.size()]));
 	}
 	
 	private void updateFate()
@@ -708,35 +710,7 @@ class Deckbuilder extends JFrame implements ActionListener
 		fateLabel.setText("Fate (" + fateDeck.size() + "):");
 		textDeck.setText(dynDeck,fateDeck);
 		Collections.sort(fateDeck);
-		fateList.setListData(deckToText(fateDeck));
-	}
-
-	private String[] deckToText(List<StoredCard> deck)
-	{
-		List<String> deckText = new ArrayList<String>();
-		Collections.sort(deck);
-		int x = 0, i = 1;
-		do
-		{
-			if(deck.size() != 0)
-			{
-				while(x + 1 < deck.size())
-				{
-					if (deck.get(x).getName().equals(deck.get(x + 1).getName()))
-					{
-						i++;
-						x++;
-					}
-					else
-						break;
-				}
-
-				deckText.add(i + "x " + deck.get(x).getName());
-				i = 1;
-			}
-			x++;
-		}while(x < deck.size());
-		return deckText.toArray(new String[0]);
+		fateList.setListData(fateDeck.toArray(new StoredCard[fateDeck.size()]));
 	}
 	
 	private void setFrameTitle(String s, boolean ed)
