@@ -24,17 +24,14 @@ public class Network extends Thread
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(gamePort);
+			// Once we're listening on the game port start a new server
 			EggServer server = new EggServer();
-			server.start();
 			while (true) {
 				try {
+					// Block till we see a new connection incoming
 					Socket clientSocket = serverSocket.accept();
-					// NetworkHandler nh = new NetworkHandler(clientSocket, connections);
-					// nh.start();
-					// connections.add(nh);
+					// Accept it and pass it into the server code
 					server.clientConnect(clientSocket);
-					// EggClient client = new EggClient(clientSocket);
-					// client.start();
 					System.out.println("Accept succeeded.");
 				} catch (IOException e) {
 					System.err.println("Accept failed.");

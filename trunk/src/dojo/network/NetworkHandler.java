@@ -6,24 +6,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.List;
-import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONStringer;
 
 // TODO: Remove when developing this class
+// For any client or server component that requires network communication
+// Provides JSON encoding and read/write to socket
 //@SuppressWarnings("unused")
 public class NetworkHandler extends Thread
 {
 	private BufferedReader in;
 	private BufferedWriter out;
-	private List<NetworkHandler> connections;
 	private int clientID;
-	private Map<Integer, String> clientNames;
 
-	public NetworkHandler(Socket s, List<NetworkHandler> connections)
+	public NetworkHandler(Socket s)
 	{
-		this.connections = connections;
 		try {
 			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -32,9 +29,14 @@ public class NetworkHandler extends Thread
 			System.err.println("** Failed to get in/out stream to client");
 		}
 	}
+	
+	public String readLine() throws IOException
+	{
+		return in.readLine();
+	}
 
 	// Encode values into a JSON compatible string to send over the network
-	private String encode(String type, String key, int value) throws JSONException
+	public String encode(String type, String key, int value) throws JSONException
 	{
 		// Create an array where:
 		// 1st: String of message type
@@ -51,7 +53,7 @@ public class NetworkHandler extends Thread
 	}
 
 	// Encode values into a JSON compatible string to send over the network
-	private String encode(String type, String key, String value) throws JSONException
+	public String encode(String type, String key, String value) throws JSONException
 	{
 		// Create an array where:
 		// 1st: String of message type
