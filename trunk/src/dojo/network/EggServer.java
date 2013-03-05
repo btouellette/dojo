@@ -38,6 +38,14 @@ public class EggServer
 		client.start();
 	}
 	
+	public void broadcast(String message)
+	{
+		for (Client client : clients)
+		{
+			client.send(message);
+		}
+	}
+	
 	private class Client extends Thread
 	{
 		int clientID;
@@ -49,6 +57,10 @@ public class EggServer
 			handler = new NetworkHandler(s);
 		}
 		
+		public void send(String message) {
+			handler.send(message);
+		}
+
 		public void run()
 		{
 			while (true) {
@@ -79,14 +91,15 @@ public class EggServer
 			if (jobj.getInt("version") == protocolVersion) {
 				// Handshake okay, continue on
 				// send welcome clid clientID
-				// send client-names names clientNames
+				// send ["client-names", {"names": [[0, "Toku-san"]]}]
 				// send deck-submitted clid clientID
 				// broadcast client-join clid clientID
 
 				// Assign a unique ID to the client and let it know
-				int clientId = 1;
-				// String message = encode("welcome", "clid", clientId);
-
+				String message = handler.encode("welcome", "clid", clientID);
+				send(message);
+				//message = handler.encode("client-names", key, value)
+				
 			} else {
 				// We've encountered a different protocol version
 				// Report back failure to the client
