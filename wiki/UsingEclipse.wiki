@@ -54,6 +54,7 @@ govtpiggy: and it should work
 
 Step by Step 2013
 <pre>
+Download and install the latest version of the JDK
 Download Eclipse for Java developers - latest version
 Extract to folder where it'll live (I used My Documents)
 Use default workspace location
