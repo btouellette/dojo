@@ -1,4 +1,5 @@
 package dojo;
+
 // DeckImporter.java
 // Written by Brian Ouellette
 // Imports both The Game/Gempukku style decks as well as Egg style
@@ -18,18 +19,15 @@ class DeckImporter
 		// Grab the file path
 		String path = file.getAbsolutePath();
 		// So we can grab the file extension
-		String fileType = path.substring(path.length()-4);
+		String fileType = path.substring(path.length() - 4);
 		// Default storage for 100 cards (includes both decks and stronghold/wind)
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		try {
 			// Egg decks use *.l5d and Game and Gempukku decks use *.dck file extension
 			BufferedReader br = new BufferedReader(new FileReader(path));
-			if(fileType.equals(".l5d"))
-			{
+			if (fileType.equals(".l5d")) {
 				cards = importEggStyle(br);
-			}
-			else if(fileType.equals(".dck"))
-			{
+			} else if (fileType.equals(".dck")) {
 				cards = importGameStyle(br);
 			}
 		} catch (IOException err) {
@@ -37,38 +35,31 @@ class DeckImporter
 			err.printStackTrace();
 		}
 		// If import was successful and we now have cards to work with create decks
-		if(cards != null && !cards.isEmpty())
-		{
+		if (cards != null && !cards.isEmpty()) {
 			// Make two new decks to sort into
 			Deck dynasty = new Deck(true);
 			Deck fate = new Deck(false);
 			// Treat strongholds and winds specially
 			PlayableCard wind = null, stronghold = null;
 			// For every card we imported
-			for(StoredCard currentCard : cards)
-			{
+			for (StoredCard currentCard : cards) {
 				// Check the type
 				String type = currentCard.getType();
 				// If the card is a wind put it on the table instead of in a deck and if there is a stronghold on the table attach the wind to it
-				if(type.equals("wind"))
-				{
+				if (type.equals("wind")) {
 					wind = new PlayableCard(currentCard);
 					wind.setFaceUp();
 				}
-				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it 
-				else if(type.equals("stronghold"))
-				{
+				// If the card is a stronghold put it on the table in the lower left and attach any found wind to it
+				else if (type.equals("stronghold")) {
 					stronghold = new PlayableCard(currentCard);
 					stronghold.setFaceUp();
-					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - 2*Main.playArea.getCardHeight() - 20);	
+					stronghold.setLocationSimple(Main.playArea.getCardWidth(), Main.playArea.getHeight() - 2 * Main.playArea.getCardHeight() - 20);
 				}
 				// If it isn't a special type of card just add it to the appropriate deck
-				else if(currentCard.isDynasty())
-				{
+				else if (currentCard.isDynasty()) {
 					dynasty.add(currentCard);
-				}
-				else
-				{
+				} else {
 					fate.add(currentCard);
 				}
 			}
@@ -76,17 +67,15 @@ class DeckImporter
 			TextActionListener.send(Preferences.userName + " loads a new deck.", "Action");
 			fate.shuffle();
 			dynasty.shuffle();
-		
+
 			Main.state.resetState(dynasty, fate);
 			// After clearing the table put out the stronghold and wind
-			if(stronghold != null)
-			{
+			if (stronghold != null) {
 				Main.state.addToTable(stronghold);
-				if(wind != null)
-				{
+				if (wind != null) {
 					stronghold.attach(wind);
 				}
-				//TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
+				// TODO: If you find a sensei prompt to pull one out of your deck and automatically attach to stronghold (check faction)
 			}
 			Main.playArea.redrawBackground();
 			Main.playArea.repaint();
@@ -98,25 +87,21 @@ class DeckImporter
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String line;
 		// Iterate over the entire file
-		while((line = br.readLine()) != null)
-		{
+		while ((line = br.readLine()) != null) {
 			// As long as the line isn't blank or commented out
-			if(!line.isEmpty() && line.charAt(0) != '#')
-			{
+			if (!line.isEmpty() && line.charAt(0) != '#') {
 				int count = 0, num = 0;
 				// First grab the number of cards
-				while(Character.isDigit(line.charAt(count)))
-				{
+				while (Character.isDigit(line.charAt(count))) {
 					num *= 10;
 					num += Character.getNumericValue(line.charAt(count));
 					count++;
 				}
 				// Then the card itself
-				String cardName = line.substring(count+1);
+				String cardName = line.substring(count + 1);
 				// And add the correct number of copies
 				StoredCard currentCard = Main.databaseName.get(cardName);
-				for(int i = 0; i < num; i++)
-				{
+				for (int i = 0; i < num; i++) {
 					cards.add(currentCard);
 				}
 			}
@@ -130,11 +115,9 @@ class DeckImporter
 		// Pull the string in and tokenize it
 		List<StoredCard> cards = new ArrayList<StoredCard>(100);
 		String deck = br.readLine();
-		if(deck != null)
-		{
+		if (deck != null) {
 			StringTokenizer st = new StringTokenizer(deck, "|");
-			while(st.hasMoreTokens())
-			{
+			while (st.hasMoreTokens()) {
 				cards.add(Main.databaseID.get(st.nextToken()));
 			}
 		}

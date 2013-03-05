@@ -1,4 +1,5 @@
 package dojo;
+
 // StoredCard.java
 // Written by Brian Ouellette
 // Format in which cards are stored in the database after being read in from XML.
@@ -12,7 +13,7 @@ class StoredCard extends Card implements Comparable<StoredCard>
 {
 	private String type;
 	private String name;
-	//TODO: Update to only be MRP in new XML type
+	// TODO: Update to only be MRP in new XML type
 	private List<String> imageLocation, imageEdition;
 	private List<String> legal, clan, rulings;
 	private String edition, text, cost, focus;
@@ -28,7 +29,7 @@ class StoredCard extends Card implements Comparable<StoredCard>
 		legal = new ArrayList<String>();
 		clan = new ArrayList<String>();
 		rulings = new ArrayList<String>();
-		//Avoid null values in the text field (it isn't guaranteed present in cards.xml)
+		// Avoid null values in the text field (it isn't guaranteed present in cards.xml)
 		text = "";
 	}
 
@@ -36,14 +37,9 @@ class StoredCard extends Card implements Comparable<StoredCard>
 	{
 		this.type = type;
 		// Set appropriate dynasty field
-		if(type.equals("strategy") || type.equals("kiho")     || type.equals("spell") ||
-		   type.equals("ancestor") || type.equals("follower") || type.equals("item")  ||
-		   type.equals("ring")     || type.equals("sensei")   || type.equals("wind"))
-		{
+		if (type.equals("strategy") || type.equals("kiho") || type.equals("spell") || type.equals("ancestor") || type.equals("follower") || type.equals("item") || type.equals("ring") || type.equals("sensei") || type.equals("wind")) {
 			isDynasty = false;
-		}
-		else
-		{
+		} else {
 			// True for: celestials, events, regions, holdings, personalities, strongholds
 			isDynasty = true;
 		}
@@ -56,15 +52,15 @@ class StoredCard extends Card implements Comparable<StoredCard>
 
 	public void setImageLocation(String imageLocation)
 	{
-		//Always add it at the end of the list
-		//MRP will be the last card and we want that in the first position
+		// Always add it at the end of the list
+		// MRP will be the last card and we want that in the first position
 		this.imageLocation.add(imageLocation);
 	}
 
 	public void setImageEdition(String imageEdition)
 	{
-		//Always add it at the end of the list
-		//MRP will be the last card and we want that in the first position
+		// Always add it at the end of the list
+		// MRP will be the last card and we want that in the first position
 		this.imageEdition.add(imageEdition);
 	}
 
@@ -149,12 +145,10 @@ class StoredCard extends Card implements Comparable<StoredCard>
 		int count = 0;
 
 		// Find the first valid image location
-		while(count < imageLocation.size())
-		{
+		while (count < imageLocation.size()) {
 			cardImageLoc = imageLocation.get(count);
 			// Only return it if the file exists
-			if((new File(cardImageLoc)).exists())
-			{
+			if ((new File(cardImageLoc)).exists()) {
 				return cardImageLoc;
 			}
 			count++;
@@ -162,11 +156,10 @@ class StoredCard extends Card implements Comparable<StoredCard>
 		return null;
 	}
 
-	//TODO: Make this smarter. Try to download multiple editions if possible
+	// TODO: Make this smarter. Try to download multiple editions if possible
 	public String getImageEdition()
 	{
-		if(!imageEdition.isEmpty())
-		{
+		if (!imageEdition.isEmpty()) {
 			// Just return the MRP edition
 			return imageEdition.get(0);
 		}
@@ -232,7 +225,7 @@ class StoredCard extends Card implements Comparable<StoredCard>
 	{
 		return honorReq;
 	}
-	
+
 	public List<String> getLegal()
 	{
 		return legal;

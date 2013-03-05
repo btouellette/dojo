@@ -1,4 +1,5 @@
 package dojo;
+
 // XMLImporter.java
 // Written by Brian Ouellette
 // Imports the database from the XML and stores it in a HashMap.
@@ -10,11 +11,11 @@ import java.util.HashMap;
 
 class XMLImporter extends DefaultHandler
 {
-	//private Writer out;
-	//private String version;
+	// private Writer out;
+	// private String version;
 	private String eName;
 	// Database to map ID or name to card
-	//TODO: Serialize these databases and only reload if the xml is newer
+	// TODO: Serialize these databases and only reload if the xml is newer
 	private Map<String, StoredCard> databaseID, databaseName;
 	private StoredCard currentCard;
 
@@ -29,7 +30,7 @@ class XMLImporter extends DefaultHandler
 		} catch (Throwable t) {
 			t.printStackTrace();
 		} */
-		
+
 		// Create a new HashMap with an initial capacity of 1500
 		// This value might need to be tweaked
 		databaseID = new HashMap<String, StoredCard>(1500);
@@ -40,12 +41,12 @@ class XMLImporter extends DefaultHandler
 	{
 		return databaseID;
 	}
-	
+
 	public Map<String, StoredCard> getNameDatabase()
 	{
 		return databaseName;
 	}
-	
+
 	/* Disabled, debugging code for if importer starts barfing on reading cards.xml
 	public String getVersion()
 	{
@@ -95,26 +96,24 @@ class XMLImporter extends DefaultHandler
 		}
 	}*/
 
-	public void startElement(String namespaceURI,
-	                         String sName, // simple name (localName)
-	                         String qName, // qualified name
-	                         Attributes attrs) throws SAXException
+	public void startElement(String namespaceURI, String sName, // simple name (localName)
+			String qName, // qualified name
+			Attributes attrs) throws SAXException
 	{
-		//nl();
-		//emit("ELEMENT: ");
+		// nl();
+		// emit("ELEMENT: ");
 		eName = sName;
-		if ("".equals(eName))
-		{
+		if ("".equals(eName)) {
 			eName = qName;
 		}
-		//emit("<"+eName);
+		// emit("<"+eName);
 
 		if (attrs != null) {
 			for (int i = 0; i < attrs.getLength(); i++) {
-				//nl();
-				//emit("   ATTR: ");
+				// nl();
+				// emit("   ATTR: ");
 				String localName = attrs.getLocalName(i);
-				//emit(localName);
+				// emit(localName);
 				String localValue = attrs.getValue(i);
 
 				/*
@@ -122,27 +121,21 @@ class XMLImporter extends DefaultHandler
 				{
 					version = localValue;
 				}*/
-				
-				if(localName.equals("id"))
-				{
-					if(currentCard != null)
-					{
+
+				if (localName.equals("id")) {
+					if (currentCard != null) {
 						databaseID.put(currentCard.getID(), currentCard);
 						databaseName.put(currentCard.getName(), currentCard);
 					}
 					currentCard = new StoredCard(localValue);
-				}
-				else if(localName.equals("type"))
-				{
+				} else if (localName.equals("type")) {
 					currentCard.setType(localValue);
-				}
-				else if(localName.equals("edition"))
-				{
+				} else if (localName.equals("edition")) {
 					currentCard.setImageEdition(localValue);
 				}
-				//emit("\t\"");
-				//emit(localValue);
-				//emit("\"");
+				// emit("\t\"");
+				// emit(localValue);
+				// emit("\"");
 			}
 		}
 		/*if(attrs.getLength() > 0)
@@ -151,7 +144,7 @@ class XMLImporter extends DefaultHandler
 		}
 		emit(">");*/
 	}
-	
+
 	/*
 	public void endElement(String namespaceURI,
 						   String sName, // simple name
@@ -165,91 +158,53 @@ class XMLImporter extends DefaultHandler
 	}*/
 
 	// Function called when the parser encounters a block of characters
-	public void characters(char buf[], int offset, int len)	throws SAXException
+	public void characters(char buf[], int offset, int len) throws SAXException
 	{
-		//nl();
-		//emit("CHARS:   ");
+		// nl();
+		// emit("CHARS:   ");
 		String s = new String(buf, offset, len);
 		// The if statement makes sure it isn't just useless white space
-		if(!s.trim().equals(""))
-		{
-			//emit(s);
+		if (!s.trim().equals("")) {
+			// emit(s);
 
 			// Note: Java switch statements don't operate on String
-			if(eName.equals("name"))
-			{
+			if (eName.equals("name")) {
 				currentCard.setName(s);
-			}
-			else if(eName.equals("image"))
-			{
+			} else if (eName.equals("image")) {
 				currentCard.setImageLocation(s);
-			}
-			else if(eName.equals("edition"))
-			{
+			} else if (eName.equals("edition")) {
 				currentCard.setEdition(s);
-			}
-			else if(eName.equals("legal"))
-			{
+			} else if (eName.equals("legal")) {
 				currentCard.setLegal(s);
-			}
-			else if(eName.equals("text"))
-			{
+			} else if (eName.equals("text")) {
 				currentCard.setText(s);
-			}
-			else if(eName.equals("cost"))
-			{
+			} else if (eName.equals("cost")) {
 				currentCard.setCost(s);
-			}
-			else if(eName.equals("focus"))
-			{
+			} else if (eName.equals("focus")) {
 				currentCard.setFocus(s);
-			}
-			else if(eName.equals("clan"))
-			{
+			} else if (eName.equals("clan")) {
 				currentCard.setClan(s);
-			}
-			else if(eName.equals("province_strength"))
-			{
+			} else if (eName.equals("province_strength")) {
 				currentCard.setProvinceStrength(s);
-			}
-			else if(eName.equals("gold_production"))
-			{
+			} else if (eName.equals("gold_production")) {
 				currentCard.setGoldProduction(s);
-			}
-			else if(eName.equals("starting_honor"))
-			{
+			} else if (eName.equals("starting_honor")) {
 				currentCard.setStartingHonor(s);
-			}
-			else if(eName.equals("force"))
-			{
+			} else if (eName.equals("force")) {
 				currentCard.setForce(s);
-			}
-			else if(eName.equals("chi"))
-			{
+			} else if (eName.equals("chi")) {
 				currentCard.setChi(s);
-			}
-			else if(eName.equals("personal_honor"))
-			{
+			} else if (eName.equals("personal_honor")) {
 				currentCard.setPersonalHonor(s);
-			}
-			else if(eName.equals("honor_req"))
-			{
+			} else if (eName.equals("honor_req")) {
 				currentCard.setHonorReq(s);
-			}
-			else if(eName.equals("rarity"))
-			{
+			} else if (eName.equals("rarity")) {
 				currentCard.setRarity(s);
-			}
-			else if(eName.equals("flavor"))
-			{
+			} else if (eName.equals("flavor")) {
 				currentCard.setFlavor(s);
-			}
-			else if(eName.equals("artist"))
-			{
+			} else if (eName.equals("artist")) {
 				currentCard.setArtist(s);
-			}
-			else if(eName.equals("rulings"))
-			{
+			} else if (eName.equals("rulings")) {
 				currentCard.setRulings(s);
 			}
 		}
