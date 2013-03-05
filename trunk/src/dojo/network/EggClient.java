@@ -1,6 +1,6 @@
 package dojo.network;
 
-// Emulator for Egg client
+//Emulator for Egg client
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,7 +14,19 @@ import org.json.JSONObject;
 import org.json.JSONStringer;
 import dojo.TextActionListener;
 
-/*Loading card database: success! Sent: ["protocol",{"version":8}] Connect succeeded. Got: ["welcome", {"clid": 5}] Got: ["client-names", {"names": [[0, "Toku-san"]]}] Got: ["client-join", {"clid": 5}] */
+/**
+ * Hosting:
+ * Accept succeeded.
+ * Got:  ["protocol", {"version": 8}]
+ * 
+ * Connecting:
+ * Connect succeeded.
+ * Sent: ["protocol",{"version":8}]
+ * Got:  ["welcome", {"clid": 1}]
+ * Got:  ["client-names", {"names": [[0, "Toku-san"]]}]
+ * Got:  ["client-join", {"clid": 1}]
+ * 
+ */
 public class EggClient extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
@@ -44,9 +56,7 @@ public class EggClient extends Thread
 					try {
 						JSONArray jarray = new JSONArray(inputLine);
 						String command = jarray.getString(0);
-						if (command.equals("protocol")) {
-							handleProtocol(jarray.getJSONObject(1));
-						} else if (command.equals("rejected")) {
+						if (command.equals("rejected")) {
 							handleRejected(jarray.getJSONObject(1));
 						} else if (command.equals("welcome")) {
 							handleWelcome(jarray.getJSONObject(1));
@@ -57,11 +67,11 @@ public class EggClient extends Thread
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
-						System.err.println("** Failed to parse JSON command from client");
+						System.err.println("** Failed to parse JSON command from server");
 					}
 				}
 			} catch (IOException e) {
-				System.err.println("** Couldn't get new line from client");
+				System.err.println("** Couldn't get new line from server");
 			}
 		}
 	}
@@ -127,23 +137,6 @@ public class EggClient extends Thread
 	{
 		String message = encode("protocol", "version", protocolVersion);
 		send(message);
-	}
-
-	// Handle the "protocol" message from client for exchanging protocol versions as a handshake
-	private void handleProtocol(JSONObject jobj) throws JSONException
-	{
-		if (jobj.getInt("version") == protocolVersion) {
-			// Handshake okay, continue on
-			// send welcome clid clientID
-			// send client-names names clientNames
-			// send deck-submitted clid clientID
-			// broadcast client-join clid clientID
-		} else {
-			// We've encountered a different protocol version
-			// Report back failure to the client
-			String message = encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
-			send(message);
-		}
 	}
 
 	// Handle the "rejected" message from server if our protocol handshake wasn't established correctly
