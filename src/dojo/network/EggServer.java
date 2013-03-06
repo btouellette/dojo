@@ -90,21 +90,32 @@ public class EggServer
 		{
 			if (jobj.getInt("version") == protocolVersion) {
 				// Handshake okay, continue on
-				// send welcome clid clientID
-				// send ["client-names", {"names": [[0, "Toku-san"]]}]
-				// send deck-submitted clid clientID
-				// broadcast client-join clid clientID
-
-				// Assign a unique ID to the client and let it know
+				// Let the client know the assigned ID
 				String message = handler.encode("welcome", "clid", clientID);
 				send(message);
-				//message = handler.encode("client-names", key, value)
 				
+				// Send the currently connected client names and IDs
+				int[] intValues = new int[clients.size() + 1];
+				String[] stringValues = new String[clients.size() + 1];
+				// Populate the host client ID and user name
+				intValues[0] = EggServer.this.clientID;
+				stringValues[0] = dojo.Preferences.userName;
+				for (int i = 1; i <= clients.size(); i++)
+				{
+					intValues[i] = clients.get(i).clientID;
+					stringValues[i] = clients.get(i).name;
+				}
+				message = handler.encode("client-names", "names", intValues, stringValues);
+				send(message);
+				
+				// Let the other clients know about the join
+				message = handler.encode("client-join", "clid", clientID);
+				EggServer.this.broadcast(message);
 			} else {
 				// We've encountered a different protocol version
 				// Report back failure to the client
-				// String message = encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
-				// send(message);
+				String message = handler.encode("rejected", "msg", "Your client protocol version is wrong (got " + jobj.getInt("version") + ", needs " + protocolVersion + ")");
+				send(message);
 			}
 		}
 	}

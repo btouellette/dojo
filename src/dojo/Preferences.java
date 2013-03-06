@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
-class Preferences
+public class Preferences
 {
 	// Width and height stored in the config file
 	static int width, height;
@@ -23,7 +23,8 @@ class Preferences
 	// The editions we've attempted to download
 	static Set<String> downloadedEditions = new HashSet<String>();
 	// Used for personalization
-	static String userName, gender;
+	public static String userName;
+	static String gender;
 
 	public static void importPreferences()
 	{
