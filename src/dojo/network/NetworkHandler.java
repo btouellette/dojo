@@ -19,7 +19,6 @@ public class NetworkHandler extends Thread
 {
 	private BufferedReader in;
 	private BufferedWriter out;
-	private int clientID;
 
 	public NetworkHandler(Socket s)
 	{
@@ -31,7 +30,7 @@ public class NetworkHandler extends Thread
 			System.err.println("** Failed to get in/out stream to client");
 		}
 	}
-	
+
 	public String readLine() throws IOException
 	{
 		return in.readLine();
@@ -74,10 +73,10 @@ public class NetworkHandler extends Thread
 	// send ["client-names", {"names": [[0, "Toku-san"]]}]
 	public String encode(String type, String key, int[] intValues, String[] stringValues) throws JSONException
 	{
-		if(intValues.length != stringValues.length) {
+		if (intValues.length != stringValues.length) {
 			throw new IllegalArgumentException("Must have same number of integer and string values");
 		}
-		
+
 		JSONStringer message = new JSONStringer();
 		message.array();
 		message.value(type);
@@ -89,7 +88,7 @@ public class NetworkHandler extends Thread
 			message.value(intValues[i]);
 			message.value(stringValues[i]);
 			message.endArray();
-		}		
+		}
 		message.endArray();
 		message.endObject();
 		message.endArray();
