@@ -7,13 +7,18 @@ import java.net.Socket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import dojo.Preferences;
 import dojo.TextActionListener;
 
 /**
  * Hosting:
  * Accept succeeded.
  * Got:  ["protocol", {"version": 8}]
+ * Sent: ["welcome",{"clid":1}]
+ * Sent: ["client-names",{"names":[[0,"New Player"]]}]
+ * Sent: ["client-join",{"clid":1}]
+ * Got:  ["name", {"value": "Toku-san"}]
+ * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
  * Connecting:
  * Connect succeeded.
@@ -29,7 +34,7 @@ public class EggClient extends Thread
 	private int protocolVersion = 8;
 	private int clientID;
 	private NetworkHandler handler;
-	
+
 	public EggClient(Socket s)
 	{
 		handler = new NetworkHandler(s);
@@ -100,8 +105,8 @@ public class EggClient extends Thread
 	{
 		// Update our clientID with the one reported back to us
 		clientID = jobj.getInt("clid");
-
-		// TODO: Send name to server
+		String message = handler.encode("name", "value", Preferences.userName);
+		handler.send(message);
 	}
 
 	private void handleClientJoin(JSONObject jobj) throws JSONException

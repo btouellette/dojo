@@ -70,7 +70,7 @@ public class NetworkHandler extends Thread
 		return message.toString();
 	}
 
-	// send ["client-names", {"names": [[0, "Toku-san"]]}]
+	// Encode values into a JSON compatible string to send over the network, int and string values will be paired together
 	public String encode(String type, String key, int[] intValues, String[] stringValues) throws JSONException
 	{
 		if (intValues.length != stringValues.length) {
