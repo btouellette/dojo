@@ -11,6 +11,11 @@ import org.json.JSONObject;
  * Hosting:
  * Accept succeeded.
  * Got:  ["protocol", {"version": 8}]
+ * Sent: ["welcome",{"clid":1}]
+ * Sent: ["client-names",{"names":[[0,"New Player"]]}]
+ * Sent: ["client-join",{"clid":1}]
+ * Got:  ["name", {"value": "Toku-san"}]
+ * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
  * Connecting:
  * Connect succeeded.
@@ -37,27 +42,27 @@ public class EggServer
 		clients.add(client);
 		client.start();
 	}
-	
+
 	public void broadcast(String message)
 	{
-		for (Client client : clients)
-		{
+		for (Client client : clients) {
 			client.send(message);
 		}
 	}
-	
+
 	private class Client extends Thread
 	{
 		int clientID;
 		String name;
 		NetworkHandler handler;
-		
+
 		public Client(Socket s)
 		{
 			handler = new NetworkHandler(s);
 		}
-		
-		public void send(String message) {
+
+		public void send(String message)
+		{
 			handler.send(message);
 		}
 
@@ -67,7 +72,7 @@ public class EggServer
 				try {
 					String inputLine = handler.readLine();
 					if (inputLine != null) {
-						System.out.println("Client " + clientID + " got:  " + inputLine);
+						System.out.println("Got:  " + inputLine);
 						try {
 							JSONArray jarray = new JSONArray(inputLine);
 							String command = jarray.getString(0);
@@ -93,21 +98,24 @@ public class EggServer
 				// Let the client know the assigned ID
 				String message = handler.encode("welcome", "clid", clientID);
 				send(message);
-				
+
 				// Send the currently connected client names and IDs
-				int[] intValues = new int[clients.size() + 1];
-				String[] stringValues = new String[clients.size() + 1];
+				int[] intValues = new int[clients.size()];
+				String[] stringValues = new String[clients.size()];
 				// Populate the host client ID and user name
 				intValues[0] = EggServer.this.clientID;
 				stringValues[0] = dojo.Preferences.userName;
-				for (int i = 1; i <= clients.size(); i++)
-				{
-					intValues[i] = clients.get(i).clientID;
-					stringValues[i] = clients.get(i).name;
+				int i = 1;
+				for (Client curr : clients) {
+					if (curr != this) {
+						intValues[i + 1] = curr.clientID;
+						stringValues[i + 1] = curr.name;
+						i++;
+					}
 				}
 				message = handler.encode("client-names", "names", intValues, stringValues);
 				send(message);
-				
+
 				// Let the other clients know about the join
 				message = handler.encode("client-join", "clid", clientID);
 				EggServer.this.broadcast(message);
