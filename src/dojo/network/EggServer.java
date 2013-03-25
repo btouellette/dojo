@@ -32,7 +32,13 @@ public class EggServer
 	// Host client ID will always be 0
 	private final int clientID = 0;
 	private ArrayList<Client> clients = new ArrayList<Client>();
+	private Network network;
 
+	public EggServer(Network network)
+	{
+		this.network = network;
+	}
+	
 	public void clientConnect(Socket s)
 	{
 		// For each client connection set up input and output streams for communication

@@ -4,6 +4,8 @@ package dojo.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Iterator;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,10 +36,12 @@ public class EggClient extends Thread
 	private int protocolVersion = 8;
 	private int clientID;
 	private NetworkHandler handler;
+	private Network network;
 
-	public EggClient(Socket s)
+	public EggClient(Socket s, Network network)
 	{
 		handler = new NetworkHandler(s);
+		this.network = network;
 	}
 
 	public void run()
@@ -118,7 +122,15 @@ public class EggClient extends Thread
 		}
 	}
 
-	private void handleClientNames(JSONObject jobj)
+	private void handleClientNames(JSONObject jobj) throws JSONException
 	{
+		JSONArray names = jobj.getJSONArray("names");
+		for (int i = 0; i < names.length(); i++)
+		{
+			JSONArray nameID = names.getJSONArray(i);
+			int id = nameID.getInt(0);
+			String name = nameID.getString(1);
+			network.opponentConnect(id, name);
+		}
 	}
 }

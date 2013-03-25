@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
+import dojo.Main;
+
 public class Network extends Thread
 {
 	// Port the game communications use
@@ -25,7 +27,7 @@ public class Network extends Thread
 		try {
 			serverSocket = new ServerSocket(gamePort);
 			// Once we're listening on the game port start a new server
-			EggServer server = new EggServer();
+			EggServer server = new EggServer(this);
 			while (true) {
 				try {
 					// Block till we see a new connection incoming
@@ -63,7 +65,7 @@ public class Network extends Thread
 				String port = splitServer[1];
 				hostSocket = new Socket(hostname, Integer.parseInt(port));
 			}
-			EggClient client = new EggClient(hostSocket);
+			EggClient client = new EggClient(hostSocket, this);
 			client.start();
 			client.handshake();
 			System.out.println("Connect succeeded.");
@@ -82,5 +84,10 @@ public class Network extends Thread
 		for (NetworkHandler nh : connections) {
 			nh.send(message);
 		}
+	}
+	
+	public void opponentConnect(int id, String name)
+	{
+		Main.state.opponentConnect(id, name);
 	}
 }
