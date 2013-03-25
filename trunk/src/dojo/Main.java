@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.*;
 import javax.swing.*;
@@ -20,7 +21,7 @@ import javax.swing.plaf.basic.*;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
 
-class Main
+public class Main
 {
 	// Database of all cards in XML, ID or name maps to card
 	static Map<String, StoredCard> databaseID, databaseName;
@@ -32,13 +33,13 @@ class Main
 	// Main playing surface
 	static PlayArea playArea;
 	// Object representing current game state
-	static GameState state;
+	public static GameState state;
 	static JFrame frame;
 	// Interface to the network
 	static Network network;
 	// Lock used to disable interface while we're downloading the database or updates
 	// This allows us to launch the Swing GUI before we load in everything
-	static boolean loading = false;
+	static volatile boolean loading = false;
 	// Game version, will be checked against the version present online and updated as needed
 	static double version = 0.5;
 
@@ -342,6 +343,7 @@ class Main
 			System.err.println("\n** Parsing error" + ", line " + spe.getLineNumber() + ", uri " + spe.getSystemId());
 			System.err.println("   " + spe.getMessage());
 		} catch (IOException io) {
+			// TODO: If this fails prompt the user to load it from disk
 			System.out.print("failed\n** Card database missing.\n** Attempting to get from kamisasori.net: ");
 			// Database not present so try to get database off kamisasori.net
 			// TODO: Also do this if someone you connect to has a newer database
@@ -425,7 +427,7 @@ class Main
 			Main.loading = false;
 		}
 	}
-
+	
 	public static void main(String[] args)
 	{
 		// Add shutdown hook for writing out preferences
@@ -447,6 +449,7 @@ class Main
 		network = new Network();
 		network.start();
 		// Check for updates
-		new Updater().start();
+		// TODO: Enable this
+		//new Updater().start();
 	}
 }

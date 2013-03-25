@@ -10,6 +10,8 @@ class Updater extends Thread
 {
 	public void run()
 	{
+		// TODO: Inform user that update is being checked
+		// TODO: Timeout quickly
 		// Wait for the loading flag to be cleared
 		while (Main.loading) {
 			// Do nothing
@@ -27,7 +29,8 @@ class Updater extends Thread
 			e.printStackTrace();
 		} catch (IOException e) {
 			// No net connection, do nothing
+		} finally {
+			Main.loading = false;
 		}
-		Main.loading = false;
 	}
 }

@@ -5,10 +5,28 @@ package dojo;
 // Contains any pertinent information to the state of the game (cards on the table, decks, etc)
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-class GameState
+public class GameState
 {
+	public class OpponentGameState {
+		private Deck dynastyDeck, fateDeck;
+		private Discard dynastyDiscard, fateDiscard;
+		private String name;
+		
+		public OpponentGameState(String name)
+		{
+			this.name = name;
+			// Create decks, discards, and provinces
+			dynastyDeck = new Deck(true);
+			fateDeck = new Deck(false);
+			dynastyDiscard = new Discard();
+			fateDiscard = new Discard();
+		}
+	}
+
 	// Your decks and discard piles
 	private Deck dynastyDeck, fateDeck;
 	private Discard dynastyDiscard, fateDiscard;
@@ -21,6 +39,8 @@ class GameState
 	private List<PlayableCard> hand;
 	// All cards visible to player, to keep necessary logic during repaint down
 	private List<PlayableCard> allCards;
+	// Object representing opponents game state, mapped by user ID
+	static Map<Integer, OpponentGameState> opponentStates;
 
 	public GameState()
 	{
@@ -42,6 +62,8 @@ class GameState
 		table = new ArrayList<PlayableCard>(12);
 		hand = new ArrayList<PlayableCard>(8);
 		allCards = new ArrayList<PlayableCard>(20);
+		
+		opponentStates = new HashMap<Integer, OpponentGameState>();
 	}
 
 	public void rescale()
@@ -214,5 +236,10 @@ class GameState
 		}
 		// Failed all tests. Must not be in hand
 		return false;
+	}
+	
+	public void opponentConnect(int id, String name)
+	{
+		opponentStates.put(id, new OpponentGameState(name));
 	}
 }
