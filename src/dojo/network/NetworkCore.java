@@ -5,17 +5,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import dojo.Main;
 
-public class Network extends Thread
+public class NetworkCore extends Thread
 {
 	// Port the game communications use
 	private int gamePort = 18073;
 	private List<NetworkHandler> connections;
 
-	public Network()
+	public NetworkCore()
 	{
 		// Using a vector since it is thread safe
 		connections = new Vector<NetworkHandler>();
@@ -86,8 +87,17 @@ public class Network extends Thread
 		}
 	}
 	
-	public void opponentConnect(int id, String name)
+	public void opponentConnect(int clientID, String name)
 	{
-		Main.state.opponentConnect(id, name);
+		Main.state.opponentConnect(clientID, name);
+	}
+	
+	public void opponentNameChange(int clientID, String name)
+	{
+		Main.state.setOpponentName(clientID, name);
+	}
+
+	public void opponentSubmitDeck(int clientID, Map<String, Integer> cardList) {
+		Main.state.loadOpponentDecks(clientID, cardList);
 	}
 }

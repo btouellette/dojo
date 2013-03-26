@@ -59,16 +59,16 @@ class MenuListener implements ActionListener
 				// Generate a random boolean for use as a coin flip and send it to the chat box
 				Random gen = new Random();
 				if (gen.nextBoolean()) {
-					TextActionListener.send(Preferences.userName + " flips a coin and it comes up heads.", "Action");
+					TextActionListener.send(Main.state.name + " flips a coin and it comes up heads.", "Action");
 				} else {
-					TextActionListener.send(Preferences.userName + " flips a coin and it comes up tails.", "Action");
+					TextActionListener.send(Main.state.name + " flips a coin and it comes up tails.", "Action");
 				}
 			} else if (name.equals("Drop Random Fate Card")) {
 				// TODO: Move random card from hand to table
-				TextActionListener.send(Preferences.userName + " drops a random fate card.", "Action");
+				TextActionListener.send(Main.state.name + " drops a random fate card.", "Action");
 			} else if (name.equals("Reveal Hand")) {
 				// TODO: Show cards in hand to opponent
-				TextActionListener.send(Preferences.userName + " reveals " + Preferences.gender + " hand.", "Action");
+				TextActionListener.send(Main.state.name + " reveals " + Preferences.gender + " hand.", "Action");
 			} else if (name.equals("About Dojo")) {
 				// TODO: If Dojo gets an icon add it here
 				// TODO: Make this a legit JFrame that looks decent

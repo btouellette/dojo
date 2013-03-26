@@ -64,7 +64,7 @@ class DeckImporter
 				}
 			}
 			// Shuffle decks and load them into the current game state
-			TextActionListener.send(Preferences.userName + " loads a new deck.", "Action");
+			TextActionListener.send(Main.state.name + " loads a new deck.", "Action");
 			fate.shuffle();
 			dynasty.shuffle();
 

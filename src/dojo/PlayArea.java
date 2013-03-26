@@ -754,10 +754,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 			// Shuffle deck and notify chat box
 			if (dynastyClicked) {
 				state.getDynastyDeck().shuffle();
-				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " dynasty deck.", "Action");
+				TextActionListener.send(Main.state.name + " shuffles " + Preferences.gender + " dynasty deck.", "Action");
 			} else if (fateClicked) {
 				state.getFateDeck().shuffle();
-				TextActionListener.send(Preferences.userName + " shuffles " + Preferences.gender + " fate deck.", "Action");
+				TextActionListener.send(Main.state.name + " shuffles " + Preferences.gender + " fate deck.", "Action");
 			}
 		} else if (name.equals("Search")) {
 			// TODO: Add search interface

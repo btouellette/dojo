@@ -17,11 +17,11 @@ class ButtonListener implements ActionListener
 			// And repaint so the unbowing is reflected in the display
 			Main.playArea.repaint();
 			// Send a message to the chatbox
-			TextActionListener.send(Preferences.userName + " unbows all " + Preferences.gender + " cards.", "Action");
+			TextActionListener.send(Main.state.name + " unbows all " + Preferences.gender + " cards.", "Action");
 		} else if (name.equals("End Turn")) {
 			// Send a message to the chatbox to notify other player of end of turn
-			TextActionListener.send(Preferences.userName + " bows.", "Action");
-			TextActionListener.send(Preferences.userName + ": The table is yours.", "You");
+			TextActionListener.send(Main.state.name + " bows.", "Action");
+			TextActionListener.send(Main.state.name + ": The table is yours.", "You");
 		}
 	}
 }

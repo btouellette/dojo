@@ -12,7 +12,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.*;
 import javax.swing.*;
@@ -36,7 +35,7 @@ public class Main
 	public static GameState state;
 	static JFrame frame;
 	// Interface to the network
-	static Network network;
+	static NetworkCore network;
 	// Lock used to disable interface while we're downloading the database or updates
 	// This allows us to launch the Swing GUI before we load in everything
 	static volatile boolean loading = false;
@@ -446,7 +445,7 @@ public class Main
 			}
 		});
 		// Start the networking module
-		network = new Network();
+		network = new NetworkCore();
 		network.start();
 		// Check for updates
 		// TODO: Enable this
