@@ -3,6 +3,9 @@ package dojo.network;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,9 +35,9 @@ public class EggServer
 	// Host client ID will always be 0
 	private final int clientID = 0;
 	private ArrayList<Client> clients = new ArrayList<Client>();
-	private Network network;
+	private NetworkCore network;
 
-	public EggServer(Network network)
+	public EggServer(NetworkCore network)
 	{
 		this.network = network;
 	}
@@ -55,7 +58,7 @@ public class EggServer
 			client.send(message);
 		}
 	}
-
+	
 	private class Client extends Thread
 	{
 		int clientID;
@@ -84,6 +87,10 @@ public class EggServer
 							String command = jarray.getString(0);
 							if (command.equals("protocol")) {
 								handleProtocol(jarray.getJSONObject(1));
+							} else if (command.equals("name")) {
+								handleName(jarray.getJSONObject(1));
+							} else if (command.equals("submit-deck")) {
+								handleSubmitDeck(jarray.getJSONObject(1));
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
@@ -94,6 +101,25 @@ public class EggServer
 					System.err.println("** Couldn't get new line from client");
 				}
 			}
+		}
+
+		private void handleSubmitDeck(JSONObject jobj) throws JSONException
+		{
+			Map<String, Integer> cardList = new HashMap<String, Integer>();
+			JSONArray cards = jobj.getJSONArray("cards");
+			for (int i = 0; i < cards.length(); i++)
+			{
+				JSONArray card = cards.getJSONArray(i);
+				int num = card.getInt(0);
+				String name = card.getString(1);
+				cardList.put(name, num);
+			}
+			network.opponentSubmitDeck(clientID, cardList);
+		}
+
+		private void handleName(JSONObject jobj) throws JSONException
+		{
+			network.opponentNameChange(clientID, jobj.getString("value"));
 		}
 
 		// Handle the "protocol" message from client for exchanging protocol versions as a handshake
@@ -110,7 +136,7 @@ public class EggServer
 				String[] stringValues = new String[clients.size()];
 				// Populate the host client ID and user name
 				intValues[0] = EggServer.this.clientID;
-				stringValues[0] = dojo.Preferences.userName;
+				stringValues[0] = dojo.Main.state.name;
 				int i = 1;
 				for (Client curr : clients) {
 					if (curr != this) {

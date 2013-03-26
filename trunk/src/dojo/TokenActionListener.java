@@ -29,7 +29,7 @@ class TokenActionListener implements ActionListener, MouseListener
 
 		if ("comboBoxEdited".equals(e.getActionCommand())) {
 			// String has been entered and the user wants to make a token
-			TextActionListener.send(Preferences.userName + " makes a token.", "Action");
+			TextActionListener.send(Main.state.name + " makes a token.", "Action");
 			// Update the list of token names
 			for (int i = 0; i < comboBox.getItemCount(); i++) {
 				if (text.equals(comboBox.getItemAt(i))) {

@@ -4,12 +4,10 @@ package dojo.network;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import dojo.Preferences;
 import dojo.TextActionListener;
 
 /**
@@ -36,9 +34,9 @@ public class EggClient extends Thread
 	private int protocolVersion = 8;
 	private int clientID;
 	private NetworkHandler handler;
-	private Network network;
+	private NetworkCore network;
 
-	public EggClient(Socket s, Network network)
+	public EggClient(Socket s, NetworkCore network)
 	{
 		handler = new NetworkHandler(s);
 		this.network = network;
@@ -109,7 +107,7 @@ public class EggClient extends Thread
 	{
 		// Update our clientID with the one reported back to us
 		clientID = jobj.getInt("clid");
-		String message = handler.encode("name", "value", Preferences.userName);
+		String message = handler.encode("name", "value", dojo.Main.state.name);
 		handler.send(message);
 	}
 

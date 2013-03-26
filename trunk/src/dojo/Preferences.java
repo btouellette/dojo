@@ -22,8 +22,6 @@ public class Preferences
 	static int sliderValue;
 	// The editions we've attempted to download
 	static Set<String> downloadedEditions = new HashSet<String>();
-	// Used for personalization
-	public static String userName;
 	static String gender;
 
 	public static void importPreferences()
@@ -65,7 +63,7 @@ public class Preferences
 					} else if (line.startsWith("downloaded ")) {
 						downloadedEditions.add(line.substring(11));
 					} else if (line.startsWith("userName ")) {
-						userName = line.substring(9);
+						Main.state.setName(line.substring(9));
 					} else if (line.startsWith("gender ")) {
 						gender = line.substring(7);
 					} else {
@@ -101,7 +99,7 @@ public class Preferences
 		cardHeight = 0;
 		sliderValue = 50;
 		downloadedEditions.clear();
-		userName = "New Player";
+		Main.state.setName("New Player");
 		gender = "his";
 	}
 
@@ -132,7 +130,7 @@ public class Preferences
 				fw.write("downloaded " + s + "\n");
 			}
 			fw.write("# User name to be used in chat box\n");
-			fw.write("userName " + userName + "\n");
+			fw.write("userName " + Main.state.name + "\n");
 			fw.write("# Used for gender specific personalization (his or her)\n");
 			fw.write("gender " + gender + "\n");
 			fw.close();

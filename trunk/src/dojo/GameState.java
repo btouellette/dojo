@@ -11,22 +11,6 @@ import java.util.Map;
 
 public class GameState
 {
-	public class OpponentGameState {
-		private Deck dynastyDeck, fateDeck;
-		private Discard dynastyDiscard, fateDiscard;
-		private String name;
-		
-		public OpponentGameState(String name)
-		{
-			this.name = name;
-			// Create decks, discards, and provinces
-			dynastyDeck = new Deck(true);
-			fateDeck = new Deck(false);
-			dynastyDiscard = new Discard();
-			fateDiscard = new Discard();
-		}
-	}
-
 	// Your decks and discard piles
 	private Deck dynastyDeck, fateDeck;
 	private Discard dynastyDiscard, fateDiscard;
@@ -40,7 +24,9 @@ public class GameState
 	// All cards visible to player, to keep necessary logic during repaint down
 	private List<PlayableCard> allCards;
 	// Object representing opponents game state, mapped by user ID
-	static Map<Integer, OpponentGameState> opponentStates;
+	private Map<Integer, GameState> opponentStates;
+	// Name of the owner of this state
+	public String name;
 
 	public GameState()
 	{
@@ -63,7 +49,13 @@ public class GameState
 		hand = new ArrayList<PlayableCard>(8);
 		allCards = new ArrayList<PlayableCard>(20);
 		
-		opponentStates = new HashMap<Integer, OpponentGameState>();
+		opponentStates = new HashMap<Integer, GameState>();
+	}
+	
+	public GameState(String name)
+	{
+		this();
+		this.name = name;
 	}
 
 	public void rescale()
@@ -238,8 +230,38 @@ public class GameState
 		return false;
 	}
 	
-	public void opponentConnect(int id, String name)
+	public void opponentConnect(int clientID, String name)
 	{
-		opponentStates.put(id, new OpponentGameState(name));
+		opponentStates.put(clientID, new GameState(name));
+	}
+
+	public void setOpponentName(int clientID, String name)
+	{
+		opponentStates.get(clientID).name = name;
+	}
+
+	public void loadOpponentDecks(int clientID, Map<String, Integer> cardList)
+	{
+		// Grab the game state associated with this client
+		GameState state = opponentStates.get(clientID);
+		// Add each card in the card list the appropriate number of times to the correct deck
+		for (String key : cardList.keySet())
+		{
+			int numCards = cardList.get(key);
+			for (int i = 0; i < numCards; i++)
+			{
+				PlayableCard card = new PlayableCard(key);
+				if(card.isDynasty()) {
+					state.dynastyDeck.add(card);
+				} else {
+					state.fateDeck.add(card);
+				}
+			}
+		}
+	}
+
+	public void setName(String name) {
+		// TODO: Send out update to network
+		this.name = name;
 	}
 }
