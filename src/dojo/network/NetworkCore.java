@@ -6,21 +6,19 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
+import org.json.JSONException;
+
+import dojo.StoredCard;
 import dojo.Main;
 
 public class NetworkCore extends Thread
 {
 	// Port the game communications use
 	private int gamePort = 18073;
-	private List<NetworkHandler> connections;
-
-	public NetworkCore()
-	{
-		// Using a vector since it is thread safe
-		connections = new Vector<NetworkHandler>();
-	}
+	private EggClient client;
+	private EggServer server;
+	public boolean hosting = false;
 
 	public void run()
 	{
@@ -28,13 +26,14 @@ public class NetworkCore extends Thread
 		try {
 			serverSocket = new ServerSocket(gamePort);
 			// Once we're listening on the game port start a new server
-			EggServer server = new EggServer(this);
+			server = new EggServer(this);
 			while (true) {
 				try {
 					// Block till we see a new connection incoming
 					Socket clientSocket = serverSocket.accept();
 					// Accept it and pass it into the server code
 					server.clientConnect(clientSocket);
+					hosting = true; // TODO: Set this to false whenever the total number of connected clients drops to zero
 					System.out.println("Accept succeeded.");
 				} catch (IOException e) {
 					System.err.println("Accept failed.");
@@ -56,6 +55,11 @@ public class NetworkCore extends Thread
 	public boolean connectEgg(String server)
 	{
 		try {
+			if(hosting)
+			{
+				System.err.println("** Already hosting a game.");
+				return false;
+			}
 			Socket hostSocket;
 			// Check for if port syntax was given
 			if (!server.contains(":")) {
@@ -66,7 +70,7 @@ public class NetworkCore extends Thread
 				String port = splitServer[1];
 				hostSocket = new Socket(hostname, Integer.parseInt(port));
 			}
-			EggClient client = new EggClient(hostSocket, this);
+			client = new EggClient(hostSocket, this);
 			client.start();
 			client.handshake();
 			System.out.println("Connect succeeded.");
@@ -79,13 +83,6 @@ public class NetworkCore extends Thread
 		}
 		return true;
 	}
-
-	public void broadcast(String message)
-	{
-		for (NetworkHandler nh : connections) {
-			nh.send(message);
-		}
-	}
 	
 	public void opponentConnect(int clientID, String name)
 	{
@@ -97,7 +94,17 @@ public class NetworkCore extends Thread
 		Main.state.setOpponentName(clientID, name);
 	}
 
-	public void opponentSubmitDeck(int clientID, Map<String, Integer> cardList) {
+	public void opponentSubmitDeck(int clientID, Map<String, Integer> cardList)
+	{
 		Main.state.loadOpponentDecks(clientID, cardList);
+	}
+	
+	public void submitDeck(List<StoredCard> deck) throws JSONException
+	{
+		if(hosting) {
+			// TODO: server deck send
+		} else if(client.isConnected()) {
+			client.submitDeck(deck);
+		}
 	}
 }

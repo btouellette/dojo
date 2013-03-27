@@ -11,6 +11,10 @@ import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+
+import org.json.JSONException;
+
+import java.util.List;
 import java.util.Random;
 
 class MenuListener implements ActionListener
@@ -45,7 +49,19 @@ class MenuListener implements ActionListener
 				int returnVal = fc.showOpenDialog(Main.frame);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					// And import the deck if they picked one
-					DeckImporter.importDeck(fc.getSelectedFile());
+					List<StoredCard> deck = DeckImporter.importDeck(fc.getSelectedFile());
+					if(deck != null && !deck.isEmpty()) {
+						try {
+							Main.network.submitDeck(deck);
+						} catch (JSONException e1) {
+							// TODO: Bail out properly on JSON exception
+							System.err.println("** Error encountered in deck loading.");
+							e1.printStackTrace();
+						}
+					}
+					else {
+						// TODO: Report that the deck import failed
+					}
 				}
 			} else if (name.equals("Start Game")) {
 			} else if (name.equals("Find Game")) {

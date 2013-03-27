@@ -47,6 +47,9 @@ public class Main
 	 */
 	private static void createAndShowGUI()
 	{
+		// Initialize a fresh game state
+		state = new GameState();
+				
 		// Create and set up the window
 		frame = new JFrame("Dojo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,9 +58,6 @@ public class Main
 		Preferences.importPreferences();
 		int width = Preferences.width;
 		int height = Preferences.height;
-
-		// Initialize a fresh game state
-		state = new GameState();
 
 		// Create the play area associated with this game state
 		playArea = new PlayArea(state, width, height);

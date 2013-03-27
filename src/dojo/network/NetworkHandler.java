@@ -19,12 +19,14 @@ public class NetworkHandler extends Thread
 {
 	private BufferedReader in;
 	private BufferedWriter out;
+	public boolean isConnected = false;
 
 	public NetworkHandler(Socket s)
 	{
 		try {
 			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+			isConnected = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("** Failed to get in/out stream to client");
