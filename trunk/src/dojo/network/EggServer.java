@@ -18,6 +18,7 @@ import org.json.JSONObject;
  * Sent: ["client-names",{"names":[[0,"New Player"]]}]
  * Sent: ["client-join",{"clid":1}]
  * Got:  ["name", {"value": "Toku-san"}]
+ * -- Join Game -> Submit Deck
  * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
  * Connecting:
@@ -119,7 +120,8 @@ public class EggServer
 
 		private void handleName(JSONObject jobj) throws JSONException
 		{
-			network.opponentNameChange(clientID, jobj.getString("value"));
+			// Now that we have an ID and name for the client and the handshake is done they are connected
+			network.opponentConnect(clientID, jobj.getString("value"));
 		}
 
 		// Handle the "protocol" message from client for exchanging protocol versions as a handshake

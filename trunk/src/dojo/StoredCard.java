@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-class StoredCard extends Card implements Comparable<StoredCard>
+public class StoredCard extends Card implements Comparable<StoredCard>
 {
 	private String type;
 	private String name;

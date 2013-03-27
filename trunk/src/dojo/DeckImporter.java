@@ -14,7 +14,30 @@ import java.util.StringTokenizer;
 
 class DeckImporter
 {
-	public static void importDeck(File file)
+	public static List<StoredCard> importDeck(File file)
+	{
+		// Grab the file path
+		String path = file.getAbsolutePath();
+		// So we can grab the file extension
+		String fileType = path.substring(path.length() - 4);
+		// List to load all the cards into
+		List<StoredCard> cards = null;
+		try {
+			// Egg decks use *.l5d and Game and Gempukku decks use *.dck file extension
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			if (fileType.equals(".l5d")) {
+				cards = importEggStyle(br);
+			} else if (fileType.equals(".dck")) {
+				cards = importGameStyle(br);
+			}
+		} catch (IOException err) {
+			TextActionListener.send("Failed to read in deck.\n", "Error");
+			err.printStackTrace();
+		}
+		return cards;
+	}
+	
+	public static void importDeckAndStart(File file)
 	{
 		// Grab the file path
 		String path = file.getAbsolutePath();

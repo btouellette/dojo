@@ -4,10 +4,16 @@ package dojo.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import dojo.StoredCard;
 import dojo.TextActionListener;
 
 /**
@@ -72,6 +78,11 @@ public class EggClient extends Thread
 		}
 	}
 
+	public boolean isConnected()
+	{
+		return handler.isConnected;
+	}
+	
 	public void handshake()
 	{
 		try {
@@ -130,5 +141,17 @@ public class EggClient extends Thread
 			String name = nameID.getString(1);
 			network.opponentConnect(id, name);
 		}
+	}
+	
+	public void submitDeck(List<StoredCard> deck) throws JSONException
+	{
+		// Coalesce the deck into a list of card IDs with their associated counts
+		Map<String, Integer> cardList = new HashMap<String, Integer>();
+		Collections.sort(deck);
+		String[] cardIDs = new String[cardList.size()];
+		int[] cardCounts = new int[cardList.size()];
+		
+		String message = handler.encode("submit-deck", "cards", cardCounts, cardIDs);
+		handler.send(message);
 	}
 }
