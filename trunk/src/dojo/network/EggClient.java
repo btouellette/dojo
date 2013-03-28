@@ -118,16 +118,15 @@ public class EggClient extends Thread
 	{
 		// Update our clientID with the one reported back to us
 		clientID = jobj.getInt("clid");
-		String message = handler.encode("name", "value", dojo.Main.state.name);
-		handler.send(message);
 	}
 
 	private void handleClientJoin(JSONObject jobj) throws JSONException
 	{
 		int clientID = jobj.getInt("clid");
-		// Ignore the join if it is us joining
+		// If it is us joining, report name to the server
 		if (this.clientID == clientID) {
-			return;
+			String message = handler.encode("name", "value", dojo.Main.state.name);
+			handler.send(message);
 		}
 	}
 
@@ -148,9 +147,23 @@ public class EggClient extends Thread
 		// Coalesce the deck into a list of card IDs with their associated counts
 		Map<String, Integer> cardList = new HashMap<String, Integer>();
 		Collections.sort(deck);
+		for(int i = 0; i < deck.size(); i++) {
+			String cardID = deck.get(i).getID();
+			if(cardList.containsKey(cardID)) {
+				cardList.put(cardID, cardList.get(cardID) + 1);
+			} else {
+				cardList.put(cardID, 1);
+			}
+		}
 		String[] cardIDs = new String[cardList.size()];
 		int[] cardCounts = new int[cardList.size()];
-		
+		int i = 0;
+		for (Map.Entry<String, Integer> entry : cardList.entrySet())
+		{
+			cardIDs[i] = entry.getKey();
+			cardCounts[i] = entry.getValue();
+			i++;
+		}
 		String message = handler.encode("submit-deck", "cards", cardCounts, cardIDs);
 		handler.send(message);
 	}

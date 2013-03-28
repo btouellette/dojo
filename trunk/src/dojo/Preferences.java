@@ -99,7 +99,7 @@ public class Preferences
 		cardHeight = 0;
 		sliderValue = 50;
 		downloadedEditions.clear();
-		Main.state.setName("New Player");
+		Main.state.setName("Dojo Player");
 		gender = "his";
 	}
 

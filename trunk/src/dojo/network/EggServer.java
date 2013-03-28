@@ -27,6 +27,11 @@ import org.json.JSONObject;
  * Got:  ["welcome", {"clid": 1}]
  * Got:  ["client-names", {"names": [[0, "Toku-san"]]}]
  * Got:  ["client-join", {"clid": 1}]
+ * Sent: ["name",{"value":"New Player"}]
+ * Got:  ["name", {"clid": 1, "value": "New Player"}]
+ * Submit Deck
+ * Sent: ["submit-deck",{"cards":[[3,"Celestial311"],[3,"Celestial263"],[3,"GotE092"],[3,"Celestial246"],[2,"WoH032"],[3,"Emperor042"],[1,"IG2018"],[1,"IG2017"],[3,"Celestial074"],[1,"Celestial075"],[1,"Celestial070"],[1,"IG2044"],[3,"Emperor351"],[1,"Celestial071"],[3,"GotE017"],[3,"Celestial204"],[3,"GotE019"],[2,"GotE018"],[3,"Celestial216"],[3,"GotE086"],[3,"WoH008"],[3,"Celestial237"],[3,"DaK012"],[1,"Celestial009"],[3,"Emperor229"],[3,"IG2010"],[2,"P282"],[3,"Celestial299"],[1,"Emperor054"],[1,"Emperor016"],[1,"IG2070"],[3,"IG1004"],[1,"GotE021"],[1,"IG2008"],[1,"Celestial345"],[1,"Celestial381"],[1,"GotE004"],[3,"Emperor231"]]}]
+ * Got:  ["deck-submitted", {"clid": 1}]
  * 
  */
 public class EggServer
@@ -41,6 +46,16 @@ public class EggServer
 	public EggServer(NetworkCore network)
 	{
 		this.network = network;
+	}
+	
+	public boolean isClientConnected()
+	{
+		for(Client client : clients) {
+			if(client.handler.isConnected) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void clientConnect(Socket s)

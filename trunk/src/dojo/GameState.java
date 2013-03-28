@@ -245,12 +245,12 @@ public class GameState
 		// Grab the game state associated with this client
 		GameState state = opponentStates.get(clientID);
 		// Add each card in the card list the appropriate number of times to the correct deck
-		for (String key : cardList.keySet())
+		for (Map.Entry<String, Integer> entry : cardList.entrySet())
 		{
-			int numCards = cardList.get(key);
+			int numCards = entry.getValue();
 			for (int i = 0; i < numCards; i++)
 			{
-				PlayableCard card = new PlayableCard(key);
+				PlayableCard card = new PlayableCard(entry.getKey());
 				if(card.isDynasty()) {
 					state.dynastyDeck.add(card);
 				} else {
