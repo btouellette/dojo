@@ -18,31 +18,37 @@ public class NetworkCore extends Thread
 	private int gamePort = 18073;
 	private EggClient client;
 	private EggServer server;
-	public boolean hosting = false;
+	private volatile ServerSocket serverSocket;
+	private volatile boolean connectFlag = false;
 
 	public void run()
 	{
-		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(gamePort);
 			// Once we're listening on the game port start a new server
 			server = new EggServer(this);
 			while (true) {
-				try {
-					// Block till we see a new connection incoming
-					Socket clientSocket = serverSocket.accept();
-					// Accept it and pass it into the server code
-					server.clientConnect(clientSocket);
-					hosting = true; // TODO: Set this to false whenever the total number of connected clients drops to zero
-					System.out.println("Accept succeeded.");
-				} catch (IOException e) {
-					System.err.println("Accept failed.");
+				// If we're not trying to connect to another host
+				if(!connectFlag) {
+					try {
+						// Block till we see a new connection incoming
+						Socket clientSocket = serverSocket.accept();
+						if(client == null || !client.isConnected()) {
+							// Accept it and pass it into the server code
+							server.clientConnect(clientSocket);
+							System.out.println("Accept succeeded.");
+						}
+					} catch (IOException e) {
+						if(!connectFlag) {
+							System.err.println("Accept failed.");
+						}
+					}
 				}
 			}
 		} catch (IOException e) {
 			System.err.println("** Could not listen on port: " + gamePort + ".");
 		} finally {
-			if (serverSocket != null) {
+			if (serverSocket != null && !serverSocket.isClosed()) {
 				try {
 					serverSocket.close();
 				} catch (IOException e) {
@@ -52,36 +58,49 @@ public class NetworkCore extends Thread
 		}
 	}
 
-	public boolean connectEgg(String server)
+	public boolean connectEgg(String url)
 	{
+		boolean success = true;
 		try {
-			if(hosting)
+			if(server.isClientConnected())
 			{
 				System.err.println("** Already hosting a game.");
 				return false;
 			}
+			// Shut down the hosting listener
+			// TODO: Turn this flag off when client connection is closed
+			connectFlag = true;
+			if (serverSocket != null && !serverSocket.isClosed()) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					System.err.println("** Failed to close ServerSocket.");
+				}
+			}
+			// Parse the URL given and connect to the host
 			Socket hostSocket;
 			// Check for if port syntax was given
-			if (!server.contains(":")) {
-				hostSocket = new Socket(server, gamePort);
+			if (!url.contains(":")) {
+				hostSocket = new Socket(url, gamePort);
 			} else {
-				String[] splitServer = server.split(":");
+				String[] splitServer = url.split(":");
 				String hostname = splitServer[0];
 				String port = splitServer[1];
 				hostSocket = new Socket(hostname, Integer.parseInt(port));
 			}
+			// Start up our client code and handshake with the host
 			client = new EggClient(hostSocket, this);
 			client.start();
 			client.handshake();
 			System.out.println("Connect succeeded.");
 		} catch (UnknownHostException e) {
-			System.err.println("** Could not find server " + server);
-			return false;
+			System.err.println("** Could not find server " + url);
+			success = false;
 		} catch (IOException e) {
-			System.err.println("** Could not connect to server " + server);
-			return false;
+			System.err.println("** Could not connect to server " + url);
+			success = false;
 		}
-		return true;
+		return success;
 	}
 	
 	public void opponentConnect(int clientID, String name)
@@ -101,7 +120,7 @@ public class NetworkCore extends Thread
 	
 	public void submitDeck(List<StoredCard> deck) throws JSONException
 	{
-		if(hosting) {
+		if(server.isClientConnected()) {
 			// TODO: server deck send
 		} else if(client.isConnected()) {
 			client.submitDeck(deck);
