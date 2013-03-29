@@ -118,6 +118,11 @@ public class NetworkCore extends Thread
 		Main.state.loadOpponentDecks(clientID, cardList);
 	}
 	
+	public void markDeckSubmitted(int clientID)
+	{
+		// TODO: Mark somewhere that the user has a deck loaded
+	}
+	
 	public void submitDeck(List<StoredCard> deck) throws JSONException
 	{
 		if(server.isClientConnected()) {
