@@ -133,6 +133,7 @@ public class EggServer
 			// Broadcast to all clients that the user has submitted a deck
 			String message = handler.encode("deck-submitted", "clid", clientID);
 			broadcast(message);
+			network.markDeckSubmitted(clientID);
 		}
 
 		private void handleName(JSONObject jobj) throws JSONException
