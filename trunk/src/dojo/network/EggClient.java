@@ -24,6 +24,7 @@ import dojo.TextActionListener;
  * Sent: ["client-names",{"names":[[0,"New Player"]]}]
  * Sent: ["client-join",{"clid":1}]
  * Got:  ["name", {"value": "Toku-san"}]
+ * -- Join Game -> Submit Deck
  * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
  * Connecting:
@@ -32,6 +33,11 @@ import dojo.TextActionListener;
  * Got:  ["welcome", {"clid": 1}]
  * Got:  ["client-names", {"names": [[0, "Toku-san"]]}]
  * Got:  ["client-join", {"clid": 1}]
+ * Sent: ["name",{"value":"New Player"}]
+ * Got:  ["name", {"clid": 1, "value": "New Player"}]
+ * Submit Deck
+ * Sent: ["submit-deck",{"cards":[[3,"Celestial311"],[3,"Celestial263"],[3,"GotE092"],[3,"Celestial246"],[2,"WoH032"],[3,"Emperor042"],[1,"IG2018"],[1,"IG2017"],[3,"Celestial074"],[1,"Celestial075"],[1,"Celestial070"],[1,"IG2044"],[3,"Emperor351"],[1,"Celestial071"],[3,"GotE017"],[3,"Celestial204"],[3,"GotE019"],[2,"GotE018"],[3,"Celestial216"],[3,"GotE086"],[3,"WoH008"],[3,"Celestial237"],[3,"DaK012"],[1,"Celestial009"],[3,"Emperor229"],[3,"IG2010"],[2,"P282"],[3,"Celestial299"],[1,"Emperor054"],[1,"Emperor016"],[1,"IG2070"],[3,"IG1004"],[1,"GotE021"],[1,"IG2008"],[1,"Celestial345"],[1,"Celestial381"],[1,"GotE004"],[3,"Emperor231"]]}]
+ * Got:  ["deck-submitted", {"clid": 1}]
  * 
  */
 public class EggClient extends Thread
@@ -66,6 +72,8 @@ public class EggClient extends Thread
 							handleClientNames(jarray.getJSONObject(1));
 						} else if (command.equals("client-join")) {
 							handleClientJoin(jarray.getJSONObject(1));
+						} else if (command.equals("deck-submitted")) {
+							handleDeckSubmitted(jarray.getJSONObject(1));
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -106,8 +114,7 @@ public class EggClient extends Thread
 		final String message = jobj.getString("msg");
 		// Report the error but do so on the event dispatch queue where it is safe to interact with Swing components
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run()
-			{
+			public void run() {
 				TextActionListener.send(message, "Error");
 			}
 		});
@@ -133,13 +140,18 @@ public class EggClient extends Thread
 	private void handleClientNames(JSONObject jobj) throws JSONException
 	{
 		JSONArray names = jobj.getJSONArray("names");
-		for (int i = 0; i < names.length(); i++)
-		{
+		for (int i = 0; i < names.length(); i++) {
 			JSONArray nameID = names.getJSONArray(i);
 			int id = nameID.getInt(0);
 			String name = nameID.getString(1);
 			network.opponentConnect(id, name);
 		}
+	}
+
+	private void handleDeckSubmitted(JSONObject jobj) throws JSONException
+	{
+		int clientID = jobj.getInt("clid");
+		network.markDeckSubmitted(clientID);
 	}
 	
 	public void submitDeck(List<StoredCard> deck) throws JSONException
@@ -147,7 +159,7 @@ public class EggClient extends Thread
 		// Coalesce the deck into a list of card IDs with their associated counts
 		Map<String, Integer> cardList = new HashMap<String, Integer>();
 		Collections.sort(deck);
-		for(int i = 0; i < deck.size(); i++) {
+		for (int i = 0; i < deck.size(); i++) {
 			String cardID = deck.get(i).getID();
 			if(cardList.containsKey(cardID)) {
 				cardList.put(cardID, cardList.get(cardID) + 1);
@@ -158,8 +170,7 @@ public class EggClient extends Thread
 		String[] cardIDs = new String[cardList.size()];
 		int[] cardCounts = new int[cardList.size()];
 		int i = 0;
-		for (Map.Entry<String, Integer> entry : cardList.entrySet())
-		{
+		for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
 			cardIDs[i] = entry.getKey();
 			cardCounts[i] = entry.getValue();
 			i++;

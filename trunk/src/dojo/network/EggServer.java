@@ -31,8 +31,7 @@ import org.json.JSONObject;
  * Got:  ["name", {"clid": 1, "value": "New Player"}]
  * Submit Deck
  * Sent: ["submit-deck",{"cards":[[3,"Celestial311"],[3,"Celestial263"],[3,"GotE092"],[3,"Celestial246"],[2,"WoH032"],[3,"Emperor042"],[1,"IG2018"],[1,"IG2017"],[3,"Celestial074"],[1,"Celestial075"],[1,"Celestial070"],[1,"IG2044"],[3,"Emperor351"],[1,"Celestial071"],[3,"GotE017"],[3,"Celestial204"],[3,"GotE019"],[2,"GotE018"],[3,"Celestial216"],[3,"GotE086"],[3,"WoH008"],[3,"Celestial237"],[3,"DaK012"],[1,"Celestial009"],[3,"Emperor229"],[3,"IG2010"],[2,"P282"],[3,"Celestial299"],[1,"Emperor054"],[1,"Emperor016"],[1,"IG2070"],[3,"IG1004"],[1,"GotE021"],[1,"IG2008"],[1,"Celestial345"],[1,"Celestial381"],[1,"GotE004"],[3,"Emperor231"]]}]
- * Got:  ["deck-submitted", {"clid": 1}]
- * 
+ * Got:  ["deck-submitted", {"clid": 1}] 
  */
 public class EggServer
 {
@@ -121,16 +120,19 @@ public class EggServer
 
 		private void handleSubmitDeck(JSONObject jobj) throws JSONException
 		{
+			// Read the deck JSON into a list of cards to forward on to the game core
 			Map<String, Integer> cardList = new HashMap<String, Integer>();
 			JSONArray cards = jobj.getJSONArray("cards");
-			for (int i = 0; i < cards.length(); i++)
-			{
+			for (int i = 0; i < cards.length(); i++) {
 				JSONArray card = cards.getJSONArray(i);
 				int num = card.getInt(0);
 				String name = card.getString(1);
 				cardList.put(name, num);
 			}
 			network.opponentSubmitDeck(clientID, cardList);
+			// Broadcast to all clients that the user has submitted a deck
+			String message = handler.encode("deck-submitted", "clid", clientID);
+			broadcast(message);
 		}
 
 		private void handleName(JSONObject jobj) throws JSONException
