@@ -39,7 +39,7 @@ public class NetworkHandler extends Thread
 	}
 
 	// Encode values into a JSON compatible string to send over the network
-	public String encode(String type, String key, int value) throws JSONException
+	public static String encode(String type, String key, int value) throws JSONException
 	{
 		// Create an array where:
 		// 1st: String of message type
@@ -56,7 +56,7 @@ public class NetworkHandler extends Thread
 	}
 
 	// Encode values into a JSON compatible string to send over the network
-	public String encode(String type, String key, String value) throws JSONException
+	public static String encode(String type, String key, String value) throws JSONException
 	{
 		// Create an array where:
 		// 1st: String of message type
@@ -73,7 +73,7 @@ public class NetworkHandler extends Thread
 	}
 
 	// Encode values into a JSON compatible string to send over the network, int and string values will be paired together
-	public String encode(String type, String key, int[] intValues, String[] stringValues) throws JSONException
+	public static String encode(String type, String key, int[] intValues, String[] stringValues) throws JSONException
 	{
 		if (intValues.length != stringValues.length) {
 			throw new IllegalArgumentException("Must have same number of integer and string values");

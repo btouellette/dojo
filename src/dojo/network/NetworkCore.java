@@ -126,7 +126,7 @@ public class NetworkCore extends Thread
 	public void submitDeck(List<StoredCard> deck) throws JSONException
 	{
 		if(server.isClientConnected()) {
-			// TODO: server deck send
+			server.submitDeck();
 		} else if(client.isConnected()) {
 			client.submitDeck(deck);
 		}
