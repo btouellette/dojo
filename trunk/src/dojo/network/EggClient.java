@@ -23,6 +23,133 @@ import dojo.TextActionListener;
  * Got:  ["name", {"value": "Toku-san"}]
  * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
+ * game-setup  		 -- don't do anything
+ * player-join 		 -- mark player as active and not spectating, associates clid and pid
+ * set-zone    		 -- card creation? cgids == card ids, pid == playerid (associated in player-join event), zid (0: table, 1/2: dyn/fate deck)
+ *     stronghold, border keep + bamboo harvesters, 4 provs, 6 cards in hand, 2 decks
+ * game-start  	 	 -- don't do anything
+ * move-card   		 -- cgid, faceup: false/true, random: false/true (if discarded card from hand is random), pid, zid, x/y/, mover: pid, top: true (to or from top of deck), false (to deck bottom, to hand???), null (table to table move)
+ * reveal-card 		 -- cgid, cdid (cardID)
+ * set-family-honor  -- pid, honor
+ * set-card-property -- cgid, property (tapped, faceUp, dishonored), pid, value
+ * peek-card		 -- cgid pid, report to chat only
+ * peek-opponent	 -- cgid pid, when showing card send associated reveal-card
+ * view-zone		 -- viewer (???), zid, pid, number (of cards)
+ * show-zone		 -- zid, pid (entire zone is revealed)
+ * show-zone-random	 -- cgids, zid, pid
+ * zone-shuffled 	 -- zid, pid
+ * set-markers		 -- cgid, token (+1F or w/e), pid, number (amount of tokens), image (URL: images/markers/marker_p1f.png)
+ * set-favor		 -- zid (-1 for discard)
+ * flip-coin		 -- pid, result (true/false)
+ * roll-die		 	 -- pid, result, size
+ * deck-unsubmitted  -- pid (leaving game)
+ * new-card			 -- personal_honor, force, name, chi, cost, text, honor_req, type, id (first personality was _1 for this value???)
+ * create-card		 -- cgid, cdid (_1???), pid, zid
+ * 
+ * ZoneIDs:
+ * 0 - dummy
+ * 1 - dynasty deck
+ * 2 - fate deck
+ * 3 - dynasty discard
+ * 4 - fate discard
+ * 5 - hand
+ * 6 - removed from game
+ * 7 - table
+ * 8 - focus pool (obsolete)
+ * 
+ * flip face down
+ * Got:  ["set-card-property", {"cgid": 40, "property": "faceUp", "pid": 1, "value": false}]
+ * 
+ * peek at card
+ * Got:  ["peek-card", {"cgid": 1, "pid": 1}]
+ * 
+ * show card to opponent
+ * Got:  ["reveal-card", {"cgid": 1, "cdid": "Emperor028"}]
+ * Got:  ["peek-opponent", {"cgid": 1, "pid": 1}]
+ * 
+ * look at top two cards of dynasty deck
+ * Got:  ["view-zone", {"viewer": 1, "zid": 1, "pid": 1, "number": 2}]
+ * 
+ * draw three fate cards
+ * Got:  ["move-card", {"cgid": 76, "faceup": null, "random": false, "pid": 1, "zid": 5, "mover": 1, "top": true}]
+ * Got:  ["move-card", {"cgid": 75, "faceup": null, "random": false, "pid": 1, "zid": 5, "mover": 1, "top": true}]
+ * Got:  ["move-card", {"cgid": 73, "faceup": null, "random": false, "pid": 1, "zid": 5, "mover": 1, "top": true}]
+ * 
+ * reveal hand
+ * Got:  ["reveal-card", {"cgid": 81, "cdid": "Celestial237"}]
+ * Got:  ["reveal-card", {"cgid": 82, "cdid": "Celestial216"}]
+ * Got:  ["reveal-card", {"cgid": 76, "cdid": "Celestial345"}]
+ * Got:  ["reveal-card", {"cgid": 75, "cdid": "Celestial237"}]
+ * Got:  ["reveal-card", {"cgid": 73, "cdid": "Celestial311"}]
+ * Got:  ["show-zone", {"zid": 5, "pid": 1}]
+ * 
+ * reveal random card from hand
+ * Got:  ["reveal-card", {"cgid": 81, "cdid": "Celestial237"}]
+ * Got:  ["show-zone-random", {"cgids": [81], "zid": 5, "pid": 1}]
+ * 
+ * discard random card from hand
+ * Got:  ["reveal-card", {"cgid": 81, "cdid": "Celestial237"}]
+ * Got:  ["move-card", {"cgid": 81, "faceup": true, "random": true, "pid": 1, "zid": 4, "mover": 1, "top": null}]
+ * 
+ * dishonor
+ * Got:  ["set-card-property", {"cgid": 2, "property": "dishonored", "pid": 1, "value": true}]
+ * 
+ * discard dynasty
+ * Got:  ["reveal-card", {"cgid": 41, "cdid": "GotE018"}]
+ * Got:  ["move-card", {"cgid": 41, "faceup": null, "random": false, "pid": 1, "zid": 3, "mover": 1, "top": true}]
+ * 
+ * discard fate
+ * Got:  ["reveal-card", {"cgid": 78, "cdid": "Celestial299"}]
+ * Got:  ["move-card", {"cgid": 78, "faceup": null, "random": false, "pid": 1, "zid": 4, "mover": 1, "top": true}]
+ * 
+ * give control
+ * Got:  ["reveal-card", {"cgid": 42, "cdid": "GotE018"}]
+ * Got:  ["move-card", {"cgid": 42, "faceup": null, "random": false, "pid": 2, "zid": 7, "y": 0, "x": 0.0, "mover": 1, "top": null}]
+ * 
+ * no communication of attached state, just sends both card movements at once
+ * 
+ * remove from game 
+ * Got:  ["reveal-card", {"cgid": 83, "cdid": "GotE086"}]
+ * Got:  ["move-card", {"cgid": 83, "faceup": null, "random": false, "pid": 1, "zid": 6, "mover": 1, "top": true}]
+ * 
+ * move to dyn deck top
+ * Got:  ["move-card", {"cgid": 37, "faceup": false, "random": false, "pid": 1, "zid": 1, "mover": 1, "top": true}]
+ * 
+ * move to fate deck top
+ * Got:  ["move-card", {"cgid": 80, "faceup": false, "random": false, "pid": 1, "zid": 2, "mover": 1, "top": true}]
+ * 
+ * move to dyn deck bottom
+ * Got:  ["move-card", {"cgid": 39, "faceup": false, "random": false, "pid": 1, "zid": 1, "mover": 1, "top": false}]
+ * 
+ * add 1F marker
+ * Got:  ["set-markers", {"cgid": 80, "token": "+1F", "pid": 1, "number": 1, "image": "images/markers/marker_p1f.png"}]
+ * 
+ * remove 1F marker
+ * Got:  ["set-markers", {"cgid": 80, "token": "+1F", "pid": 1, "number": 0, "image": "images/markers/marker_p1f.png"}]
+ * 
+ * add 2 -2C markers
+ * Got:  ["set-markers", {"cgid": 80, "token": "-2C", "pid": 1, "number": 2, "image": "images/markers/marker_m2c.png"}]
+ * 
+ * shuffle fate
+ * Got:  ["zone-shuffled", {"zid": 2, "pid": 1}]
+ * 
+ * take the favor then discard it
+ * Got:  ["set-favor", {"pid": 1}]
+ * Got:  ["set-favor", {"pid": -1}]
+ * 
+ * flip a coin and get tails
+ * Got:  ["flip-coin", {"pid": 1, "result": false}]
+ * 
+ * roll a d20 and get 1
+ * Got:  ["roll-die", {"pid": 1, "result": 1, "size": 20}]
+ * 
+ * create personality (which goes into my hand)
+ * Got:  ["new-card", {"personal_honor": "5", "force": "1", "name": "TestDude", "chi": "2", "cost": "4", "text": "Test text", "honor_req": "3", "type": "personality", "id": "_1"}]
+ * Got:  ["create-card", {"cgid": 167, "cdid": "_1", "pid": 1, "zid": 5}]
+ * 
+ * leave game
+ * Got:  ["deck-unsubmitted", {"clid": 0}]
+ * 
  * Connecting:
  * Sent: ["protocol",{"version":8}]
  * Got:  ["welcome", {"clid": 1}]
