@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.json.JSONException;
 
+import dojo.Card.Location;
 import dojo.StoredCard;
 import dojo.Main;
 
@@ -130,5 +131,55 @@ public class NetworkCore extends Thread
 		} else if(client.isConnected()) {
 			client.submitDeck(deck);
 		}
+	}
+
+	public void playerJoined(int clientID, int playerID) {
+		Main.state.associateClientIDToPlayerID(clientID, playerID);
+	}
+
+	// Translate between Egg zone IDs and Location enum
+	public Location zidToLocation(int zid) {
+		if(zid == 0) {
+			return Location.Table;
+		} else if(zid == 1) {
+			return Location.DynastyDeck;
+		} else if(zid == 2) {
+			return Location.FateDeck;
+		} else if(zid == 3) {
+			return Location.DynastyDiscard;
+		} else if(zid == 4) {
+			return Location.FateDiscard;
+		} else if(zid == 5) {
+			return Location.Hand;
+		} else if(zid == 6) {
+			return Location.RemovedFromGame;
+		} else if(zid == 7) {
+			return Location.Table;
+		} else if(zid == 8) {
+			return Location.FocusPool;
+		}
+		throw new IllegalArgumentException();
+	}
+
+	// Translate between Location enum and Egg zone IDs
+	public int locationToZid(Location location) {
+		if(location == Location.DynastyDeck) {
+			return 1;
+		} else if(location == Location.FateDeck) {
+			return 2;
+		} else if(location == Location.DynastyDiscard) {
+			return 3;
+		} else if(location == Location.FateDiscard) {
+			return 4;
+		} else if(location == Location.Hand) {
+			return 5;
+		} else if(location == Location.RemovedFromGame) {
+			return 6;
+		} else if(location == Location.Table) {
+			return 7;
+		} else if(location == Location.FocusPool) {
+			return 8;
+		}
+		throw new IllegalArgumentException();
 	}
 }

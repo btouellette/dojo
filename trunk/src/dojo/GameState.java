@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dojo.Card.Location;
+
 public class GameState
 {
 	// Your decks and discard piles
@@ -23,10 +25,20 @@ public class GameState
 	private List<PlayableCard> hand;
 	// All cards visible to player, to keep necessary logic during repaint down
 	private List<PlayableCard> allCards;
-	// Object representing opponents game state, mapped by user ID
+	
+	// Opponents game state, mapped by client ID
 	private Map<Integer, GameState> opponentStates;
+	// Map between client and player IDs and back
+	// This is used since Egg differentiates these IDs depending on where in the game we are
+	// Client IDs who do not have associated player IDs are spectating a game and will not be in these maps
+	private Map<Integer, Integer> clientIDToPlayerID;
+	private Map<Integer, Integer> playerIDToClientID;
+	// Map between card IDs and the cards themselves, this includes all cards we know about
+	private Map<Integer, Card> cards;
 	// Name of the owner of this state
 	public String name;
+	// Honor for the owner of this state
+	public int honor;
 
 	public GameState()
 	{
@@ -50,6 +62,8 @@ public class GameState
 		allCards = new ArrayList<PlayableCard>(20);
 		
 		opponentStates = new HashMap<Integer, GameState>();
+		clientIDToPlayerID = new HashMap<Integer, Integer>();
+		cards = new HashMap<Integer, Card>();
 	}
 	
 	public GameState(String name)
@@ -263,5 +277,41 @@ public class GameState
 	public void setName(String name) {
 		// TODO: Send out update to network
 		this.name = name;
+	}
+
+	public void associateClientIDToPlayerID(int clientID, int playerID) {
+		clientIDToPlayerID.put(clientID, playerID);
+		playerIDToClientID.put(playerID, clientID);
+	}
+
+	public void setOpponentZone(Location zone, int[] cardIDs, int playerID) {
+		opponentStates.get(playerIDToClientID.get(playerID)).setZone(zone, cardIDs);
+	}
+
+	public void setZone(Location zone, int[] cardIDs) {
+		// Clear out any existing cards in this zone
+		for(Card card : cards.values()) {
+			// If there is a card already in the zone being set remove it
+			if(card.location == zone) {
+				card.location = Location.RemovedFromGame;
+			}
+		}
+		// Add all cards into zone, creating them if they don't yet exist
+		for(int cardID : cardIDs) {
+			Card card = cards.get(cardID);
+			if(card == null) {
+				card = new Card(cardID);
+				cards.put(cardID, card);
+			}
+			card.location = zone;
+		}
+	}
+
+	public void setHonor(int honor) {
+		this.honor = honor;
+	}
+
+	public void setOpponentHonor(int playerID, int honor) {
+		opponentStates.get(playerIDToClientID.get(playerID)).setHonor(honor);
 	}
 }
