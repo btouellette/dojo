@@ -9,8 +9,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-public class StoredCard extends Card implements Comparable<StoredCard>
+public class StoredCard implements Comparable<StoredCard>
 {
+	// The ID of the card in the XML database
+	private final String id;
+	// Whether the card is dynasty or fate
+	private boolean isDynasty;
 	private String type;
 	private String name;
 	// TODO: Update to only be MRP in new XML type
@@ -23,7 +27,7 @@ public class StoredCard extends Card implements Comparable<StoredCard>
 
 	public StoredCard(String id)
 	{
-		super(id);
+		this.id = id;
 		imageLocation = new ArrayList<String>();
 		imageEdition = new ArrayList<String>();
 		legal = new ArrayList<String>();
@@ -279,5 +283,20 @@ public class StoredCard extends Card implements Comparable<StoredCard>
 	public String toString()
 	{
 		return name;
+	}
+
+	public String getID()
+	{
+		return id;
+	}
+
+	public boolean isDynasty()
+	{
+		return isDynasty;
+	}
+
+	public boolean isFate()
+	{
+		return !isDynasty;
 	}
 }

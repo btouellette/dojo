@@ -1,33 +1,19 @@
 package dojo;
 
-// Card.java
-// Written by Brian Ouellette
-// Base class for PlayableCard and StoredCard's commonalities
-
-public abstract class Card
-{
-	// The ID of the card in the XML database
-	protected final String id;
-	// Whether the card is dynasty or fate
-	protected boolean isDynasty;
-
-	public Card(String id)
-	{
+public class Card {
+	// Unique identifier for this card (cgid in Egg terminology)
+	int id;
+	boolean bowed, faceUp, dishonored;
+	public enum Location { Table, DynastyDeck, FateDeck, DynastyDiscard, FateDiscard, Hand, RemovedFromGame, FocusPool }	
+	// Where the card is
+	Location location;
+	// PlayerID of the owner of this card
+	int ownerPlayerID;
+	
+	public Card(int id) {
 		this.id = id;
-	}
-
-	public String getID()
-	{
-		return id;
-	}
-
-	public boolean isDynasty()
-	{
-		return isDynasty;
-	}
-
-	public boolean isFate()
-	{
-		return !isDynasty;
+		bowed = false;
+		faceUp = false;
+		dishonored = false;
 	}
 }

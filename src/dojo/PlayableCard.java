@@ -27,8 +27,13 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitorInputStream;
 
-class PlayableCard extends Card
+class PlayableCard
 {
+	// The ID of the card in the XML database
+	private final String id;
+	// Whether the card is dynasty or fate
+	private boolean isDynasty;
+	// Card type
 	private String type;
 	// Any cards directly attached
 	private List<PlayableCard> attachments;
@@ -47,7 +52,7 @@ class PlayableCard extends Card
 
 	public PlayableCard(String id)
 	{
-		super(id);
+		this.id = id;
 		location = new int[2];
 		location[0] = 0;
 		location[1] = 0;
@@ -71,7 +76,7 @@ class PlayableCard extends Card
 	public PlayableCard(String name, boolean isToken)
 	{
 		// Store the token name in the id field
-		super(name);
+		id = name;
 		this.isToken = isToken;
 		location = new int[2];
 		location[0] = 0;
@@ -134,6 +139,21 @@ class PlayableCard extends Card
 	public String getType()
 	{
 		return type;
+	}
+
+	public String getID()
+	{
+		return id;
+	}
+
+	public boolean isDynasty()
+	{
+		return isDynasty;
+	}
+
+	public boolean isFate()
+	{
+		return !isDynasty;
 	}
 
 	public void setLocation(int x, int y)

@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dojo.Card.Location;
+import dojo.Main;
 import dojo.StoredCard;
 import dojo.TextActionListener;
 
@@ -23,15 +25,15 @@ import dojo.TextActionListener;
  * Got:  ["name", {"value": "Toku-san"}]
  * Got:  ["submit-deck", {"cards": [[1, "Emperor393"], [1, "TSE005"], [1, "SC003"], [1, "P460"], [1, "Emperor005"], [1, "P440"], [1, "SC078"], [3, "Emperor038"], [2, "SoD009"], [3, "FL008"], [1, "Emperor054"], [1, "EEGempukku009"], [3, "EoW008"], [1, "FL007"], [1, "FL006"], [1, "EoW014"], [3, "TSE016"], [3, "FL010"], [1, "TSE018"], [3, "HaT012"], [2, "TSE015"], [1, "Emperor059"], [1, "Emperor060"], [3, "EoW013"], [3, "SoD014"], [3, "Emperor295"], [3, "TSE113"], [3, "TA110"], [1, "FL066"], [1, "FL059"], [1, "P475"], [3, "BtD122"], [3, "TSE125"], [3, "Emperor362"], [1, "Emperor364"], [1, "EoW147"], [3, "SC153"], [3, "SoD156"], [3, "FL063"], [1, "TSE138"], [3, "TA123"], [2, "P450"], [1, "P491"], [1, "Emperor245"]]}]
  * 
- * game-setup  		 -- don't do anything
- * player-join 		 -- mark player as active and not spectating, associates clid and pid
- * set-zone    		 -- card creation? cgids == card ids, pid == playerid (associated in player-join event), zid (0: table, 1/2: dyn/fate deck)
- *     stronghold, border keep + bamboo harvesters, 4 provs, 6 cards in hand, 2 decks
- * game-start  	 	 -- don't do anything
+ -* game-setup  		 -- don't do anything
+ -* player-join 		 -- mark player as active and not spectating, associates clid and pid
+ -* set-zone    		 -- card creation? cgids == card ids, pid == playerid (associated in player-join event), zid (0: table, 1/2: dyn/fate deck)
+ -*     stronghold, border keep + bamboo harvesters, 4 provs, 6 cards in hand, 2 decks
+ -* game-start  	 	 -- don't do anything
  * move-card   		 -- cgid, faceup: false/true, random: false/true (if discarded card from hand is random), pid, zid, x/y/, mover: pid, top: true (to or from top of deck), false (to deck bottom, to hand???), null (table to table move)
  * reveal-card 		 -- cgid, cdid (cardID)
- * set-family-honor  -- pid, honor
- * set-card-property -- cgid, property (tapped, faceUp, dishonored), pid, value
+ -* set-family-honor  -- pid, honor
+ -* set-card-property -- cgid, property (tapped, faceUp, dishonored), pid, value
  * peek-card		 -- cgid pid, report to chat only
  * peek-opponent	 -- cgid pid, when showing card send associated reveal-card
  * view-zone		 -- viewer (???), zid, pid, number (of cards)
@@ -47,7 +49,7 @@ import dojo.TextActionListener;
  * create-card		 -- cgid, cdid (_1???), pid, zid
  * 
  * ZoneIDs:
- * 0 - dummy
+ * 0 - dummy (Border Keep and Bamboo Harvesters are in this zone)
  * 1 - dynasty deck
  * 2 - fate deck
  * 3 - dynasty discard
@@ -231,7 +233,7 @@ public class EggClient extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;
-	private int clientID;
+	private int clientID, playerID;
 	private NetworkHandler handler;
 	private NetworkCore network;
 
@@ -261,6 +263,18 @@ public class EggClient extends Thread
 							handleClientJoin(jarray.getJSONObject(1));
 						} else if (command.equals("deck-submitted")) {
 							handleDeckSubmitted(jarray.getJSONObject(1));
+						} else if (command.equals("game-setup")) {
+							// Do nothing
+						} else if (command.equals("player-join")) {
+							handlePlayerJoin(jarray.getJSONObject(1));
+						} else if (command.equals("set-zone")) {
+							handleSetZone(jarray.getJSONObject(1));
+						} else if (command.equals("game-start")) {
+							// Do nothing
+						} else if (command.equals("set-family-honor")) {
+							handleSetHonor(jarray.getJSONObject(1));
+						} else if (command.equals("set-card-property")) {
+							handleSetCardProperty(jarray.getJSONObject(1));
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -270,6 +284,27 @@ public class EggClient extends Thread
 			} catch (IOException e) {
 				System.err.println("** Couldn't get new line from server");
 			}
+		}
+	}
+
+	private void handleSetCardProperty(JSONObject jsonObject) throws JSONException {
+		//cgid, property (tapped, faceUp, dishonored), pid, value
+		// ["set-card-property", {"cgid": 85, "property": "tapped", "pid": 2, "value": true}]
+		int cardID = jsonObject.getInt("cgid");
+		String property = jsonObject.getString("property");
+		int playerID = jsonObject.getInt("pid");
+		boolean value = jsonObject.getBoolean("value");
+		// TODO: implement
+		//Main.state.setCardProperty(cardID, property, value);
+	}
+
+	private void handleSetHonor(JSONObject jsonObject) throws JSONException {
+		int playerID = jsonObject.getInt("pid");
+		int honor = jsonObject.getInt("honor");
+		if(this.playerID == playerID) {
+			Main.state.setHonor(honor);
+		} else {
+			Main.state.setOpponentHonor(playerID, honor);
 		}
 	}
 
@@ -339,6 +374,34 @@ public class EggClient extends Thread
 	{
 		int clientID = jobj.getInt("clid");
 		network.markDeckSubmitted(clientID);
+	}
+
+	private void handlePlayerJoin(JSONObject jobj) throws JSONException
+	{
+		int clientID = jobj.getInt("clid");
+		int playerID = jobj.getInt("pid");
+		// If the player joining is us record our player ID, otherwise update the game state with the association
+		if(this.clientID == clientID) {
+			this.playerID = playerID;
+		} else {
+			network.playerJoined(clientID, playerID);
+		}
+	}
+
+	private void handleSetZone(JSONObject jsonObject) throws JSONException {
+		JSONArray cgids = jsonObject.getJSONArray("cgids");
+		int zid = jsonObject.getInt("zid");
+		Location zone = network.zidToLocation(zid);
+		int playerID = jsonObject.getInt("pid");
+		int[] cardIDs = new int[cgids.length()];
+		for(int i = 0; i < cgids.length(); i++) {
+			cardIDs[i] = cgids.getInt(i);
+		}
+		if(this.playerID == playerID) {
+			Main.state.setZone(zone, cardIDs);
+		} else {
+			Main.state.setOpponentZone(zone, cardIDs, playerID);
+		}
 	}
 	
 	public void submitDeck(List<StoredCard> deck) throws JSONException
