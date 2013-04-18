@@ -104,19 +104,18 @@ public class NetworkCore extends Thread
 		return success;
 	}
 	
+	public void setZone(Location zone, int[] cardIDs, int playerID) {
+		Main.state.setZone(zone, cardIDs, playerID);		
+	}
+	
 	public void opponentConnect(int clientID, String name)
 	{
 		Main.state.opponentConnect(clientID, name);
 	}
-	
-	public void opponentNameChange(int clientID, String name)
-	{
-		Main.state.setOpponentName(clientID, name);
-	}
 
 	public void opponentSubmitDeck(int clientID, Map<String, Integer> cardList)
 	{
-		Main.state.loadOpponentDecks(clientID, cardList);
+		Main.state.loadOpponentDeck(cardList, clientID);
 	}
 	
 	public void markDeckSubmitted(int clientID)
@@ -134,7 +133,7 @@ public class NetworkCore extends Thread
 	}
 
 	public void playerJoined(int clientID, int playerID) {
-		Main.state.associateClientIDToPlayerID(clientID, playerID);
+		Main.state.playerJoined(clientID, playerID);
 	}
 
 	// Translate between Egg zone IDs and Location enum
@@ -181,5 +180,25 @@ public class NetworkCore extends Thread
 			return 8;
 		}
 		throw new IllegalArgumentException();
+	}
+
+	public void coinFlipped(boolean value, int playerID) {
+		Main.state.coinFlipped(value, playerID);
+	}
+
+	public void setHonor(int honor, int playerID) {
+		Main.state.setHonor(honor, playerID);
+	}
+
+	public void playerIDAssigned(int playerID) {
+		Main.state.playerID = playerID;
+	}
+
+	public void setCardProperty(int cardID, String property, boolean value,	int playerID) {
+		Main.state.setCardProperty(cardID, property, value, playerID);
+	}
+
+	public void dieRolled(int result, int size, int playerID) {
+		Main.state.dieRolled(result, size, playerID);
 	}
 }
