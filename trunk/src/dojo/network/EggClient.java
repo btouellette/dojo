@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dojo.Card.Location;
-import dojo.Main;
 import dojo.StoredCard;
 import dojo.TextActionListener;
 
@@ -42,8 +41,8 @@ import dojo.TextActionListener;
  * zone-shuffled 	 -- zid, pid
  * set-markers		 -- cgid, token (+1F or w/e), pid, number (amount of tokens), image (URL: images/markers/marker_p1f.png)
  * set-favor		 -- zid (-1 for discard)
- * flip-coin		 -- pid, result (true/false)
- * roll-die		 	 -- pid, result, size
+ -* flip-coin		 -- pid, result (true/false)
+ -* roll-die		 	 -- pid, result, size
  * deck-unsubmitted  -- pid (leaving game)
  * new-card			 -- personal_honor, force, name, chi, cost, text, honor_req, type, id (first personality was _1 for this value???)
  * create-card		 -- cgid, cdid (_1???), pid, zid
@@ -233,7 +232,7 @@ public class EggClient extends Thread
 {
 	// Protocol version. Keep incompatible versions from trying to play together
 	private int protocolVersion = 8;
-	private int clientID, playerID;
+	private int clientID;
 	private NetworkHandler handler;
 	private NetworkCore network;
 
@@ -275,7 +274,12 @@ public class EggClient extends Thread
 							handleSetHonor(jarray.getJSONObject(1));
 						} else if (command.equals("set-card-property")) {
 							handleSetCardProperty(jarray.getJSONObject(1));
+						} else if (command.equals("flip-coin")) {
+							handleFlipCoin(jarray.getJSONObject(1));
+						} else if (command.equals("roll-die")) {
+							handleDieRoll(jarray.getJSONObject(1));
 						}
+						
 					} catch (JSONException e) {
 						e.printStackTrace();
 						System.err.println("** Failed to parse JSON command from server");
@@ -287,25 +291,31 @@ public class EggClient extends Thread
 		}
 	}
 
+	private void handleDieRoll(JSONObject jsonObject) throws JSONException {
+		int playerID = jsonObject.getInt("pid");
+		int result = jsonObject.getInt("result");
+		int size = jsonObject.getInt("size");
+		network.dieRolled(result, size, playerID);
+	}
+
+	private void handleFlipCoin(JSONObject jsonObject) throws JSONException {
+		int playerID = jsonObject.getInt("pid");
+		boolean value = jsonObject.getBoolean("result");
+		network.coinFlipped(value, playerID);
+	}
+
 	private void handleSetCardProperty(JSONObject jsonObject) throws JSONException {
-		//cgid, property (tapped, faceUp, dishonored), pid, value
-		// ["set-card-property", {"cgid": 85, "property": "tapped", "pid": 2, "value": true}]
 		int cardID = jsonObject.getInt("cgid");
 		String property = jsonObject.getString("property");
 		int playerID = jsonObject.getInt("pid");
 		boolean value = jsonObject.getBoolean("value");
-		// TODO: implement
-		//Main.state.setCardProperty(cardID, property, value);
+		network.setCardProperty(cardID, property, value, playerID);
 	}
 
 	private void handleSetHonor(JSONObject jsonObject) throws JSONException {
 		int playerID = jsonObject.getInt("pid");
 		int honor = jsonObject.getInt("honor");
-		if(this.playerID == playerID) {
-			Main.state.setHonor(honor);
-		} else {
-			Main.state.setOpponentHonor(playerID, honor);
-		}
+		network.setHonor(honor, playerID);
 	}
 
 	public boolean isConnected()
@@ -380,9 +390,9 @@ public class EggClient extends Thread
 	{
 		int clientID = jobj.getInt("clid");
 		int playerID = jobj.getInt("pid");
-		// If the player joining is us record our player ID, otherwise update the game state with the association
+		// Record the player ID
 		if(this.clientID == clientID) {
-			this.playerID = playerID;
+			network.playerIDAssigned(playerID);
 		} else {
 			network.playerJoined(clientID, playerID);
 		}
@@ -397,11 +407,7 @@ public class EggClient extends Thread
 		for(int i = 0; i < cgids.length(); i++) {
 			cardIDs[i] = cgids.getInt(i);
 		}
-		if(this.playerID == playerID) {
-			Main.state.setZone(zone, cardIDs);
-		} else {
-			Main.state.setOpponentZone(zone, cardIDs, playerID);
-		}
+		network.setZone(zone, cardIDs, playerID);
 	}
 	
 	public void submitDeck(List<StoredCard> deck) throws JSONException

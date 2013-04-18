@@ -26,19 +26,22 @@ public class GameState
 	// All cards visible to player, to keep necessary logic during repaint down
 	private List<PlayableCard> allCards;
 	
-	// Opponents game state, mapped by client ID
+	// Opponents game state, mapped by player ID
 	private Map<Integer, GameState> opponentStates;
-	// Map between client and player IDs and back
-	// This is used since Egg differentiates these IDs depending on where in the game we are
-	// Client IDs who do not have associated player IDs are spectating a game and will not be in these maps
-	private Map<Integer, Integer> clientIDToPlayerID;
-	private Map<Integer, Integer> playerIDToClientID;
+	// Name and loaded decks for clients who have connected but not joined the game yet
+	// Mapped by client ID
+	private Map<Integer, String> clientNames;
+	private Map<Integer, List<String>> clientDecks;
 	// Map between card IDs and the cards themselves, this includes all cards we know about
 	private Map<Integer, Card> cards;
 	// Name of the owner of this state
 	public String name;
 	// Honor for the owner of this state
 	public int honor;
+	// Player ID for this GameState
+	public int playerID;
+	// Deck (holding card names ala Edition001 not card IDs)
+	private List<String> deck;
 
 	public GameState()
 	{
@@ -62,7 +65,8 @@ public class GameState
 		allCards = new ArrayList<PlayableCard>(20);
 		
 		opponentStates = new HashMap<Integer, GameState>();
-		clientIDToPlayerID = new HashMap<Integer, Integer>();
+		clientNames = new HashMap<Integer, String>();
+		clientDecks = new HashMap<Integer, List<String>>();
 		cards = new HashMap<Integer, Card>();
 	}
 	
@@ -244,32 +248,25 @@ public class GameState
 		return false;
 	}
 	
+	
+	
 	public void opponentConnect(int clientID, String name)
 	{
-		opponentStates.put(clientID, new GameState(name));
+		clientNames.put(clientID, name);
 	}
 
-	public void setOpponentName(int clientID, String name)
+	public void loadOpponentDeck(Map<String, Integer> cardList, int clientID)
 	{
-		opponentStates.get(clientID).name = name;
-	}
-
-	public void loadOpponentDecks(int clientID, Map<String, Integer> cardList)
-	{
-		// Grab the game state associated with this client
-		GameState state = opponentStates.get(clientID);
 		// Add each card in the card list the appropriate number of times to the correct deck
 		for (Map.Entry<String, Integer> entry : cardList.entrySet())
 		{
 			int numCards = entry.getValue();
 			for (int i = 0; i < numCards; i++)
 			{
-				PlayableCard card = new PlayableCard(entry.getKey());
-				if(card.isDynasty()) {
-					state.dynastyDeck.add(card);
-				} else {
-					state.fateDeck.add(card);
+				if(!clientDecks.containsKey(clientID)) {
+					clientDecks.put(clientID, new ArrayList<String>());
 				}
+				clientDecks.get(clientID).add(entry.getKey());
 			}
 		}
 	}
@@ -279,39 +276,62 @@ public class GameState
 		this.name = name;
 	}
 
-	public void associateClientIDToPlayerID(int clientID, int playerID) {
-		clientIDToPlayerID.put(clientID, playerID);
-		playerIDToClientID.put(playerID, clientID);
-	}
-
-	public void setOpponentZone(Location zone, int[] cardIDs, int playerID) {
-		opponentStates.get(playerIDToClientID.get(playerID)).setZone(zone, cardIDs);
-	}
-
-	public void setZone(Location zone, int[] cardIDs) {
-		// Clear out any existing cards in this zone
-		for(Card card : cards.values()) {
-			// If there is a card already in the zone being set remove it
-			if(card.location == zone) {
-				card.location = Location.RemovedFromGame;
+	public void setZone(Location zone, int[] cardIDs, int playerID) {
+		if(this.playerID == playerID) {
+			// Clear out any existing cards in this zone
+			for(Card card : cards.values()) {
+				// If there is a card already in the zone being set remove it
+				if(card.location == zone) {
+					card.location = Location.RemovedFromGame;
+				}
 			}
-		}
-		// Add all cards into zone, creating them if they don't yet exist
-		for(int cardID : cardIDs) {
-			Card card = cards.get(cardID);
-			if(card == null) {
-				card = new Card(cardID);
-				cards.put(cardID, card);
+			// Add all cards into zone, creating them if they don't yet exist
+			for(int cardID : cardIDs) {
+				Card card = cards.get(cardID);
+				if(card == null) {
+					card = new Card(cardID, playerID);
+					cards.put(cardID, card);
+				}
+				card.location = zone;
 			}
-			card.location = zone;
+		} else {
+			opponentStates.get(playerID).setZone(zone, cardIDs, playerID);
 		}
 	}
 
-	public void setHonor(int honor) {
-		this.honor = honor;
+	public void setHonor(int honor, int playerID) {
+		if(this.playerID == playerID) {
+			this.honor = honor;
+		} else {
+			opponentStates.get(playerID).setHonor(honor, playerID);
+		}
 	}
 
-	public void setOpponentHonor(int playerID, int honor) {
-		opponentStates.get(playerIDToClientID.get(playerID)).setHonor(honor);
+	public void playerJoined(int clientID, int playerID) {
+		// Move the client name and deck into a game state
+		GameState state = new GameState(clientNames.get(clientID));
+		state.deck = clientDecks.get(clientID);
+		opponentStates.put(playerID, state);
+	}
+
+	public void coinFlipped(boolean value, int playerID) {
+		// TODO: report to chat
+	}
+	
+
+	public void setCardProperty(int cardID, String property, boolean value, int playerID) {
+		Card card = cards.get(cardID);
+		card.ownerID = playerID;
+		if("tapped".equals(property)) {
+			card.bowed = value;
+		} else if("faceUp".equals(property)) {
+			card.faceUp = value;
+		} else if("dishonored".equals(property)) {
+			card.dishonored = value;
+		}
+	}
+
+	public void dieRolled(int result, int size, int playerID) {
+		// TODO: report to chat
 	}
 }
