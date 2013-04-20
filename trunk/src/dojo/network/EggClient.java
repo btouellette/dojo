@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import dojo.Card.Location;
+import dojo.Card.GameArea;
 import dojo.StoredCard;
 import dojo.TextActionListener;
 
@@ -252,34 +252,35 @@ public class EggClient extends Thread
 					try {
 						JSONArray jarray = new JSONArray(inputLine);
 						String command = jarray.getString(0);
-						if (command.equals("rejected")) {
+						if ("rejected".equals(command)) {
 							handleRejected(jarray.getJSONObject(1));
-						} else if (command.equals("welcome")) {
+						} else if ("welcome".equals(command)) {
 							handleWelcome(jarray.getJSONObject(1));
-						} else if (command.equals("client-names")) {
+						} else if ("client-names".equals(command)) {
 							handleClientNames(jarray.getJSONObject(1));
-						} else if (command.equals("client-join")) {
+						} else if ("client-join".equals(command)) {
 							handleClientJoin(jarray.getJSONObject(1));
-						} else if (command.equals("deck-submitted")) {
+						} else if ("deck-submitted".equals(command)) {
 							handleDeckSubmitted(jarray.getJSONObject(1));
-						} else if (command.equals("game-setup")) {
+						} else if ("game-setup".equals(command)) {
 							// Do nothing
-						} else if (command.equals("player-join")) {
+						} else if ("player-join".equals(command)) {
 							handlePlayerJoin(jarray.getJSONObject(1));
-						} else if (command.equals("set-zone")) {
+						} else if ("set-zone".equals(command)) {
 							handleSetZone(jarray.getJSONObject(1));
-						} else if (command.equals("game-start")) {
+						} else if ("game-start".equals(command)) {
 							// Do nothing
-						} else if (command.equals("set-family-honor")) {
+						} else if ("set-family-honor".equals(command)) {
 							handleSetHonor(jarray.getJSONObject(1));
-						} else if (command.equals("set-card-property")) {
+						} else if ("set-card-property".equals(command)) {
 							handleSetCardProperty(jarray.getJSONObject(1));
-						} else if (command.equals("flip-coin")) {
+						} else if ("flip-coin".equals(command)) {
 							handleFlipCoin(jarray.getJSONObject(1));
-						} else if (command.equals("roll-die")) {
+						} else if ("roll-die".equals(command)) {
 							handleDieRoll(jarray.getJSONObject(1));
-						}
-						
+						} else if ("move-card".equals(command)) {
+							handleMoveCard(jarray.getJSONObject(1));
+						}						
 					} catch (JSONException e) {
 						e.printStackTrace();
 						System.err.println("** Failed to parse JSON command from server");
@@ -289,6 +290,21 @@ public class EggClient extends Thread
 				System.err.println("** Couldn't get new line from server");
 			}
 		}
+	}
+
+	private void handleMoveCard(JSONObject jsonObject) throws JSONException {
+		int cardID = jsonObject.getInt("cgid");
+		// Area the card is being moved to
+		GameArea destGameArea = network.zidToGameArea(jsonObject.getInt("zid"));
+		// Player ID of the player who owns the area the card is being moved to
+		int destOwnerPlayerID = jsonObject.getInt("pid");
+		int moverPlayerID = jsonObject.getInt("mover");
+		boolean faceUp = jsonObject.getBoolean("faceup");
+		boolean random = jsonObject.getBoolean("random");
+		boolean toTopOfDestGameArea = jsonObject.getBoolean("top");
+		double x = jsonObject.getDouble("x");
+		double y = jsonObject.getDouble("y");
+		network.moveCard(cardID, x, y, faceUp, moverPlayerID, destGameArea, destOwnerPlayerID, random, toTopOfDestGameArea);
 	}
 
 	private void handleDieRoll(JSONObject jsonObject) throws JSONException {
@@ -401,7 +417,7 @@ public class EggClient extends Thread
 	private void handleSetZone(JSONObject jsonObject) throws JSONException {
 		JSONArray cgids = jsonObject.getJSONArray("cgids");
 		int zid = jsonObject.getInt("zid");
-		Location zone = network.zidToLocation(zid);
+		GameArea zone = network.zidToGameArea(zid);
 		int playerID = jsonObject.getInt("pid");
 		int[] cardIDs = new int[cgids.length()];
 		for(int i = 0; i < cgids.length(); i++) {
@@ -416,22 +432,22 @@ public class EggClient extends Thread
 		Map<String, Integer> cardList = new HashMap<String, Integer>();
 		Collections.sort(deck);
 		for (int i = 0; i < deck.size(); i++) {
-			String cardID = deck.get(i).getID();
-			if(cardList.containsKey(cardID)) {
-				cardList.put(cardID, cardList.get(cardID) + 1);
+			String cardXMLID = deck.get(i).getID();
+			if(cardList.containsKey(cardXMLID)) {
+				cardList.put(cardXMLID, cardList.get(cardXMLID) + 1);
 			} else {
-				cardList.put(cardID, 1);
+				cardList.put(cardXMLID, 1);
 			}
 		}
-		String[] cardIDs = new String[cardList.size()];
+		String[] cardXMLIDs = new String[cardList.size()];
 		int[] cardCounts = new int[cardList.size()];
 		int i = 0;
 		for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
-			cardIDs[i] = entry.getKey();
+			cardXMLIDs[i] = entry.getKey();
 			cardCounts[i] = entry.getValue();
 			i++;
 		}
-		String message = NetworkHandler.encode("submit-deck", "cards", cardCounts, cardIDs);
+		String message = NetworkHandler.encode("submit-deck", "cards", cardCounts, cardXMLIDs);
 		handler.send(message);
 	}
 }

@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dojo.Card;
+
 /**
  * Hosting:
  * Got:  ["protocol", {"version": 8}]
@@ -184,13 +186,13 @@ public class EggServer
 		private void handleSubmitDeck(JSONObject jobj) throws JSONException
 		{
 			// Read the deck JSON into a list of cards to forward on to the game core
-			Map<String, Integer> cardList = new HashMap<String, Integer>();
+			Map<Card, Integer> cardList = new HashMap<Card, Integer>();
 			JSONArray cards = jobj.getJSONArray("cards");
 			for (int i = 0; i < cards.length(); i++) {
 				JSONArray card = cards.getJSONArray(i);
 				int num = card.getInt(0);
-				String name = card.getString(1);
-				cardList.put(name, num);
+				String xmlID = card.getString(1);
+				cardList.put(new Card(xmlID), num);
 			}
 			network.opponentSubmitDeck(clientID, cardList);
 			// Broadcast to all clients that the user has submitted a deck

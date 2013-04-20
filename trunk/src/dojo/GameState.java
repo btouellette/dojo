@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import dojo.Card.Location;
+import dojo.Card.GameArea;
 
 public class GameState
 {
@@ -31,7 +31,7 @@ public class GameState
 	// Name and loaded decks for clients who have connected but not joined the game yet
 	// Mapped by client ID
 	private Map<Integer, String> clientNames;
-	private Map<Integer, List<String>> clientDecks;
+	private Map<Integer, List<Card>> clientDecks;
 	// Map between card IDs and the cards themselves, this includes all cards we know about
 	private Map<Integer, Card> cards;
 	// Name of the owner of this state
@@ -40,9 +40,34 @@ public class GameState
 	public int honor;
 	// Player ID for this GameState
 	public int playerID;
-	// Deck (holding card names ala Edition001 not card IDs)
-	private List<String> deck;
+	// Complete deck list (holding XML DB IDs such as Celestial001 not game card IDs)
+	public List<Card> deck;
 
+	//TODO: pick this
+	// Card storage architecture options	
+	// Single flat storage: cards in single container in main game state
+	// Multiple flat storage: cards in game area specific containers in main game state
+	// Single split storage: cards in single containers in owner's game state
+	// Multiple split storage: cards in game area specific containers in owner's game state
+	//
+	// Alternately we can maintain multiple containers in parallel (gross), multiple split plus master container with known cards
+	// Generic card (or location or owner or container) lookup can be reduced to a subroutine
+	// New card creation (only parallel maintenance) is limited to select situations
+	
+	// Single vs Multiple: one container vs game area specific containers
+	// CON: single makes zone ordering less obvious
+	// CON: single makes zone shuffle slightly harder
+	// PRO: single makes changing card area slightly simpler
+	// PRO: single makes card display slightly simpler
+	// PRO: single means that when game area not sent along with cardID in JSON search for correct game area not required
+	
+	// Flat vs Split: main vs owner's game state
+	// CON: flat requires playerID validation before interacting with card rather than just on entering state
+	// CON: flat is less architecturally obvious
+	// PRO: flat makes changing card owner slightly easier
+	// PRO: flat makes card display slightly simpler
+	// PRO: flat means that when playerID not sent along with cardID in JSON search for correct state not required
+	
 	public GameState()
 	{
 		// TODO: Support Ratling/Spirit or other starting sizes
@@ -66,13 +91,14 @@ public class GameState
 		
 		opponentStates = new HashMap<Integer, GameState>();
 		clientNames = new HashMap<Integer, String>();
-		clientDecks = new HashMap<Integer, List<String>>();
+		clientDecks = new HashMap<Integer, List<Card>>();
 		cards = new HashMap<Integer, Card>();
 	}
 	
-	public GameState(String name)
+	public GameState(int playerID, String name)
 	{
 		this();
+		this.playerID = playerID;
 		this.name = name;
 	}
 
@@ -255,16 +281,17 @@ public class GameState
 		clientNames.put(clientID, name);
 	}
 
-	public void loadOpponentDeck(Map<String, Integer> cardList, int clientID)
+	public void loadOpponentDeck(Map<Card, Integer> cardList, int clientID)
 	{
 		// Add each card in the card list the appropriate number of times to the correct deck
-		for (Map.Entry<String, Integer> entry : cardList.entrySet())
+		// cardList is a mapping between each card in the deck's XML DB ID and the number of instances in the deck
+		for (Map.Entry<Card, Integer> entry : cardList.entrySet())
 		{
 			int numCards = entry.getValue();
 			for (int i = 0; i < numCards; i++)
 			{
 				if(!clientDecks.containsKey(clientID)) {
-					clientDecks.put(clientID, new ArrayList<String>());
+					clientDecks.put(clientID, new ArrayList<Card>());
 				}
 				clientDecks.get(clientID).add(entry.getKey());
 			}
@@ -276,13 +303,13 @@ public class GameState
 		this.name = name;
 	}
 
-	public void setZone(Location zone, int[] cardIDs, int playerID) {
+	public void setZone(GameArea zone, int[] cardIDs, int playerID) {
 		if(this.playerID == playerID) {
 			// Clear out any existing cards in this zone
 			for(Card card : cards.values()) {
 				// If there is a card already in the zone being set remove it
-				if(card.location == zone) {
-					card.location = Location.RemovedFromGame;
+				if(card.gameArea == zone) {
+					card.gameArea = GameArea.RemovedFromGame;
 				}
 			}
 			// Add all cards into zone, creating them if they don't yet exist
@@ -292,7 +319,7 @@ public class GameState
 					card = new Card(cardID, playerID);
 					cards.put(cardID, card);
 				}
-				card.location = zone;
+				card.gameArea = zone;
 			}
 		} else {
 			opponentStates.get(playerID).setZone(zone, cardIDs, playerID);
@@ -309,7 +336,7 @@ public class GameState
 
 	public void playerJoined(int clientID, int playerID) {
 		// Move the client name and deck into a game state
-		GameState state = new GameState(clientNames.get(clientID));
+		GameState state = new GameState(playerID, clientNames.get(clientID));
 		state.deck = clientDecks.get(clientID);
 		opponentStates.put(playerID, state);
 	}
@@ -333,5 +360,13 @@ public class GameState
 
 	public void dieRolled(int result, int size, int playerID) {
 		// TODO: report to chat
+	}
+
+	public void moveCard(int cardID, double x, double y, boolean faceUp,
+			int moverPlayerID, GameArea destGameArea,
+			int destOwnerPlayerID, boolean random,
+			boolean toTopOfDestGameArea) {
+		// TODO Auto-generated method stub
+		
 	}
 }

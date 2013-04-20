@@ -9,7 +9,8 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import dojo.Card.Location;
+import dojo.Card;
+import dojo.Card.GameArea;
 import dojo.StoredCard;
 import dojo.Main;
 
@@ -104,7 +105,7 @@ public class NetworkCore extends Thread
 		return success;
 	}
 	
-	public void setZone(Location zone, int[] cardIDs, int playerID) {
+	public void setZone(GameArea zone, int[] cardIDs, int playerID) {
 		Main.state.setZone(zone, cardIDs, playerID);		
 	}
 	
@@ -113,7 +114,7 @@ public class NetworkCore extends Thread
 		Main.state.opponentConnect(clientID, name);
 	}
 
-	public void opponentSubmitDeck(int clientID, Map<String, Integer> cardList)
+	public void opponentSubmitDeck(int clientID, Map<Card, Integer> cardList)
 	{
 		Main.state.loadOpponentDeck(cardList, clientID);
 	}
@@ -136,47 +137,47 @@ public class NetworkCore extends Thread
 		Main.state.playerJoined(clientID, playerID);
 	}
 
-	// Translate between Egg zone IDs and Location enum
-	public Location zidToLocation(int zid) {
+	// Translate between Egg zone IDs and GameArea enum
+	public GameArea zidToGameArea(int zid) {
 		if(zid == 0) {
-			return Location.Table;
+			return GameArea.Table;
 		} else if(zid == 1) {
-			return Location.DynastyDeck;
+			return GameArea.DynastyDeck;
 		} else if(zid == 2) {
-			return Location.FateDeck;
+			return GameArea.FateDeck;
 		} else if(zid == 3) {
-			return Location.DynastyDiscard;
+			return GameArea.DynastyDiscard;
 		} else if(zid == 4) {
-			return Location.FateDiscard;
+			return GameArea.FateDiscard;
 		} else if(zid == 5) {
-			return Location.Hand;
+			return GameArea.Hand;
 		} else if(zid == 6) {
-			return Location.RemovedFromGame;
+			return GameArea.RemovedFromGame;
 		} else if(zid == 7) {
-			return Location.Table;
+			return GameArea.Table;
 		} else if(zid == 8) {
-			return Location.FocusPool;
+			return GameArea.FocusPool;
 		}
 		throw new IllegalArgumentException();
 	}
 
-	// Translate between Location enum and Egg zone IDs
-	public int locationToZid(Location location) {
-		if(location == Location.DynastyDeck) {
+	// Translate between GameArea enum and Egg zone IDs
+	public int gameAreaToZID(GameArea gameArea) {
+		if(gameArea == GameArea.DynastyDeck) {
 			return 1;
-		} else if(location == Location.FateDeck) {
+		} else if(gameArea == GameArea.FateDeck) {
 			return 2;
-		} else if(location == Location.DynastyDiscard) {
+		} else if(gameArea == GameArea.DynastyDiscard) {
 			return 3;
-		} else if(location == Location.FateDiscard) {
+		} else if(gameArea == GameArea.FateDiscard) {
 			return 4;
-		} else if(location == Location.Hand) {
+		} else if(gameArea == GameArea.Hand) {
 			return 5;
-		} else if(location == Location.RemovedFromGame) {
+		} else if(gameArea == GameArea.RemovedFromGame) {
 			return 6;
-		} else if(location == Location.Table) {
+		} else if(gameArea == GameArea.Table) {
 			return 7;
-		} else if(location == Location.FocusPool) {
+		} else if(gameArea == GameArea.FocusPool) {
 			return 8;
 		}
 		throw new IllegalArgumentException();
@@ -200,5 +201,10 @@ public class NetworkCore extends Thread
 
 	public void dieRolled(int result, int size, int playerID) {
 		Main.state.dieRolled(result, size, playerID);
+	}
+
+	public void moveCard(int cardID, double x, double y, boolean faceUp, int moverPlayerID, GameArea destGameArea,
+					 	 int destOwnerPlayerID, boolean random, boolean toTopOfDestGameArea) {
+		Main.state.moveCard(cardID, x, y, faceUp, moverPlayerID, destGameArea, destOwnerPlayerID, random, toTopOfDestGameArea);
 	}
 }
