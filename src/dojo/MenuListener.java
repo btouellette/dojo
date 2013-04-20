@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -53,6 +54,11 @@ class MenuListener implements ActionListener
 					if(deck != null && !deck.isEmpty()) {
 						try {
 							Main.network.submitDeck(deck);
+							List<Card> storedDeck = new ArrayList<Card>();
+							for(StoredCard currentCard : deck) {
+								storedDeck.add(new Card(currentCard.getID()));
+							}
+							Main.state.deck = storedDeck;
 						} catch (JSONException e1) {
 							// TODO: Bail out properly on JSON exception
 							System.err.println("** Error encountered in deck loading.");
