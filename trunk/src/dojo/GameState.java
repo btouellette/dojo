@@ -12,28 +12,7 @@ import java.util.Map;
 import dojo.Card.GameArea;
 
 public class GameState
-{
-	// Your decks and discard piles
-	private Deck dynastyDeck, fateDeck;
-	private Discard dynastyDiscard, fateDiscard;
-	// Provinces (left to right from 0->max)
-	private List<Province> provinces;
-	// The base cards of all units to be displayed. Attachments are fetched at display time and aren't present here
-	// This is done so that attachments will always be drawn behind units
-	private List<PlayableCard> table;
-	// Cards present in the players hand
-	private List<PlayableCard> hand;
-	// All cards visible to player, to keep necessary logic during repaint down
-	private List<PlayableCard> allCards;
-	
-	// Opponents game state, mapped by player ID
-	private Map<Integer, GameState> opponentStates;
-	// Name and loaded decks for clients who have connected but not joined the game yet
-	// Mapped by client ID
-	private Map<Integer, String> clientNames;
-	private Map<Integer, List<Card>> clientDecks;
-	// Map between card IDs and the cards themselves, this includes all cards we know about
-	private Map<Integer, Card> cards;
+{	
 	// Name of the owner of this state
 	public String name;
 	// Honor for the owner of this state
@@ -42,8 +21,23 @@ public class GameState
 	public int playerID;
 	// Complete deck list (holding XML DB IDs such as Celestial001 not game card IDs)
 	public List<Card> deck;
+	
+	// Opponents game state, mapped by player ID
+	private Map<Integer, GameState> opponentStates;
+	// Name and loaded decks for clients who have connected but not joined the game yet
+	// Mapped by client ID
+	private Map<Integer, String> clientNames;
+	private Map<Integer, List<Card>> clientDecks;
+	
+	// These are all the locations that can contain cards	
+	// Map between card IDs and the cards themselves, this includes all cards owned by this player, ordered zones are lists, unordered zones are maps
+	private Map<Integer, Card> hand, removedFromGame, table;
+	private List<Card> dynastyDeck, dynastyDiscard, fateDeck, fateDiscard;
+	
+	// Provinces (left to right from 0->max)
+	// Cards in provinces are in the table collection, this is for bookkeeping
+	private List<Province> provinces;
 
-	//TODO: pick this
 	// Card storage architecture options	
 	// Single flat storage: cards in single container in main game state
 	// Multiple flat storage: cards in game area specific containers in main game state
@@ -53,14 +47,14 @@ public class GameState
 	// Alternately we can maintain multiple containers in parallel (gross), multiple split plus master container with known cards
 	// Generic card (or location or owner or container) lookup can be reduced to a subroutine
 	// New card creation (only parallel maintenance) is limited to select situations
-	
+	//
 	// Single vs Multiple: one container vs game area specific containers
 	// CON: single makes zone ordering less obvious
 	// CON: single makes zone shuffle slightly harder
 	// PRO: single makes changing card area slightly simpler
 	// PRO: single makes card display slightly simpler
 	// PRO: single means that when game area not sent along with cardID in JSON search for correct game area not required
-	
+	//
 	// Flat vs Split: main vs owner's game state
 	// CON: flat requires playerID validation before interacting with card rather than just on entering state
 	// CON: flat is less architecturally obvious
@@ -79,20 +73,19 @@ public class GameState
 		provinces.add(new Province());
 
 		// Create decks, discards, and provinces
-		dynastyDeck = new Deck(true);
-		fateDeck = new Deck(false);
-		dynastyDiscard = new Discard();
-		fateDiscard = new Discard();
+		dynastyDeck = new ArrayList<Card>(50);
+		fateDeck = new ArrayList<Card>(50);
+		dynastyDiscard = new ArrayList<Card>();
+		fateDiscard = new ArrayList<Card>();
 
 		// Create a new ArrayList to hold the cards to display
-		table = new ArrayList<PlayableCard>(12);
-		hand = new ArrayList<PlayableCard>(8);
-		allCards = new ArrayList<PlayableCard>(20);
+		table = new HashMap<Integer, Card>();
+		hand = new HashMap<Integer, Card>();
+		removedFromGame = new HashMap<Integer, Card>();
 		
 		opponentStates = new HashMap<Integer, GameState>();
 		clientNames = new HashMap<Integer, String>();
 		clientDecks = new HashMap<Integer, List<Card>>();
-		cards = new HashMap<Integer, Card>();
 	}
 	
 	public GameState(int playerID, String name)
@@ -105,33 +98,27 @@ public class GameState
 	public void rescale()
 	{
 		// Rescale images for all cards in units in play
-		for (PlayableCard card : table) {
+		for (Card card : table.values()) {
 			card.rescale();
 			card.updateAttachmentLocations();
 			// Including their attachments
-			for (PlayableCard attachment : card.getAllAttachments()) {
+			for (Card attachment : card.getAllAttachments()) {
 				attachment.rescale();
 			}
 		}
-		// Rescale images from cards contained in or attached to provinces
-		for (Province province : provinces) {
-			province.rescale();
-		}
 	}
 
-	public void resetState(Deck dynasty, Deck fate)
+	public void resetState()
 	{
 		// Used when loading a new deck or clearing the field
 		// Remove all cards from play
 		table.clear();
 		hand.clear();
-		allCards.clear();
-		// Remove all cards from discards
-		fateDiscard.removeAll();
-		dynastyDiscard.removeAll();
-		// Reset decks to new decks
-		dynastyDeck = dynasty;
-		fateDeck = fate;
+		fateDiscard.clear();
+		dynastyDiscard.clear();
+		removedFromGame.clear();
+		dynastyDeck.clear();
+		fateDeck.clear();
 		provinces.clear();
 		provinces.add(new Province());
 		provinces.add(new Province());
@@ -145,136 +132,134 @@ public class GameState
 		return provinces;
 	}
 
-	public Deck getDynastyDeck()
+	public List<Card> getDynastyDeck()
 	{
 		return dynastyDeck;
 	}
 
-	public Deck getFateDeck()
+	public List<Card> getFateDeck()
 	{
 		return fateDeck;
 	}
 
-	public Discard getDynastyDiscard()
+	public List<Card> getDynastyDiscard()
 	{
 		return dynastyDiscard;
 	}
 
-	public Discard getFateDiscard()
+	public List<Card> getFateDiscard()
 	{
 		return fateDiscard;
 	}
 
-	public void addToDiscard(PlayableCard card)
+	public void addToDiscard(Card card)
 	{
 		// Takes a card from table and puts it in the appropriate discard
 		table.remove(card);
-		allCards.remove(card);
-		if (card.isDynasty()) {
+		if (card.isDynastyCard()) {
 			dynastyDiscard.add(card);
 		} else {
 			fateDiscard.add(card);
 		}
 	}
 
-	public void addToDeck(PlayableCard card)
+	public void addToDeck(Card card)
 	{
-		// Takes a card from table and puts it in the appropriate deck
-		table.remove(card);
-		allCards.remove(card);
-		if (card.isDynasty()) {
-			dynastyDeck.add(card);
+		// Takes a card from table and puts it at the top of the appropriate deck
+		table.remove(card.id);
+		if (card.isDynastyCard()) {
+			dynastyDeck.add(0, card);
 		} else {
-			fateDeck.add(card);
+			fateDeck.add(0, card);
 		}
 	}
 
 	public void unbowAll()
 	{
 		// Unbow all cards on the table
-		for (PlayableCard card : table) {
+		for (Card card : table.values()) {
 			card.unbow();
 			// And all cards attached to them
-			for (PlayableCard attachment : card.getAllAttachments()) {
-				attachment.unbow();
-			}
-		}
-		// And all cards attached to provinces
-		for (Province province : provinces) {
-			for (PlayableCard attachment : province.getAttachments()) {
+			for (Card attachment : card.getAllAttachments()) {
 				attachment.unbow();
 			}
 		}
 	}
 
-	public List<PlayableCard> getAllCards()
-	{
+	public List<Card> getAllCards()
+	{ 
+		//TODO: This is surely wildly inefficient, do this with iterators or something else, or just bake the logic into whatever is using it
+		List<Card> allCards = new ArrayList<Card>(table.values());
+		allCards.addAll(hand.values());
+		for(GameState opponentState : opponentStates.values()) {
+			allCards.addAll(opponentState.table.values());
+		}
 		return allCards;
 	}
 
-	public boolean addToTable(PlayableCard card)
+	public boolean addToTable(Card card)
 	{
-		// If we successfully add it then also add to all cards and indicate success
-		if (table.add(card)) {
-			allCards.add(card);
+		// If we successfully add it indicate success
+		if (!table.containsKey(card.id)) {
+			table.put(card.id, card);
 			return true;
 		}
 		return false;
 	}
 
 	// Remove from either the table or the hand, wherever it is
-	public boolean removeCard(PlayableCard card)
+	public boolean removeCard(Card card)
 	{
 		return removeFromTable(card) || removeFromHand(card);
 	}
 
-	public boolean removeFromTable(PlayableCard card)
+	public boolean removeFromTable(Card card)
 	{
 		// If we successfully remove it then also remove from all cards and indicate success
-		if (table.remove(card)) {
-			allCards.remove(card);
+		if (table.containsKey(card.id)) {
+			table.remove(card.id);
 			return true;
 		}
 		return false;
 	}
 
-	public boolean addToHand(PlayableCard card)
+	public boolean addToHand(Card card)
 	{
-		// If we successfully add it then also add to all cards and indicate success
-		if (hand.add(card)) {
-			allCards.add(card);
+		// If we successfully add it indicate success
+		// Check if hand already contains this card
+		if(!hand.containsKey(card.id)) {
+			hand.put(card.id, card);
 			return true;
 		}
 		return false;
 	}
 
-	public boolean removeFromHand(PlayableCard card)
+	public boolean removeFromHand(Card card)
 	{
-		// If we successfully remove it then also remove from all cards and indicate success
-		if (hand.remove(card)) {
-			allCards.remove(card);
+		// If we successfully remove it indicate success
+		// Check if hand already contains this card
+		if(hand.containsKey(card.id)) {
+			hand.remove(card.id);
 			return true;
 		}
 		return false;
 	}
 
-	public boolean handContains(PlayableCard card)
+	public boolean handContains(Card card)
 	{
 		// See if the card is directly contained in the hand
-		if (hand.contains(card)) {
+		if (hand.containsKey(card.id))
 			return true;
-		}
 		// If not see if it is attached to something in the hand
-		for (PlayableCard base : hand) {
-			if (base.getAllAttachments().contains(card)) {
-				return true;
-			}
+		for (Card baseCard : hand.values()) {
+			List<Card> attachments = baseCard.getAllAttachments();
+			for (Card attachedCard : attachments)
+				if (card.id == attachedCard.id)
+					return true;
 		}
 		// Failed all tests. Must not be in hand
 		return false;
-	}
-	
-	
+	}	
 	
 	public void opponentConnect(int clientID, String name)
 	{
@@ -303,27 +288,93 @@ public class GameState
 		this.name = name;
 	}
 
-	public void setZone(GameArea zone, int[] cardIDs, int playerID) {
+	public void setGameAreaContents(GameArea area, int[] cardIDs, int playerID) {
 		if(this.playerID == playerID) {
 			// Clear out any existing cards in this zone
-			for(Card card : cards.values()) {
-				// If there is a card already in the zone being set remove it
-				if(card.gameArea == zone) {
+			List<Card> cardsList = null;
+			if (area == GameArea.DynastyDeck) {
+				cardsList = dynastyDeck;
+			} else if (area == GameArea.DynastyDiscard) {
+				cardsList = dynastyDiscard;
+			} else if (area == GameArea.FateDeck) {
+				cardsList = fateDeck;
+			} else if (area == GameArea.FateDiscard) {
+				cardsList = fateDiscard;
+			}
+			if(cardsList != null) {
+				// Remove any existing cards in that game area from the game
+				for(Card card : cardsList) {
 					card.gameArea = GameArea.RemovedFromGame;
+					removedFromGame.put(card.id, card);
+				}
+				cardsList.clear();
+				// Add all cards into the game area, creating them if they don't yet exist
+				for(int cardID : cardIDs) {
+					Card card = getCard(cardID);
+					if(card == null) {
+						card = new Card(cardID, playerID);
+					}
+					card.gameArea = area;
+					cardsList.add(card);
 				}
 			}
-			// Add all cards into zone, creating them if they don't yet exist
-			for(int cardID : cardIDs) {
-				Card card = cards.get(cardID);
-				if(card == null) {
-					card = new Card(cardID, playerID);
-					cards.put(cardID, card);
+			Map<Integer, Card> cardsMap = null;
+			if (area == GameArea.FocusPool) {
+				//TODO: Handle focus pools
+				throw new UnsupportedOperationException("Trying to set a focus pool zone, not programmed yet");
+			} else if (area == GameArea.Hand) {
+				cardsMap = hand;
+			} else if (area == GameArea.Table) {
+				cardsMap = table;
+			}
+			if(cardsMap != null) {
+				// Remove any existing cards in that game area from the game
+				for(Card card : cardsMap.values()) {
+					card.gameArea = GameArea.RemovedFromGame;
+					removedFromGame.put(card.id, card);
 				}
-				card.gameArea = zone;
+				cardsMap.clear();
+				// Add all cards into the game area, creating them if they don't yet exist
+				for(int cardID : cardIDs) {
+					Card card = getCard(cardID);
+					if(card == null) {
+						card = new Card(cardID, playerID);
+					}
+					card.gameArea = area;
+					cardsMap.put(cardID, card);
+				}
 			}
 		} else {
-			opponentStates.get(playerID).setZone(zone, cardIDs, playerID);
+			opponentStates.get(playerID).setGameAreaContents(area, cardIDs, playerID);
 		}
+	}
+
+	// Find a card by card ID in this or any child game states
+	public Card getCard(int cardID) {
+		if (table.containsKey(cardID)) 
+			return table.get(cardID);
+		if (hand.containsKey(cardID)) 
+			return table.get(cardID);
+		if (removedFromGame.containsKey(cardID)) 
+			return table.get(cardID);
+		for (Card card : dynastyDeck)
+			if(cardID == card.id)
+				return card;
+		for (Card card : fateDeck)
+			if(cardID == card.id)
+				return card;
+		for (Card card : dynastyDiscard)
+			if(cardID == card.id)
+				return card;
+		for (Card card : fateDiscard)
+			if(cardID == card.id)
+				return card;
+		for (GameState childState : opponentStates.values()) {
+			Card card = childState.getCard(cardID);
+			if(card != null)
+				return card;
+		}
+		return null;
 	}
 
 	public void setHonor(int honor, int playerID) {
@@ -347,7 +398,7 @@ public class GameState
 	
 
 	public void setCardProperty(int cardID, String property, boolean value, int playerID) {
-		Card card = cards.get(cardID);
+		Card card = getCard(cardID);
 		card.ownerID = playerID;
 		if("tapped".equals(property)) {
 			card.bowed = value;

@@ -106,7 +106,7 @@ public class NetworkCore extends Thread
 	}
 	
 	public void setZone(GameArea zone, int[] cardIDs, int playerID) {
-		Main.state.setZone(zone, cardIDs, playerID);		
+		Main.state.setGameAreaContents(zone, cardIDs, playerID);		
 	}
 	
 	public void opponentConnect(int clientID, String name)

@@ -81,7 +81,7 @@ abstract class CardHolder
 			// No need to check for null here since we know there was a card to retrieve
 			// Put the removed card on the table and set its location to above the holder it used to be in
 			card.setLocationSimple(location[0], location[1] - (Main.playArea.getCardHeight() + 8));
-			Main.state.addToTable(card);
+			//FIXME: Main.state.addToTable(card);
 		}
 	}
 
