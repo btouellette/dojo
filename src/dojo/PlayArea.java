@@ -18,6 +18,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
@@ -216,26 +217,28 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		int startHand = width - (int) (cardWidth * 1.5);
 
 		// Draw fate and dynasty decks and discards if they have an image
-		currentImage = state.getDynastyDeck().getImage();
+		//FIXME: currentImage = state.getDynastyDeck().getImage();
+		currentImage = StoredImages.dynasty;
 		if (currentImage != null) {
 			g.drawImage(currentImage, cardWidth + 10, height - (cardHeight + 4), null);
 		}
-		currentImage = state.getDynastyDiscard().getImage();
+		//FIXME: currentImage = state.getDynastyDiscard().getImage();
 		if (currentImage != null) {
 			g.drawImage(currentImage, 4, height - (cardHeight + 4), null);
 		}
-		currentImage = state.getFateDeck().getImage();
+		//FIXME: currentImage = state.getFateDeck().getImage();
+		currentImage = StoredImages.fate;
 		if (currentImage != null) {
 			g.drawImage(currentImage, startHand - 2 * (cardWidth + 5), height - (cardHeight + 4), null);
 		}
-		currentImage = state.getFateDiscard().getImage();
+		//FIXME: currentImage = state.getFateDiscard().getImage();
 		if (currentImage != null) {
 			g.drawImage(currentImage, startHand - (cardWidth + 4), height - (cardHeight + 4), null);
 		}
 
 		// Now that we've drawn all the play surface draw all the cards on the table
-		List<PlayableCard> cards = state.getAllCards();
-		for (PlayableCard card : cards) {
+		List<Card> cards = state.getAllCards();
+		for (Card card : cards) {
 			displayCard(card, (Graphics2D) g);
 		}
 	}
@@ -256,7 +259,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		location[0] = startHand - (cardWidth + 4);
 		// location[1] remains same throughout since all decks/provinces are on same level
 		location[1] = height - (cardHeight + 4);
-		state.getFateDiscard().setLocation(location);
+		//FIXME: state.getFateDiscard().setLocation(location);
 		g.setColor(Color.BLACK);
 		g.fillRect(location[0] - (cardWidth + 10), location[1] - 4, 2 * (cardWidth + 8), cardHeight + 8);
 		g.setColor(Color.LIGHT_GRAY);
@@ -264,12 +267,12 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		// Create fate deck
 		location[0] = startHand - 2 * (cardWidth + 5);
-		state.getFateDeck().setLocation(location);
+		//FIXME: state.getFateDeck().setLocation(location);
 		g.fillRect(location[0] - 2, location[1] - 2, cardWidth + 4, cardHeight + 4);
 
 		// Create dynasty discard
 		location[0] = 4;
-		state.getDynastyDiscard().setLocation(location);
+		//FIXME: state.getDynastyDiscard().setLocation(location);
 		g.setColor(Color.BLACK);
 		g.fillRect(location[0] - 4, location[1] - 4, 2 * (cardWidth + 8) - 2, cardHeight + 8);
 		g.setColor(Color.LIGHT_GRAY);
@@ -277,7 +280,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 
 		// Create dynasty deck
 		location[0] = cardWidth + 10;
-		state.getDynastyDeck().setLocation(location);
+		//FIXME: state.getDynastyDeck().setLocation(location);
 		g.fillRect(location[0] - 2, location[1] - 2, cardWidth + 4, cardHeight + 4);
 
 		// Create opponent's fate discard
@@ -344,33 +347,34 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		redrawBackground();
 	}
 
-	private void displayCard(PlayableCard card, Graphics2D g)
+	private void displayCard(Card card, Graphics2D g)
 	{
 		// Display all the attachments first. This will draw the top attachment first which will be the farthest back on the draw stack
-		List<PlayableCard> attachments = card.getAttachments();
+		List<Card> attachments = card.getAttachments();
 		for (int i = attachments.size() - 1; i >= 0; i--) {
 			displayCard(attachments.get(i), g);
 		}
 		// Now draw the base card in the unit
-		int[] location = card.getLocation();
+		int x = (int)card.x;
+		int y = (int)card.y;
 		// Window resize can move a card off the table if we don't keep it on the play area here
-		if (location[0] > getWidth() - 10) {
-			location[0] = getWidth() - 10;
-		} else if (location[0] < 10 - cardWidth) {
-			location[0] = 10 - cardWidth;
+		if (x > getWidth() - 10) {
+			x = getWidth() - 10;
+		} else if (x < 10 - cardWidth) {
+			x = 10 - cardWidth;
 		}
-		if (location[1] > getHeight() - 10) {
-			location[1] = getHeight() - 10;
-		} else if (location[1] < 10 - cardHeight) {
-			location[1] = 10 - cardHeight;
+		if (y > getHeight() - 10) {
+			y = getHeight() - 10;
+		} else if (y < 10 - cardHeight) {
+			y = 10 - cardHeight;
 		}
 		BufferedImage currentImage = card.getImage();
 		if (currentImage != null) {
-			g.drawImage(currentImage, location[0], location[1], null);
+			g.drawImage(currentImage, x, y, null);
 		} else {
 			// Draw a temporary box to show the card if we are downloading the image still
 			g.setColor(Color.DARK_GRAY);
-			g.drawRect(location[0], location[1], cardHeight, cardWidth);
+			g.drawRect(x, y, cardHeight, cardWidth);
 		}
 	}
 
@@ -395,15 +399,15 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		if (e.getClickCount() == 2) {
 			if (deckClicked) {
 				if (dynastyClicked) {
-					state.getDynastyDeck().doubleClicked();
+					//FIXME: state.getDynastyDeck().doubleClicked();
 				} else {
-					state.getFateDeck().doubleClicked();
+					//FIXME: state.getFateDeck().doubleClicked();
 				}
 			} else if (discardClicked) {
 				if (dynastyClicked) {
-					state.getDynastyDiscard().doubleClicked();
+					//FIXME: state.getDynastyDiscard().doubleClicked();
 				} else {
-					state.getFateDiscard().doubleClicked();
+					//FIXME: state.getFateDiscard().doubleClicked();
 				}
 			} else if (attachmentClicked) {
 				clickedAttachment.doubleClicked();
@@ -438,7 +442,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		Rectangle cardArea = new Rectangle();
 		Point clickPoint = e.getPoint();
 
-		List<PlayableCard> cards = state.getAllCards();
+		List<Card> cards = state.getAllCards();
 		List<Province> provinces = state.getProvinces();
 
 		int i = cards.size();
@@ -446,7 +450,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		// This is in reverse order so topmost drawn cards are picked up first
 		while (!cardClicked && i > 0) {
 			i--;
-			clickedCard = cards.get(i);
+			//FIXME: clickedCard = cards.get(i);
 			int[] cardLocation = clickedCard.getLocation();
 			cardArea.setLocation(cardLocation[0], cardLocation[1]);
 			if (clickedCard.isBowed()) {
@@ -461,7 +465,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				attachmentClicked = false;
 				// Redraw the clicked card on top of the draw stack
 				cards.remove(clickedCard);
-				cards.add(clickedCard);
+				//FIXME: cards.add(clickedCard);
 				// Store the distance between the click and the root of the card to update location on drag correctly
 				distanceX = (int) clickPoint.getX() - cardLocation[0];
 				distanceY = (int) clickPoint.getY() - cardLocation[1];
@@ -489,7 +493,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 						attachmentClicked = true;
 						// Redraw the clicked card on top of the draw stack
 						cards.remove(clickedCard);
-						cards.add(clickedCard);
+						//FIXME: cards.add(clickedCard);
 						// Store the distance between the click and the root of the card to update location on drag correctly
 						distanceX = (int) clickPoint.getX() - cardLocation[0];
 						distanceY = (int) clickPoint.getY() - cardLocation[1];
@@ -696,6 +700,8 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 				}
 			}
 
+			//FIXME: All these in the block comment 
+			/*
 			// Detect if dragged near hand border and stall so it is obvious which the card is in
 			if (newX < startHand && newX > startHand - cardWidth) {
 				if (!state.handContains(clickedCard)) {
@@ -717,6 +723,7 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 					state.addToTable(clickedCard);
 				}
 			}
+			*/
 
 			// Update location and repaint since card has been moved
 			clickedCard.setLocation(newX, newY);
@@ -753,10 +760,10 @@ class PlayArea extends JPanel implements MouseListener, MouseMotionListener, Act
 		else if (name.equals("Shuffle")) {
 			// Shuffle deck and notify chat box
 			if (dynastyClicked) {
-				state.getDynastyDeck().shuffle();
+				Collections.shuffle(state.getDynastyDeck());
 				TextActionListener.send(Main.state.name + " shuffles " + Preferences.gender + " dynasty deck.", "Action");
 			} else if (fateClicked) {
-				state.getFateDeck().shuffle();
+				Collections.shuffle(state.getFateDeck());
 				TextActionListener.send(Main.state.name + " shuffles " + Preferences.gender + " fate deck.", "Action");
 			}
 		} else if (name.equals("Search")) {

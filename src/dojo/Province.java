@@ -55,7 +55,7 @@ class Province extends CardHolder
 
 	public void attach(PlayableCard card)
 	{
-		Main.state.removeFromTable(card);
+		//FIXME: Main.state.removeFromTable(card);
 		// Add card and any attachments of it to the province's attachments
 		attachments.add(card);
 		attachments.addAll(card.getAllAttachments());
@@ -74,7 +74,7 @@ class Province extends CardHolder
 	{
 		// Move card from attachments to the play table
 		if (attachments.remove(card)) {
-			Main.state.addToTable(card);
+			//FIXME: Main.state.addToTable(card);
 			// Unattach any cards attached to the card from the province as well
 			for (PlayableCard attachment : card.getAllAttachments()) {
 				attachments.remove(attachment);

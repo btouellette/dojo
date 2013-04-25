@@ -182,7 +182,7 @@ class PlayableCard
 		// Attach the card and then remove it from the list of units
 		attachments.add(attachingCard);
 		// Remove it from the table or the hand appropriately
-		Main.state.removeCard(attachingCard);
+		//FIXME: Main.state.removeCard(attachingCard);
 		// Attachment locations need to be updated since the cards have changed
 		updateAttachmentLocations();
 	}
@@ -196,11 +196,11 @@ class PlayableCard
 			int[] location = unattachingCard.getLocation();
 			// TODO: Do this movement better (move right unless it would put it in a different hand/table position)
 			unattachingCard.setLocation(location[0], location[1] - Main.playArea.getCardHeight());
-			if (Main.state.handContains(this)) {
-				Main.state.addToHand(unattachingCard);
-			} else {
-				Main.state.addToTable(unattachingCard);
-			}
+			//FIXME: if (Main.state.handContains(this)) {
+				//FIXME: Main.state.addToHand(unattachingCard);
+			//FIXME: } else {
+				//FIXME: Main.state.addToTable(unattachingCard);
+			//FIXME: }
 		}
 		// We didn't find it attached to the base card in the unit.
 		// Recurse through attachments of attachments
@@ -226,9 +226,9 @@ class PlayableCard
 		bowed = false;
 		// And put in appropriate discard or out of game
 		if (isToken) {
-			Main.state.removeCard(this);
+			//FIXME: Main.state.removeCard(this);
 		} else {
-			Main.state.addToDiscard(this);
+			//FIXME: Main.state.addToDiscard(this);
 		}
 	}
 
@@ -243,7 +243,7 @@ class PlayableCard
 		bowed = false;
 		dishonored = false;
 		// And put in appropriate deck
-		Main.state.addToDeck(this);
+		//FIXME: Main.state.addToDeck(this);
 	}
 
 	public void moveToProvince(Province province)
@@ -256,7 +256,7 @@ class PlayableCard
 		bowed = false;
 		dishonored = false;
 		// And put in appropriate province
-		Main.state.removeFromTable(this);
+		//FIXME: Main.state.removeFromTable(this);
 		province.add(this);
 	}
 
