@@ -167,7 +167,6 @@ class XMLImporter extends DefaultHandler
 		if (!s.trim().equals("")) {
 			// emit(s);
 
-			// Note: Java switch statements don't operate on String
 			if (eName.equals("name")) {
 				currentCard.setName(s);
 			} else if (eName.equals("image")) {

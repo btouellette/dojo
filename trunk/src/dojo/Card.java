@@ -294,7 +294,7 @@ public class Card {
 
 			// Only create dishonored images for personalities
 			// TODO: Visually inspect these at high and low res to ensure no loss of quality
-			if (type.equals("personality")) {
+			if (type == CardType.Personality) {
 				// Flip regular image vertically
 				tx = AffineTransform.getScaleInstance(1, -1);
 				tx.translate(0, -cardImage.getHeight());
@@ -371,5 +371,40 @@ public class Card {
 	public void unbow()
 	{
 		bowed = false;
+	}
+
+	public void setXMLID(String xmlID)
+	{
+		this.xmlID = xmlID;
+		String type = Main.databaseID.get(id).getType();
+		if ("ancestor".equals(type)) {
+			this.type = CardType.Ancestor;
+		} else if ("celestial".equals(type)) {
+			this.type = CardType.Celestial;
+		} else if ("event".equals(type)) {
+			this.type = CardType.Event;
+		} else if ("follower".equals(type)) {
+			this.type = CardType.Follower;
+		} else if ("holding".equals(type)) {
+			this.type = CardType.Holding;
+		} else if ("item".equals(type)) {
+			this.type = CardType.Item;
+		} else if ("personality".equals(type)) {
+			this.type = CardType.Personality;
+		} else if ("region".equals(type)) {
+			this.type = CardType.Region;
+		} else if ("ring".equals(type)) {
+			this.type = CardType.Ring;
+		} else if ("sensei".equals(type)) {
+			this.type = CardType.Sensei;
+		} else if ("spell".equals(type)) {
+			this.type = CardType.Spell;
+		} else if ("strategy".equals(type)) {
+			this.type = CardType.Strategy;
+		} else if ("stronghold".equals(type)) {
+			this.type = CardType.Stronghold;
+		} else if ("wind".equals(type)) {
+			this.type = CardType.Wind;
+		}
 	}
 }
