@@ -280,6 +280,8 @@ public class EggClient extends Thread
 							handleDieRoll(jarray.getJSONObject(1));
 						} else if ("move-card".equals(command)) {
 							handleMoveCard(jarray.getJSONObject(1));
+						} else if ("reveal-card".equals(command)) {
+							handleRevealCard(jarray.getJSONObject(1));
 						}						
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -292,6 +294,12 @@ public class EggClient extends Thread
 		}
 	}
 
+	private void handleRevealCard(JSONObject jsonObject) throws JSONException {
+		int cardID = jsonObject.getInt("cgid");
+		String xmlID = jsonObject.getString("cdid");
+		network.revealCard(cardID, xmlID);
+	}
+
 	private void handleMoveCard(JSONObject jsonObject) throws JSONException {
 		int cardID = jsonObject.getInt("cgid");
 		// Area the card is being moved to
@@ -301,9 +309,9 @@ public class EggClient extends Thread
 		int moverPlayerID = jsonObject.getInt("mover");
 		boolean faceUp = jsonObject.getBoolean("faceup");
 		boolean random = jsonObject.getBoolean("random");
-		boolean toTopOfDestGameArea = jsonObject.getBoolean("top");
-		double x = jsonObject.getDouble("x");
-		double y = jsonObject.getDouble("y");
+		Boolean toTopOfDestGameArea = jsonObject.isNull("top") ? null : jsonObject.getBoolean("top");
+		Double x = jsonObject.isNull("x") ? null : jsonObject.getDouble("x");
+		Double y = jsonObject.isNull("y") ? null : jsonObject.getDouble("y");
 		network.moveCard(cardID, x, y, faceUp, moverPlayerID, destGameArea, destOwnerPlayerID, random, toTopOfDestGameArea);
 	}
 

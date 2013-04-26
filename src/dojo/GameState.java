@@ -413,11 +413,27 @@ public class GameState
 		// TODO: report to chat
 	}
 
-	public void moveCard(int cardID, double x, double y, boolean faceUp,
+	public void moveCard(int cardID, Double x, Double y, boolean faceUp,
 			int moverPlayerID, GameArea destGameArea,
 			int destOwnerPlayerID, boolean random,
-			boolean toTopOfDestGameArea) {
-		// TODO Auto-generated method stub
-		
+			Boolean toTopOfDestGameArea) {
+		Card movingCard = getCard(cardID);
+		if(movingCard == null) {
+			throw new IllegalArgumentException ("Couldn't find card with card ID " + cardID + " to move");
+		}
+		if(x != null && y != null) {
+			movingCard.x = x;
+			movingCard.y = y;
+		}
+		movingCard.faceUp = faceUp;
+		movingCard.gameArea = destGameArea;
+	}
+
+	public void revealCard(int cardID, String xmlID) {
+		Card card = getCard(cardID);
+		if(card == null) {
+			throw new IllegalArgumentException ("Couldn't find card with card ID " + cardID + " to reveal");
+		}
+		card.setXMLID(xmlID);
 	}
 }

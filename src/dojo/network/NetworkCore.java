@@ -203,8 +203,12 @@ public class NetworkCore extends Thread
 		Main.state.dieRolled(result, size, playerID);
 	}
 
-	public void moveCard(int cardID, double x, double y, boolean faceUp, int moverPlayerID, GameArea destGameArea,
-					 	 int destOwnerPlayerID, boolean random, boolean toTopOfDestGameArea) {
+	public void moveCard(int cardID, Double x, Double y, boolean faceUp, int moverPlayerID, GameArea destGameArea,
+					 	 int destOwnerPlayerID, boolean random, Boolean toTopOfDestGameArea) {
 		Main.state.moveCard(cardID, x, y, faceUp, moverPlayerID, destGameArea, destOwnerPlayerID, random, toTopOfDestGameArea);
+	}
+
+	public void revealCard(int cardID, String xmlID) {
+		Main.state.revealCard(cardID, xmlID);
 	}
 }
