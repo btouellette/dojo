@@ -376,7 +376,7 @@ public class Card {
 	public void setXMLID(String xmlID)
 	{
 		this.xmlID = xmlID;
-		String type = Main.databaseID.get(id).getType();
+		String type = Main.databaseID.get(xmlID).getType();
 		if ("ancestor".equals(type)) {
 			this.type = CardType.Ancestor;
 		} else if ("celestial".equals(type)) {
