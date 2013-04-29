@@ -58,6 +58,13 @@ import dojo.TextActionListener;
  * 7 - table
  * 8 - focus pool (obsolete)
  * 
+ * X/Y:
+ * Origin is center bottom of play area (of game owner?)
+ * > is +x
+ * < is -x
+ * v is +y
+ * ^ is -y
+ * 
  * flip face down
  * Got:  ["set-card-property", {"cgid": 40, "property": "faceUp", "pid": 1, "value": false}]
  * 
