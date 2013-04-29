@@ -354,9 +354,9 @@ public class GameState
 		if (table.containsKey(cardID)) 
 			return table.get(cardID);
 		if (hand.containsKey(cardID)) 
-			return table.get(cardID);
+			return hand.get(cardID);
 		if (removedFromGame.containsKey(cardID)) 
-			return table.get(cardID);
+			return removedFromGame.get(cardID);
 		for (Card card : dynastyDeck)
 			if(cardID == card.id)
 				return card;
@@ -413,7 +413,7 @@ public class GameState
 		// TODO: report to chat
 	}
 
-	public void moveCard(int cardID, Double x, Double y, boolean faceUp,
+	public void moveCard(int cardID, Double x, Double y, Boolean faceUp,
 			int moverPlayerID, GameArea destGameArea,
 			int destOwnerPlayerID, boolean random,
 			Boolean toTopOfDestGameArea) {
@@ -425,8 +425,71 @@ public class GameState
 			movingCard.x = x;
 			movingCard.y = y;
 		}
-		movingCard.faceUp = faceUp;
-		movingCard.gameArea = destGameArea;
+		if(faceUp != null) {
+			movingCard.faceUp = faceUp;
+		}
+		if(movingCard.gameArea != destGameArea) {
+			changeCardGameArea(movingCard, destGameArea, destOwnerPlayerID, toTopOfDestGameArea);
+		}
+		movingCard.ownerID = destOwnerPlayerID;
+	}
+	
+	public void changeCardGameArea(Card card, GameArea destGameArea, int destPlayerID, Boolean toTopOfDestGameArea) {
+		// Remove the card from the collection/game state it is currently in
+		GameState owningGameState = this;
+		if(card.ownerID != playerID) {
+			owningGameState = opponentStates.get(card.ownerID);
+		}
+		if(card.gameArea == GameArea.DynastyDeck) {
+			owningGameState.dynastyDeck.remove(card);
+		} else if(card.gameArea == GameArea.DynastyDiscard) {
+			owningGameState.dynastyDiscard.remove(card);
+		} else if(card.gameArea == GameArea.FateDeck) {
+			owningGameState.fateDeck.remove(card);
+		} else if(card.gameArea == GameArea.FateDiscard) {
+			owningGameState.fateDiscard.remove(card);
+		} else if(card.gameArea == GameArea.Hand) {
+			owningGameState.hand.remove(card.id);
+		} else if(card.gameArea == GameArea.Table) {
+			owningGameState.table.remove(card.id);
+		}
+		
+		card.gameArea = destGameArea;
+		
+		// Add it to the destination collection/game state
+		GameState destGameState = this;
+		if(destPlayerID != playerID) {
+			destGameState = opponentStates.get(destPlayerID);
+		}
+		if(destGameArea == GameArea.DynastyDeck) {
+			if(toTopOfDestGameArea) {
+				destGameState.dynastyDeck.add(0, card);
+			} else {
+				destGameState.dynastyDeck.add(card);
+			}
+		} else if(destGameArea == GameArea.DynastyDiscard) {
+			if(toTopOfDestGameArea) {
+				destGameState.dynastyDiscard.add(0, card);
+			} else {
+				destGameState.dynastyDiscard.add(card);
+			}
+		} else if(destGameArea == GameArea.FateDeck) {
+			if(toTopOfDestGameArea) {
+				destGameState.fateDeck.add(0, card);
+			} else {
+				destGameState.fateDeck.add(card);
+			}
+		} else if(destGameArea == GameArea.FateDiscard) {
+			if(toTopOfDestGameArea) {
+				destGameState.fateDiscard.add(0, card);
+			} else {
+				destGameState.fateDiscard.add(card);
+			}
+		} else if(destGameArea == GameArea.Hand) {
+			destGameState.hand.put(card.id, card);
+		} else if(destGameArea == GameArea.Table) {
+			destGameState.table.put(card.id, card);
+		}
 	}
 
 	public void revealCard(int cardID, String xmlID) {

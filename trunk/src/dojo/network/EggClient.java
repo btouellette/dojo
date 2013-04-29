@@ -307,8 +307,8 @@ public class EggClient extends Thread
 		// Player ID of the player who owns the area the card is being moved to
 		int destOwnerPlayerID = jsonObject.getInt("pid");
 		int moverPlayerID = jsonObject.getInt("mover");
-		boolean faceUp = jsonObject.getBoolean("faceup");
 		boolean random = jsonObject.getBoolean("random");
+		Boolean faceUp = jsonObject.isNull("faceup") ? null : jsonObject.getBoolean("faceup");
 		Boolean toTopOfDestGameArea = jsonObject.isNull("top") ? null : jsonObject.getBoolean("top");
 		Double x = jsonObject.isNull("x") ? null : jsonObject.getDouble("x");
 		Double y = jsonObject.isNull("y") ? null : jsonObject.getDouble("y");
