@@ -17,7 +17,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -72,7 +71,7 @@ public class Card {
 					// TODO: Allow preference option to disable automatic download
 					try {
 						// Download image pack as zip via http
-						URL url = new URL("http://www.kamisasori.net/files/imagepacks/" + imageEdition + ".zip");
+						URL url = new URL("http://www.kamisasori.net/cards/" + imageEdition + "/" + imageEdition + ".zip");
 						URLConnection urlC = url.openConnection();
 						urlC.setConnectTimeout(500);
 						int fileSize = urlC.getContentLength();
@@ -313,7 +312,7 @@ public class Card {
 		g.fillRect(10, 10, 286, 408);
 		// TODO: Handle long names well
 		// TODO: Use templates that are type appropriate (get F/C and display)
-		String name = Main.databaseID.get(id).getName();
+		String name = Main.databaseID.get(xmlID).getName();
 		Font font = new Font(g.getFont().getFontName(), Font.ITALIC | Font.BOLD, 25);
 		g.setFont(font);
 		int x = (306 - g.getFontMetrics().stringWidth(name)) / 2;

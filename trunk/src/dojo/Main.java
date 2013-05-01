@@ -30,7 +30,7 @@ public class Main
 	// Box for displaying clicked card info
 	static CardInfoBox cardBox;
 	// Main playing surface
-	static PlayArea playArea;
+	public static PlayArea playArea;
 	// Object representing current game state
 	public static GameState state;
 	static JFrame frame;
@@ -445,6 +445,7 @@ public class Main
 			}
 		});
 		// Start the networking module
+		System.setProperty("java.net.useSystemProxies", "true");
 		network = new NetworkCore();
 		network.start();
 		// Check for updates
