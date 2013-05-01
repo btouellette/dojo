@@ -396,7 +396,6 @@ public class GameState
 		// TODO: report to chat
 	}
 	
-
 	public void setCardProperty(int cardID, String property, boolean value, int playerID) {
 		Card card = getCard(cardID);
 		card.ownerID = playerID;
@@ -407,6 +406,7 @@ public class GameState
 		} else if("dishonored".equals(property)) {
 			card.dishonored = value;
 		}
+		Main.playArea.repaint();
 	}
 
 	public void dieRolled(int result, int size, int playerID) {
@@ -432,6 +432,7 @@ public class GameState
 			changeCardGameArea(movingCard, destGameArea, destOwnerPlayerID, toTopOfDestGameArea);
 		}
 		movingCard.ownerID = destOwnerPlayerID;
+		Main.playArea.repaint();
 	}
 	
 	public void changeCardGameArea(Card card, GameArea destGameArea, int destPlayerID, Boolean toTopOfDestGameArea) {

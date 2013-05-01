@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
+public class PlayArea extends JPanel implements MouseListener, MouseMotionListener, ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	// The distance from where the card was clicked to the upper left corner of the base card

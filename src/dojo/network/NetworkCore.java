@@ -128,7 +128,7 @@ public class NetworkCore extends Thread
 	{
 		if(server.isClientConnected()) {
 			server.submitDeck();
-		} else if(client.isConnected()) {
+		} else if(client != null && client.isConnected()) {
 			client.submitDeck(deck);
 		}
 	}
@@ -183,6 +183,32 @@ public class NetworkCore extends Thread
 		throw new IllegalArgumentException();
 	}
 
+	// Translate between our and Egg X/Y locations
+	public int[] eggToDojoXY(int x, int y) {
+		/* X/Y:
+		 * 
+		 * EGG
+		 * Origin is center bottom of play area (of game owner?)
+		 * > is +x
+		 * v is +y
+		 * 190, 5 is bottom right edged
+		 * -190, 5 is bottom left edged
+		 * -210, 30 is off bottom left edge
+		 * 190, -65 is top right edge
+		 * cards are 20 wide and 30 tall
+		 * 
+		 * DOJO
+		 * Origin is top left of play area
+		 * > is +x
+		 * v is +y
+		 * Card origin is top left of card
+		 */
+		int[] newXY = new int[2];
+		int height = Main.playArea.getHeight();
+		int width = Main.playArea.getWidth();
+		return newXY;
+	}
+	
 	public void coinFlipped(boolean value, int playerID) {
 		Main.state.coinFlipped(value, playerID);
 	}
